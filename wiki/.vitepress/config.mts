@@ -11,6 +11,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Usage', link: '/usage' },
       { text: 'Projects', link: '/projects' },
       { text: 'Toolchain Map', link: '/toolchain-map' },
       { text: 'Glossary', link: '/glossary' }
@@ -20,6 +21,7 @@ export default defineConfig({
         text: 'Wiki',
         items: [
           { text: 'Home', link: '/' },
+          { text: 'Usage', link: '/usage' },
           { text: 'Projects', link: '/projects' },
           { text: 'Toolchain Map', link: '/toolchain-map' },
           { text: 'Glossary', link: '/glossary' }

@@ -23,8 +23,22 @@ See `wiki/index.md` for the human-facing wiki entry point.
 wiki/                 Human-readable Markdown wiki and website source
 .agents/              Reusable agent workflows, policies, templates, and skills
 config/target-set.yml Current target set configuration
+projects/             Local workspace for lazily cloned target repositories
 resources/            Images and other static resources
 ```
+
+## Usage
+
+Pixi is the preferred command runner for this repository. It provides the Node.js environment and runs the VitePress website tasks defined in `pixi.toml`.
+
+```bash
+pixi run install
+pixi run docs-dev
+pixi run docs-build
+pixi run docs-preview
+```
+
+See `wiki/usage.md` for target configuration, lazy repository workspace behavior, and documented agent lookup commands.
 
 ## Agent Guidance
 
@@ -35,7 +49,7 @@ Agents must start with `AGENTS.md` before performing wiki lookup, wiki updates, 
 After dependencies are installed, run:
 
 ```bash
-npm run docs:dev
+pixi run docs-dev
 ```
 
 The rendered site uses `wiki/` as its source.

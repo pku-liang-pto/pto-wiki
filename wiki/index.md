@@ -7,6 +7,7 @@ It starts as a map, not as a complete mirror of every upstream project. Pages ar
 ## Start Here
 
 - [Projects](./projects.md): current PTO and CANN repository index.
+- [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.
 - [Toolchain Map](./toolchain-map.md): how the current projects are expected to relate.
 - [Repository Profiles](./repositories/): per-repository documentation as it is created.
 - [Glossary](./glossary.md): terms and acronyms collected during wiki growth.

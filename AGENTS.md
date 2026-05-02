@@ -11,6 +11,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/dependency-and-code-analysis.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
+- `.agents/policies/repository-workspace-policy.md`
 - `.agents/policies/template-reuse-policy.md`
 
 ## Core Rules
