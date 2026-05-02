@@ -15,7 +15,7 @@ The repository is not intended to mirror every upstream project or import every 
 
 PTO-CANN is treated as the first target set for this template. The initial wiki maps PTO projects, CANN projects, runtime and communication components, serving projects, recipes, and related concepts.
 
-See `wiki/README.md` for the human-facing wiki entry point.
+See `wiki/index.md` for the human-facing wiki entry point.
 
 ## Repository Layout
 
