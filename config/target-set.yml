@@ -1,0 +1,68 @@
+name: PTO-CANN Toolchain
+description: >
+  A technical wiki target set for PTO, CANN, runtime, communication,
+  serving, recipe, and related toolchain repositories.
+wiki_scope:
+  posture: incremental
+  source_of_truth: wiki/
+  notes:
+    - The wiki grows from concrete lookup and repository documentation work.
+    - Upstream repositories and documentation remain the source for project-specific facts.
+groups:
+  - name: PTO
+    description: PTO language, runtime, serving, ISA, and supporting projects.
+  - name: CANN
+    description: CANN communication, collective, shared memory, transfer, and recipe projects.
+repositories:
+  - name: pypto_top_level_documents
+    group: PTO
+    url: https://github.com/hengliao1972/pypto_top_level_design_documents
+    role: Top-level PTO design documents.
+  - name: serving-lib
+    group: PTO
+    url: https://github.com/hengliao1972/pypto-serving
+    role: PTO serving library.
+  - name: pto-li
+    group: PTO
+    url: https://github.com/hw-native-sys/pypto-lib
+    role: PTO library project.
+  - name: pypto
+    group: PTO
+    url: https://github.com/hw-native-sys/pypto/
+    role: PTO implementation project.
+  - name: ptoas
+    group: PTO
+    url: https://github.com/zhangstevenunity/PTOAS
+    role: PTOAS project.
+  - name: pto-isa
+    group: PTO
+    url: https://github.com/PTO-ISA/pto-isa
+    role: PTO ISA project.
+  - name: simpler
+    group: PTO
+    url: https://github.com/hw-native-sys/simpler
+    role: Supporting project in the PTO target set.
+  - name: distributed-runtime
+    group: PTO
+    url: https://github.com/hengliao1972/pypto_runtime_distributed
+    role: Distributed PTO runtime.
+  - name: hcomm
+    group: CANN
+    url: https://gitcode.com/cann/hcomm
+    role: CANN communication project.
+  - name: hccl
+    group: CANN
+    url: https://gitcode.com/cann/hccl
+    role: CANN collective communication project.
+  - name: shmem
+    group: CANN
+    url: https://gitcode.com/cann/shmem
+    role: CANN shared memory project.
+  - name: hixl
+    group: CANN
+    url: https://gitcode.com/cann/hixl
+    role: CANN transfer or interconnect project.
+  - name: cann-recipes-infer
+    group: CANN
+    url: https://gitcode.com/cann/cann-recipes-infer
+    role: CANN inference recipe project.
