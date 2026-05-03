@@ -18,6 +18,7 @@ Update `wiki/index.md` whenever adding, renaming, or deleting a durable wiki pag
 Use stable directories for recurring page types:
 
 - `wiki/repositories/`: repository profiles.
+- `wiki/sources/`: concise summaries of user-supplied document materials used as evidence.
 - `wiki/topics/`: feature, design, workflow, issue family, or behavior syntheses.
 - `wiki/concepts/`: reusable technical concepts, APIs, protocols, acronyms, and architecture ideas.
 
@@ -30,7 +31,7 @@ New durable pages should include lightweight YAML frontmatter:
 ```yaml
 ---
 title: "Page Title"
-type: repository | topic | concept | overview | index | usage
+type: repository | source | topic | concept | overview | index | usage
 status: draft | stable
 sources: []
 last_updated: YYYY-MM-DD

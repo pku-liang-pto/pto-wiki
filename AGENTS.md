@@ -7,6 +7,7 @@ This repository is a reusable technical wiki template. Agents must keep reusable
 Before answering lookup requests, updating the wiki, or documenting repositories, read the relevant files:
 
 - `.agents/workflows/wiki-lookup-and-update.md`
+- `.agents/workflows/document-material-ingestion.md`
 - `.agents/workflows/repo-documentation.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
 - `.agents/workflows/github-reference-documentation.md`
@@ -14,6 +15,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/wiki-health-and-lint.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
+- `.agents/policies/document-material-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
 - `.agents/policies/template-reuse-policy.md`
@@ -26,6 +28,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.
+- Keep user-supplied document materials in ignored workspace paths such as `materials/`; summarize durable evidence in `wiki/` instead of committing raw documents.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
 - Distinguish verified facts from inferred architecture.

@@ -46,6 +46,7 @@ The wiki uses a small, queryable Markdown structure:
 - `wiki/overview.md`: living synthesis across the target set.
 - `wiki/log.md`: append-only record of durable wiki maintenance operations.
 - `wiki/repositories/`: repository profiles.
+- `wiki/sources/`: concise summaries of user-supplied document materials.
 - `wiki/topics/`: feature, workflow, behavior, and issue-family syntheses.
 - `wiki/concepts/`: reusable technical concepts and acronyms.
 
@@ -81,6 +82,22 @@ The agent should not update the wiki for one-off debugging state, unsupported gu
 
 The agent should also keep `wiki/index.md`, the relevant area index, `wiki/overview.md`, and `wiki/log.md` current when the update affects navigation, broad synthesis, or durable maintenance history.
 
+### `ingest document material: <path>`
+
+Use this for a user-supplied document file, folder, or zip archive. The agent treats the material as evidence, not repository source code.
+
+The agent enumerates files, safely extracts zip archives to ignored workspace paths, converts readable formats only when local tools are available, records path, archive member, checksum when feasible, ingestion date, and conversion method, then writes concise source summaries under `wiki/sources/`.
+
+Raw documents and extracted archive contents should not be committed unless explicitly requested.
+
+### `ingest folder: <path>`
+
+The agent scans a folder for document materials, skips generated caches and unreadable files, creates source summaries only for files that add durable knowledge, and updates topic or concept pages when the folder supports synthesis beyond individual source summaries.
+
+### `ingest zip: <path>`
+
+The agent lists archive members before extraction, rejects unsafe paths, extracts only to a temporary or ignored workspace, and cites both the archive path and individual member paths used as evidence.
+
 ### `document repository: <repo-name>`
 
 The agent finds the repository in `config/target-set.yml`, clones or syncs it under `repositories/<repository-name>/` when source inspection is required, records the inspected ref and commit SHA, and performs a documentation pass.
@@ -113,7 +130,7 @@ Wiki updates should cite the PR URL, inspected base and head refs, commit SHAs, 
 
 ### `research topic from materials: <repo-name> <topic>`
 
-Use this when you provide notes, logs, file names, symbols, issue links, PR links, branch names, commits, or design fragments about a topic or feature.
+Use this when you provide notes, logs, document files, folders, zip archives, file names, symbols, issue links, PR links, branch names, commits, or design fragments about a topic or feature.
 
 The agent extracts search anchors from the materials, searches the wiki, local repository checkout, git history, and related GitHub issues and PRs, then expands from strong matches through cross-links, commits, branches, changed files, labels, milestones, and comments when relevant.
 

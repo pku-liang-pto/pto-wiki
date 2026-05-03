@@ -1,5 +1,7 @@
 node_modules/
 docs/
+materials/*
+!materials/README.md
 wiki/.vitepress/cache/
 wiki/.vitepress/dist/
 .DS_Store
