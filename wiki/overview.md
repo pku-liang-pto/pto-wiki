@@ -4,7 +4,8 @@ type: overview
 status: draft
 sources:
   - config/target-set.yml
-last_updated: 2026-05-03
+  - wiki/sources/pto-runtime-isa-pypto-evidence-inventory.md
+last_updated: 2026-05-04
 ---
 
 # Overview
@@ -26,3 +27,9 @@ The current target set is defined in `config/target-set.yml`. The wiki starts as
 ## Maintenance Notes
 
 Update this page when new evidence changes the broad synthesis of the target set. Do not rewrite it for every small page edit.
+
+## Current PTO Runtime Synthesis
+
+当前已验证路径是 single-host L3 execution：PyPTO 表达 hierarchy programs，PyPTO distributed codegen/runner 调用 `simpler.Worker(level=3)`，`simpler` 管理 local host/chip/SubWorker execution，PTO-ISA 提供 kernel-level tile 和 communication primitives。HCCL 支撑 data-plane communication/window behavior，但不替代 PTO Runtime control plane。
+
+Remote L3、DistWorker、cross-host callable registration、RoCE/URMA-backed remote runtime control 在仓库证据改变前都记录为 `design-intended`，不能写成已实现能力。

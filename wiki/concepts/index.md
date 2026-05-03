@@ -3,7 +3,7 @@ title: "Concepts"
 type: index
 status: draft
 sources: []
-last_updated: 2026-05-03
+last_updated: 2026-05-04
 ---
 
 # Concepts
@@ -14,4 +14,4 @@ Create a concept page when a term is used across multiple pages and needs a stab
 
 ## Pages
 
-- No concept pages yet.
+- [Distributed Execution Terms](./distributed-execution-terms.md): 分布式 runtime 文档中的标准术语和状态标签。
