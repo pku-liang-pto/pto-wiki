@@ -11,6 +11,7 @@ Go deeper than README summarization. Inspect available evidence in this order:
 3. Source tree structure, entry points, public APIs, major modules, and extension points.
 4. Tests, examples, scripts, CI, deployment files, and generated artifacts.
 5. Cross-repository references, shared concepts, and version or release context.
+6. Requested branch, issue, or pull request context when the documentation task is scoped to one.
 
 ## Output Requirements
 
@@ -23,5 +24,6 @@ Write for humans. Explain:
 - which modules and entry points matter
 - how tests and examples demonstrate expected use
 - what is verified, what is inferred, and what is still unknown
+- which branch, issue, pull request, tag, or commit was inspected when the profile is not based only on the default branch
 
 Use `.agents/templates/repo-profile.md` for new repository profile pages.

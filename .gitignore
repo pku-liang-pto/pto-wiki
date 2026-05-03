@@ -1,6 +1,7 @@
 node_modules/
+docs/
 wiki/.vitepress/cache/
 wiki/.vitepress/dist/
 .DS_Store
-projects/*
-!projects/README.md
+repositories/*
+!repositories/README.md

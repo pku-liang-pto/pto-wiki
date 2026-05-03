@@ -38,14 +38,14 @@ Edit `config/target-set.yml` to change the target set documented by this wiki. K
 
 The wiki should contain human knowledge about the configured target set. Reusable instructions for agents belong under `.agents/`.
 
-## Projects Workspace
+## Repository Workspace
 
-`projects/` is the local workspace for cloned target repositories. It is empty by default except for `projects/README.md`.
+`repositories/` is the local workspace for cloned target repositories. It is empty by default except for `repositories/README.md`.
 
 Agents clone repositories there only when lookup, documentation, or dependency analysis needs source inspection. The default layout is:
 
 ```text
-projects/<group>/<repository-name>/
+repositories/<repository-name>/
 ```
 
 Cloned repositories are local cache data. They should not be committed into this wiki repository.
@@ -58,7 +58,7 @@ The following are human-agent commands, not shell commands. Ask an agent with on
 
 The agent checks `AGENTS.md`, the relevant `.agents/` workflows, `config/target-set.yml`, and existing wiki pages first. If the wiki is missing, stale, or too shallow, the agent locates the smallest relevant repository set and inspects upstream sources as needed.
 
-The answer should be clear prose with citations to source files, upstream documentation, commits, tags, releases, or local clone paths with commit SHAs.
+The answer should be clear prose with citations to source files, upstream documentation, commits, tags, releases, GitHub issues or PRs, or local checkout paths with refs and commit SHAs.
 
 ### `lookup and update wiki: <topic>`
 
@@ -68,15 +68,33 @@ The agent should not update the wiki for one-off debugging state, unsupported gu
 
 ### `document repository: <repo-name>`
 
-The agent finds the repository in `config/target-set.yml`, clones or syncs it under `projects/<group>/<repository-name>/` when source inspection is required, records the inspected commit SHA, and performs a documentation pass.
+The agent finds the repository in `config/target-set.yml`, clones or syncs it under `repositories/<repository-name>/` when source inspection is required, records the inspected ref and commit SHA, and performs a documentation pass.
 
 The resulting profile should explain what the repository does, where it fits in the target set, what the dependencies and build files imply, which entry points matter, what tests or examples show, and what remains unknown.
 
 ### `sync repository: <repo-name>`
 
-The agent checks whether the repository already exists under `projects/`. If it exists, the agent fetches or syncs it before relying on it. If it is missing and source inspection is needed, the agent clones it from the configured upstream URL.
+The agent checks whether the repository already exists under `repositories/`. If it exists, the agent fetches or syncs it before relying on it. If it is missing and source inspection is needed, the agent clones it from the configured upstream URL.
 
-If syncing fails or local clone state is uncertain, the agent should say so instead of treating the clone as fresh.
+If syncing fails or local checkout state is uncertain, the agent should say so instead of treating the checkout as fresh.
+
+### `document branch: <repo-name> <branch>`
+
+The agent fetches the named branch, inspects the branch tip and relevant source context, and records the branch name and commit SHA used as evidence.
+
+When useful, the agent compares the branch against the repository default branch or another explicit base. Wiki updates should explain durable behavior or design facts, not transient branch bookkeeping.
+
+### `document issue: <repo-name> <issue-number>`
+
+The agent inspects the GitHub issue body, state, labels, comments when relevant, linked PRs or commits, and any referenced files. Source inspection happens through `repositories/<repository-name>/` when the issue needs code evidence.
+
+Wiki updates should cite the issue URL and any checked-out refs or source files that support durable findings.
+
+### `document pull request: <repo-name> <pr-number>`
+
+The agent inspects PR title, body, state, base branch, head branch, commits, changed files, and relevant discussion. It fetches the PR head or branch before relying on source claims.
+
+Wiki updates should cite the PR URL, inspected base and head refs, commit SHAs, and relevant source files.
 
 ### `analyze dependencies: <repo-name>`
 
@@ -94,4 +112,4 @@ The output should summarize repository relationships in human-readable terms and
 
 Agents may update this wiki repository with durable documentation, reusable workflow changes, target configuration changes, and website configuration changes when asked.
 
-Agents should not commit cloned target repositories from `projects/`, raw upstream documents copied wholesale, unsupported guesses, or transient command output.
+Agents should not commit cloned target repositories from `repositories/`, raw upstream documents copied wholesale, unsupported guesses, or transient command output.

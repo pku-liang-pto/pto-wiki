@@ -9,6 +9,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/wiki-lookup-and-update.md`
 - `.agents/workflows/repo-documentation.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
+- `.agents/workflows/github-reference-documentation.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
@@ -20,6 +21,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Keep `.agents/` target-set agnostic and reusable.
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
+- Keep local target repository checkouts in `repositories/`.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - Distinguish verified facts from inferred architecture.
 - Do not copy whole upstream documents into this repository.

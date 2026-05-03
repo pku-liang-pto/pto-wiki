@@ -23,7 +23,7 @@ See `wiki/index.md` for the human-facing wiki entry point.
 wiki/                 Human-readable Markdown wiki and website source
 .agents/              Reusable agent workflows, policies, templates, and skills
 config/target-set.yml Current target set configuration
-projects/             Local workspace for lazily cloned target repositories
+repositories/         Local workspace for lazily cloned target repositories
 resources/            Images and other static resources
 ```
 
@@ -38,7 +38,7 @@ pixi run docs-build
 pixi run docs-preview
 ```
 
-See `wiki/usage.md` for target configuration, lazy repository workspace behavior, and documented agent lookup commands.
+See `wiki/usage.md` for target configuration, lazy repository workspace behavior, branch/issue/PR inspection, and documented agent lookup commands.
 
 ## Agent Guidance
 

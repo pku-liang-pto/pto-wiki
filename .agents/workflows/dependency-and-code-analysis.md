@@ -16,6 +16,7 @@ Inspect dependency and repository relationship sources before summarizing behavi
 - CI setup that reveals supported environments
 - scripts or build rules that fetch external source
 - references to other repositories in `config/target-set.yml`
+- branch, issue, or PR-specific dependency changes when the task is scoped to a non-default ref
 
 ## Code Pass
 
@@ -32,4 +33,4 @@ Inspect code structure before making architectural claims:
 
 Summaries must connect code facts to human meaning. Avoid dumping file lists. Explain why a dependency, module, or entry point matters to the target set.
 
-Distinguish verified dependency relationships from inferred relationships. For local clone evidence, cite the inspected path and commit SHA.
+Distinguish verified dependency relationships from inferred relationships. For local checkout evidence, cite the inspected path, ref, and commit SHA.
