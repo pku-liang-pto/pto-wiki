@@ -2,6 +2,8 @@
 
 Use this workflow when documenting a specific branch, issue, pull request, release, or commit from a repository in the target set.
 
+For material-driven topic research that needs to find multiple related issues or PRs, use `.agents/workflows/topic-evidence-discovery.md` before writing the wiki synthesis.
+
 ## Setup
 
 1. Read `AGENTS.md`.

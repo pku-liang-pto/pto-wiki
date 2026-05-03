@@ -13,5 +13,6 @@ Use this skill when answering target-set questions, preserving durable findings 
 7. Search `wiki/` before inspecting upstream sources.
 8. Use `repositories/<repository-name>/` only when source inspection is needed.
 9. For branch, issue, or PR-specific questions, read `.agents/workflows/github-reference-documentation.md`.
-10. Answer with verified facts, inferred architecture, and uncertainty separated.
-11. Update the smallest relevant wiki page only for durable, sourced findings.
+10. For supplied materials about a topic or feature, read `.agents/workflows/topic-evidence-discovery.md`.
+11. Answer with verified facts, inferred architecture, and uncertainty separated.
+12. Update the smallest relevant wiki page only for durable, sourced findings.

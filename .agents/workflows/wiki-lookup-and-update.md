@@ -12,9 +12,10 @@ Use this workflow for questions about the target set, repository behavior, depen
 6. Before relying on an existing checkout when freshness matters, fetch or sync it against the configured upstream.
 7. Inspect repository docs, build files, dependency files, source layout, tests, examples, CI, and relevant commits or releases as required by the question.
 8. For branch, issue, or PR questions, inspect the requested GitHub object and the relevant ref instead of assuming the default branch.
-9. When local checkout evidence is used, record the checkout path, ref, and commit SHA in the answer or wiki citation.
-10. Answer with clear human-readable explanation.
-11. Decide whether the durable knowledge should update `wiki/`.
+9. For material-driven topic questions, use `.agents/workflows/topic-evidence-discovery.md` to search related issues, PRs, commits, branches, and files before synthesizing wiki knowledge.
+10. When local checkout evidence is used, record the checkout path, ref, and commit SHA in the answer or wiki citation.
+11. Answer with clear human-readable explanation.
+12. Decide whether the durable knowledge should update `wiki/`.
 
 ## Update Decision
 

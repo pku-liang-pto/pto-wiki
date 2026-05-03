@@ -10,6 +10,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/repo-documentation.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
 - `.agents/workflows/github-reference-documentation.md`
+- `.agents/workflows/topic-evidence-discovery.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
@@ -23,6 +24,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
+- When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
 - Distinguish verified facts from inferred architecture.
 - Do not copy whole upstream documents into this repository.
 - Prefer incremental wiki updates over broad rewrites unless restructuring clearly improves correctness or navigation.

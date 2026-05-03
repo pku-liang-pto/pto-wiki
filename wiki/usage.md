@@ -96,6 +96,14 @@ The agent inspects PR title, body, state, base branch, head branch, commits, cha
 
 Wiki updates should cite the PR URL, inspected base and head refs, commit SHAs, and relevant source files.
 
+### `research topic from materials: <repo-name> <topic>`
+
+Use this when you provide notes, logs, file names, symbols, issue links, PR links, branch names, commits, or design fragments about a topic or feature.
+
+The agent extracts search anchors from the materials, searches the wiki, local repository checkout, git history, and related GitHub issues and PRs, then expands from strong matches through cross-links, commits, branches, changed files, labels, milestones, and comments when relevant.
+
+The wiki update should be a systematic synthesis. It should explain the topic, the related issues and PRs, the involved branches, commits, and files, verified facts, inferred architecture, and open questions. It should not claim exhaustive coverage unless the search scope makes that defensible.
+
 ### `analyze dependencies: <repo-name>`
 
 The agent inspects dependency and toolchain evidence before summarizing relationships. This includes package manifests, lockfiles, build files, compiler or runtime configuration, vendored dependencies, generated-code configuration, external source-fetch scripts, and CI setup.
