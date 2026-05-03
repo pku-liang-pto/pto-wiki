@@ -38,6 +38,19 @@ Edit `config/target-set.yml` to change the target set documented by this wiki. K
 
 The wiki should contain human knowledge about the configured target set. Reusable instructions for agents belong under `.agents/`.
 
+## Wiki Organization
+
+The wiki uses a small, queryable Markdown structure:
+
+- `wiki/index.md`: entry point and catalog.
+- `wiki/overview.md`: living synthesis across the target set.
+- `wiki/log.md`: append-only record of durable wiki maintenance operations.
+- `wiki/repositories/`: repository profiles.
+- `wiki/topics/`: feature, workflow, behavior, and issue-family syntheses.
+- `wiki/concepts/`: reusable technical concepts and acronyms.
+
+When agents add durable wiki pages, they keep the page reachable from `wiki/index.md` or an area index, cite evidence near factual claims, and append an operation entry to `wiki/log.md`. Broad synthesis changes should update `wiki/overview.md`.
+
 ## Repository Workspace
 
 `repositories/` is the local workspace for cloned target repositories. It is empty by default except for `repositories/README.md`.
@@ -65,6 +78,8 @@ The answer should be clear prose with citations to source files, upstream docume
 The agent performs the lookup flow, then updates the smallest relevant wiki page when the finding is durable, source-backed, and likely to help future readers.
 
 The agent should not update the wiki for one-off debugging state, unsupported guesses, or facts that are too transient to document usefully.
+
+The agent should also keep `wiki/index.md`, the relevant area index, `wiki/overview.md`, and `wiki/log.md` current when the update affects navigation, broad synthesis, or durable maintenance history.
 
 ### `document repository: <repo-name>`
 
@@ -103,6 +118,14 @@ Use this when you provide notes, logs, file names, symbols, issue links, PR link
 The agent extracts search anchors from the materials, searches the wiki, local repository checkout, git history, and related GitHub issues and PRs, then expands from strong matches through cross-links, commits, branches, changed files, labels, milestones, and comments when relevant.
 
 The wiki update should be a systematic synthesis. It should explain the topic, the related issues and PRs, the involved branches, commits, and files, verified facts, inferred architecture, and open questions. It should not claim exhaustive coverage unless the search scope makes that defensible.
+
+Topic syntheses belong under `wiki/topics/` unless a smaller existing page is clearly the better home.
+
+### `check wiki health`
+
+The agent checks structural maintainability: required core files, index or area-index reachability, local links, empty stubs, nearby citations, and `wiki/log.md` coverage for durable operations.
+
+This does not build graph data.
 
 ### `analyze dependencies: <repo-name>`
 

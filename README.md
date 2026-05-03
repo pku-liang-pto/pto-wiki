@@ -38,7 +38,7 @@ pixi run docs-build
 pixi run docs-preview
 ```
 
-See `wiki/usage.md` for target configuration, lazy repository workspace behavior, branch/issue/PR inspection, and documented agent lookup commands.
+See `wiki/usage.md` for target configuration, wiki organization, lazy repository workspace behavior, branch/issue/PR inspection, and documented agent lookup commands.
 
 ## Agent Guidance
 

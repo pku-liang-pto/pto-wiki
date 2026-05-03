@@ -6,14 +6,20 @@ It starts as a map, not as a complete mirror of every upstream project. Pages ar
 
 ## Start Here
 
+- [Overview](./overview.md): living synthesis across the configured target set.
 - [Projects](./projects.md): current PTO and CANN repository index.
 - [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.
 - [Toolchain Map](./toolchain-map.md): how the current projects are expected to relate.
 - [Repository Profiles](./repositories/): per-repository documentation as it is created.
+- [Topics](./topics/): feature, workflow, behavior, and issue-family syntheses.
+- [Concepts](./concepts/): reusable technical concepts and acronyms.
 - [Glossary](./glossary.md): terms and acronyms collected during wiki growth.
+- [Wiki Log](./log.md): append-only record of durable wiki maintenance operations.
 
 ## How This Wiki Grows
 
 When a topic is looked up, agents first check this wiki. If the answer is missing or stale, they inspect the configured target repositories and upstream documentation. Durable, sourced findings are added back here in clear prose.
 
 The wiki should explain what is known, cite where it came from, and preserve uncertainty when evidence is incomplete.
+
+New durable pages should be reachable from this index or an area index. Broad target-set findings should also update [Overview](./overview.md) when they change the synthesis.

@@ -1,3 +1,11 @@
+---
+title: "<Topic Name>"
+type: topic
+status: draft
+sources: []
+last_updated: YYYY-MM-DD
+---
+
 # <Topic Name>
 
 ## Summary

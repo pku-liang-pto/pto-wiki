@@ -1,0 +1,27 @@
+---
+title: "Overview"
+type: overview
+status: draft
+sources:
+  - config/target-set.yml
+last_updated: 2026-05-03
+---
+
+# Overview
+
+This page is the living synthesis for the configured target set. It should summarize durable knowledge that cuts across individual pages and help readers decide where to go next.
+
+The current target set is defined in `config/target-set.yml`. The wiki starts as a map and grows through source-backed lookup, repository documentation, dependency analysis, and topic synthesis work.
+
+## Current Shape
+
+- [Projects](./projects.md) lists configured repositories and their target-set roles.
+- [Toolchain Map](./toolchain-map.md) records the current high-level relationship map.
+- [Repository Profiles](./repositories/) holds per-repository documentation as it is created.
+- [Topics](./topics/) holds feature, workflow, behavior, and issue-family syntheses.
+- [Concepts](./concepts/) holds reusable concepts, APIs, protocols, acronyms, and architecture ideas.
+- [Glossary](./glossary.md) collects terms encountered during wiki growth.
+
+## Maintenance Notes
+
+Update this page when new evidence changes the broad synthesis of the target set. Do not rewrite it for every small page edit.

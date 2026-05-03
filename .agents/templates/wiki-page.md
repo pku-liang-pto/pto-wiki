@@ -1,3 +1,11 @@
+---
+title: "Page Title"
+type: topic
+status: draft
+sources: []
+last_updated: YYYY-MM-DD
+---
+
 # Page Title
 
 Write a short human-readable summary of the topic.

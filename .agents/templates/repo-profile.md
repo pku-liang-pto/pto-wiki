@@ -1,3 +1,11 @@
+---
+title: "Repository Name"
+type: repository
+status: draft
+sources: []
+last_updated: YYYY-MM-DD
+---
+
 # Repository Name
 
 Short summary of what the repository does and where it fits in the target set.

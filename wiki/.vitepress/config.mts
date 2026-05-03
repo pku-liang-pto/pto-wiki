@@ -13,6 +13,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Usage', link: '/usage' },
       { text: 'Projects', link: '/projects' },
+      { text: 'Topics', link: '/topics/' },
       { text: 'Toolchain Map', link: '/toolchain-map' },
       { text: 'Glossary', link: '/glossary' }
     ],
@@ -23,7 +24,10 @@ export default defineConfig({
           { text: 'Home', link: '/' },
           { text: 'Usage', link: '/usage' },
           { text: 'Projects', link: '/projects' },
+          { text: 'Overview', link: '/overview' },
           { text: 'Toolchain Map', link: '/toolchain-map' },
+          { text: 'Topics', link: '/topics/' },
+          { text: 'Concepts', link: '/concepts/' },
           { text: 'Glossary', link: '/glossary' }
         ]
       },

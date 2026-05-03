@@ -19,7 +19,7 @@ Materials may include prose, issue or PR URLs, branch names, commits, design not
    - issues and PRs by keyword, label, author, assignee, file path, symbol, branch, commit, and linked references
    - PR commits, changed files, review threads or comments when relevant
    - issue comments and linked PRs or commits when they affect the topic
-6. Expand the evidence graph from strong matches:
+6. Expand the evidence set from strong matches:
    - issue and PR cross-links
    - closing keywords and linked commits
    - branch names, commit messages, release notes, labels, milestones, and referenced files
@@ -29,7 +29,8 @@ Materials may include prose, issue or PR URLs, branch names, commits, design not
    - supporting: explains design, dependency, test, release, or context
    - rejected: similar terms but unrelated
 8. Inspect primary and supporting evidence deeply enough to explain the topic in human terms.
-9. Write or update the smallest useful wiki page with a synthesis, not a dump of links.
+9. Write or update the smallest useful page under `wiki/topics/` with a synthesis, not a dump of links.
+10. Update `wiki/topics/index.md`, `wiki/index.md`, `wiki/overview.md` when warranted, and `wiki/log.md`.
 
 ## Output Standard
 
@@ -40,6 +41,7 @@ The wiki should explain:
 - the timeline or evolution when that matters
 - verified facts, inferred architecture, and unresolved questions
 - rejected or ambiguous evidence when it prevents overclaiming
+- links to related repository and concept pages when they exist
 
 ## Citation Standard
 

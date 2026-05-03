@@ -11,7 +11,9 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/dependency-and-code-analysis.md`
 - `.agents/workflows/github-reference-documentation.md`
 - `.agents/workflows/topic-evidence-discovery.md`
+- `.agents/workflows/wiki-health-and-lint.md`
 - `.agents/policies/wiki-update-policy.md`
+- `.agents/policies/wiki-organization-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
 - `.agents/policies/template-reuse-policy.md`
@@ -19,6 +21,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 ## Core Rules
 
 - Keep `wiki/` human-readable.
+- Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
 - Keep `.agents/` target-set agnostic and reusable.
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
