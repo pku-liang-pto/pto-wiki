@@ -60,6 +60,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 根据 wiki-only learner review，新增 [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md)，把 `simpler/docs/` 的 L2 三程序模型、L3+ component composition、TaskArgs data flow、TensorMap/ring、Scheduler、WorkerManager、THREAD/PROCESS mode 和 worker examples 合成到 wiki。同步扩展 [Basic Terms](./concepts/basic-terms.md)、[Examples Feature Map](./topics/examples-feature-map.md)、[Distributed Execution](./topics/distributed-execution.md)、[CANN Foundation](./concepts/cann-foundation.md) 和 evidence claim maps，使示例、基础概念、status labels 和 evidence summaries 更接近 self-contained learning material。
 
+## [2026-05-04] review-update | Normalize material whitespace before merge
+
+清理 tracked material extraction 中触发 `git diff --check` 的 trailing whitespace，并同步更新 [Distributed Execution Evidence](./evidence/distributed-execution.md) 中对应 extracted file checksums。Archive checksum 保持不变。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

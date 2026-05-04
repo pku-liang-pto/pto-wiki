@@ -40,7 +40,7 @@ All material files are UTF-8 Markdown extracted from `materials/pto-runtime-dist
 
 | Material file | SHA256 | Routed to |
 | --- | --- | --- |
-| `00_README.md` | `4cc83553d71061972aaaa0d4b7b2d2a3cd12eb4c9aab90271d4ccf245301b039` | distributed status, remote gaps, GitHub status cross-check |
+| `00_README.md` | `3e3ec6e2cd5060d4685f84fa97a6738f1e29a6116a710bed1c1d82ea644ba8ac` | distributed status, remote gaps, GitHub status cross-check |
 | `01_hardware_and_software_stack.md` | `e2809e99cebb68dacf7de58fe231a02979351c97a3bfb9cec26e3edf6b446d48` | CANN/HCCL/HCOMM/URMA/RoCE boundaries |
 | `02_pto_isa_and_runtime_basics.md` | `5cb27ce861f9d05bd105baa4a33045d85b46b840025c4f0ba9f874619f89aa14` | runtime foundation, TensorMap, CommContext, deferred completion |
 | `03_distributed_blueprint.md` | `3aba7b8f09816c1defcfd592f5c1b41176e3b31323475cc154999c618b4bc4bc` | remote L3 and design-intended target path |
@@ -49,7 +49,7 @@ All material files are UTF-8 Markdown extracted from `materials/pto-runtime-dist
 | `06_development_tasks.md` | `57efef8208d90a6b44d831ac06338757e92ac4f18db68396fa5abd82cc5c4311` | durable task categories and takeover risks |
 | `07_source_notes.md` | `511c5675f153565870cab4b25ce1ff4c492de419eb970590eb96c413096d0550` | evidence trust boundary |
 | `08_top_level_design_alignment.md` | `398f5aa350e67fabf1f40a6c1d49539386fadfad298f7c3bfd5fc70b713043e7` | Lingqu/L0-L6 alignment |
-| `PTO-Runtime分布式拓展文档系统设计.md` | `ff0ffe31fc5c63ce432be1d6a322eb12201847149e1d7ba6921970062cb5dda6` | wiki writing priority and maintainer audience |
+| `PTO-Runtime分布式拓展文档系统设计.md` | `395352e67313ff31514b983876b9770cbe87e67c33580d9edd347c4fe4cc967a` | wiki writing priority and maintainer audience |
 
 ## Material Routing
 
