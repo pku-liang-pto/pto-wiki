@@ -40,6 +40,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 将“本 wiki 不能只覆盖 distributed features”写入 `AGENTS.md`、wiki policy、topic workflow、health checks、templates 和 [Usage](./usage.md)。明确 non-distributed foundations 是必备基础，examples 是 first-class documentation，需要 background、progression、cross-repo comparison、optimization notes 和 missing-example TODO/status。
 
+## [2026-05-04] topic-synthesis | Close Phase 2 wiki synthesis gaps
+
+补齐 [Examples Feature Map](./topics/examples-feature-map.md) 的 run surface、environment assumptions 和 not-run caveats；扩展 [Distributed Execution Terms](./concepts/distributed-execution-terms.md) 的 cross-repository name map；在 repository profiles 中补充 evidence-based interpretation，明确 non-distributed foundations 与 distributed extension 的阅读边界。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

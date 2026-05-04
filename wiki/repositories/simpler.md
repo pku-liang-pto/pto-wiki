@@ -123,6 +123,10 @@ Python test/example
 - `emerging`: SDMA async completion、多 callable DAG 的更广组合、deferred completion 的后续统一。
 - `design-intended`: remote L3、跨 host child worker、remote callable registration、RoCE/URMA remote control plane。
 
+## Evidence-Based Interpretation
+
+本页把 `simpler` 放在 wiki 的 runtime foundation layer：L2 `ChipWorker` 是最小可运行单元，L3 是 host-side DAG scheduler 组合多个 L2 chip worker 和 Python `SubWorker` 的层级 runtime。这个判断来自 `docs/chip-level-arch.md`、`src/a2a3/docs/runtimes.md`、`docs/orchestrator.md`、`docs/scheduler.md`、`python/simpler/worker.py` 和 `examples/workers/l2` / `examples/workers/l3`。材料中的 remote L3/DistWorker 设计应读作下一层目标，而不是覆盖这条已实现的 L2/L3 foundation。
+
 ## 未决问题
 
 - remote control channel 会成为 `simpler` 内部 backend，还是由独立 distributed runtime 调用 `simpler` local worker？

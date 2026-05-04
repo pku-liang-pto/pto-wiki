@@ -91,6 +91,10 @@ include/pto/pto-inst.hpp
 
 PyPTO 负责 Python DSL、IR、pass 和 codegen。它生成或调用的低层 kernel 最终需要落到 PTO-ISA 或相关 C++ runtime API。`pto-isa` README 的 roadmap 包含 collective communication extension 和 system scheduling extension；这与 PyPTO 的 distributed collectives 议题方向一致，但目前不能把 roadmap 写成 PyPTO 已实现 API。
 
+## Evidence-Based Interpretation
+
+本页把 `pto-isa` 解释为 kernel/ISA foundation，而不是 runtime orchestrator。证据来自 README、`include/pto/README.md`、baseline add/GEMM/Flash Attention demos、CPU demos、`include/pto/comm/README.md` 和 allgather async demo。通信 primitive 是 distributed execution 的必要支撑，但它只证明 kernel/rank/data movement 能力；worker lifecycle、DAG scheduling、remote callable registry 仍属于 runtime/PyPTO/simpler 组合需要证明的层面。
+
 ## 未决问题
 
 - PyPTO `pl.all_reduce` 等 orchestration-level collective 会直接发 PTO-ISA collective，还是先走 simpler runtime/HCCL window？

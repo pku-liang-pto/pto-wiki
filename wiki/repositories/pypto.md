@@ -67,6 +67,25 @@ Python DSL (@pl.program / @pl.function)
 
 这条路径面向普通 operator 编译执行。Distributed runner 只有在 L3+ hierarchy program 被识别时才进入。
 
+## 非分布式示例和测试表面
+
+README 将 examples 明确分成 hello world、kernel examples 和 model examples，并给出 `python examples/hello_world.py`、`python examples/kernels/06_softmax.py`、`python examples/models/01_ffn.py` 这类入口。unit tests 的 README 命令是 `python -m pytest tests/ut -n auto --maxprocesses 8 -v`。
+
+| 文件 | 重点 | 运行/验证表面 |
+| --- | --- | --- |
+| `examples/hello_world.py` | 最小 `@pl.program`，`InCore` + `Orchestration`，`pl.load/add/store` | `python examples/hello_world.py` prints `HelloWorldProgram.as_python()` |
+| `examples/kernels/01_elementwise.py` | add/mul 等基础 tile ops | script-level print/IR example |
+| `examples/kernels/03_matmul.py` | matmul / matmulacc API | script-level print/IR example |
+| `examples/kernels/06_softmax.py` | row max、exp、row sum 等 attention 前置基础 | README representative kernel command |
+| `examples/kernels/07_normalization.py` | RMSNorm / LayerNorm | script-level print/IR example |
+| `examples/models/01_ffn.py` | transformer FFN building block | README representative model command |
+| `examples/models/03_flash_attention.py` | online softmax、loop-carried state、QK/PV attention | `python examples/models/03_flash_attention.py` from docstring |
+| `examples/models/04_paged_attention.py` | KV cache / block table / golden validation | hardware/runtime path via `RunConfig(platform="a2a3", ...)` |
+| `examples/models/08_llama_mini.py` | compact LLaMA-style decoder baseline | program builder; no inspected `__main__` command |
+| `tests/ut/` | parser、IR、pass、codegen、type/error behavior | README unit-test command |
+
+这些例子构成 distributed 页面必须依赖的 foundation layer：如果不能解释普通 `@pl.program`、tile lowering、model examples 和 runtime runner，就不应直接从 L3 distributed runner 开始讲 PyPTO。
+
 ## Distributed Extension: Level / Role
 
 `function.h` 中的 `Level` 包含 `AIV`、`AIC`、`CORE_GROUP`、`CHIP_DIE`、`CHIP`、`HOST`、`CLUSTER_0`、`CLUSTER_1`、`CLUSTER_2`、`GLOBAL`，并通过 `LevelToLinquLevel()` 映射到 Lingqu 层级。`Role` 目前区分 `Orchestrator` 和 `SubWorker`。
@@ -105,6 +124,10 @@ DistributedCompiledProgram
 ## 与 Lingqu 设计的关系
 
 PyPTO 的 `LevelToLinquLevel()` 与 top-level design 中的 L0-L6 方向一致，但当前实现和测试的重心是 HOST/CHIP/CORE_GROUP 附近。Lingqu L4-L6 在本轮证据中仍应写为 `design-intended` 或 `open question`。
+
+## Evidence-Based Interpretation
+
+本页的判断是：PyPTO 的主线是普通 DSL -> IR -> pass -> codegen -> runtime path；distributed codegen/runner 是在这条主线上识别 L3+ hierarchy 后进入的扩展路径。证据来自 README examples、`hello_world.py`、parser/pass/compile source、`function.h` level enum、distributed codegen tests 和 `distributed_runner.py`。因此“PyPTO 已支持 single-host L3 hierarchy execution”可以写为 `implemented`；“remote L3、多 host、完整 distributed NN”仍应写为 `design-intended` 或 `TODO`。
 
 ## 未决问题
 

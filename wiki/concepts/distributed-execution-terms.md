@@ -44,3 +44,18 @@ last_updated: 2026-05-04
 - 写 `implemented` 分布式能力时，必须能落到源码、测试、示例或合并 PR。
 - 写 remote L3、DistWorker、跨 host callable registry 时，默认使用 `design-intended`，除非后续出现可运行证据。
 - 引用 HCCL 时，只说明 collective/window/data movement 支撑，不把它说成 PTO runtime scheduler。
+
+## Cross-Repository Name Map
+
+同一个分布式概念在三个仓库里的名字不完全一致。写 wiki 时优先使用本页“术语”列的 canonical wording；引用源码时保留 source-native identifier。
+
+| Canonical wording | simpler source wording | PyPTO source wording | PTO-ISA source wording | Status / evidence |
+| --- | --- | --- | --- | --- |
+| L2 chip execution unit | `Worker(level=2)`, `ChipWorker`, `ChipCallable`, `CoreCallable` | `CHIP`, `CORE_GROUP`, `AIC`, `AIV` levels in `Level` enum | kernel launch / PTO tile kernel | `implemented`; simpler `examples/workers/l2/*`, PyPTO `include/pypto/ir/function.h`, PTO-ISA baseline demos. |
+| L3 host orchestration | `Worker(level=3)`, host `Orchestrator`, `submit_next_level`, `submit_sub` | HOST `Orchestrator`; distributed codegen emits `submit_next_level` and `submit_sub`; runner uses `Worker(level=3)` | not a runtime scheduler concept | `implemented` for single-host L3; simpler L3 examples and PyPTO distributed runner/tests. |
+| Same-level Python callback | `SubWorker`, registered before `init()` | `Role::SubWorker`; generated Python host module collects subworker callables | not applicable | `implemented`; simple host-side reduce/verification path, not chip collective primitive. |
+| Tensor argument dependency | `TaskArgs`, `TensorArgType`, TensorMap lookup/insert | generated `TaskArgs`, `TensorArgType`, `make_tensor_arg` in distributed codegen | tensor descriptors / `GlobalTensor` at kernel level | `implemented`; simpler orchestrator docs and PyPTO unit tests anchor the lowering. |
+| Cross-rank communication memory | `ChipCommBootstrapConfig`, `ChipContext`, `CommContext`, comm window | runtime-facing distributed program passes tensor args into simpler; orchestration-level collective API still design-intended | `AsyncSession`, `TPUT_ASYNC`, `TGET_ASYNC`, `TNOTIFY`, `TWAIT` | data plane `implemented`; PyPTO collective API `design-intended` / `open question`. |
+| Communication backend | HCCL backend or sim backend behind platform-neutral comm C API | backend selected indirectly through simpler runtime path | SDMA/URMA communication primitive demos | `implemented` as supporting data-plane; not the owner of runtime control flow. |
+| Remote distributed worker | remote child worker / remote L3 target in material bundle | higher Lingqu levels and generated hierarchy are partially present | URMA/RoCE primitive direction, not callable registry | `design-intended`; material blueprint, no stable remote control-plane test in inspected source. |
+| Lingqu level terminology | L0-L6 runtime model in docs/materials | `LevelToLinquLevel()` source-native identifier maps PyPTO enum to Lingqu level | not primary taxonomy | mixed: L3 implemented; L4-L6 mostly `design-intended` / `open question`. |
