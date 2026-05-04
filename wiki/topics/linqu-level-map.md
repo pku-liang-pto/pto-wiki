@@ -6,6 +6,7 @@ sources:
   - repositories/pypto_top_level_documents/linqu_runtime_design.md
   - repositories/pypto/include/pypto/ir/function.h
   - materials/pto-runtime-distributed/08_top_level_design_alignment.md
+  - wiki/evidence/linqu-level-map.md
 last_updated: 2026-05-04
 ---
 
@@ -35,6 +36,8 @@ last_updated: 2026-05-04
 - L0-L3：可以写具体 repo 事实，但要区分 PTO-ISA kernel、simpler runtime 和 PyPTO DSL。
 - L4-L6：只能写设计目标，不能写成当前实现。
 - `GLOBAL`：PyPTO enum 存在，但 runtime 语义需要后续证据。
+
+这些状态标签的证据边界见 [Linqu Level Map Evidence](../evidence/linqu-level-map.md#claim-map)。
 
 ## 术语对齐
 

@@ -41,4 +41,4 @@ For each material or material bundle used for durable wiki facts, record:
 - conversion tool or method when conversion was needed
 - limitations, unreadable files, or excluded files
 
-Do not copy whole upstream or user-supplied documents into `wiki/`. Create concise source summaries and cite the material evidence near factual claims.
+Do not copy whole upstream or user-supplied documents into `wiki/`. Record durable material evidence in topic-scoped `wiki/evidence/` ledgers and cite material evidence near factual claims.

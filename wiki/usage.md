@@ -46,7 +46,7 @@ The wiki uses a small, queryable Markdown structure:
 - `wiki/overview.md`: living synthesis across the target set.
 - `wiki/log.md`: append-only record of durable wiki maintenance operations.
 - `wiki/repositories/`: repository profiles.
-- `wiki/sources/`: concise summaries of user-supplied document materials.
+- `wiki/evidence/`: topic-scoped evidence ledgers for material, GitHub, external-document, and cross-repository claims.
 - `wiki/topics/`: feature, workflow, behavior, and issue-family syntheses.
 - `wiki/concepts/`: reusable technical concepts and acronyms.
 
@@ -86,13 +86,13 @@ The agent should also keep `wiki/index.md`, the relevant area index, `wiki/overv
 
 Use this for a user-supplied document file, folder, or zip archive. The agent treats the material as evidence, not repository source code.
 
-The agent enumerates files, safely extracts zip archives to ignored workspace paths, converts readable formats only when local tools are available, records path, archive member, checksum when feasible, ingestion date, and conversion method, then writes concise source summaries under `wiki/sources/`.
+The agent enumerates files, safely extracts zip archives to ignored workspace paths, converts readable formats only when local tools are available, records path, archive member, checksum when feasible, ingestion date, and conversion method, then updates the relevant topic-scoped ledger under `wiki/evidence/`.
 
 Raw documents and extracted archive contents should not be committed unless explicitly requested.
 
 ### `ingest folder: <path>`
 
-The agent scans a folder for document materials, skips generated caches and unreadable files, creates source summaries only for files that add durable knowledge, and updates topic or concept pages when the folder supports synthesis beyond individual source summaries.
+The agent scans a folder for document materials, skips generated caches and unreadable files, records durable material evidence in topic-scoped ledgers, and updates topic or concept pages when the folder supports synthesis.
 
 ### `ingest zip: <path>`
 

@@ -18,6 +18,8 @@ Explain the topic or feature in human terms. State the repository or target-set 
 | --- | --- | --- |
 | <issue, PR, commit, branch, file, or material> | Primary / Supporting / Rejected | <why it matters or why it was excluded> |
 
+For topics that rely on user materials, GitHub references, external documents, or cross-repository synthesis, create a paired `wiki/evidence/<topic>.md` ledger and cite it where status labels or synthesis claims need an audit trail.
+
 ## Verified Facts
 
 - <Fact with nearby citation.>

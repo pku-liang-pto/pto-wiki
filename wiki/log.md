@@ -14,7 +14,7 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ## [2026-05-04] source-ingestion | PTO Runtime distributed material bundle
 
-将 `materials/pto-runtime-distributed.zip` 提取为 tracked source evidence `materials/pto-runtime-distributed/`，排除 archive metadata files。checksum 和材料覆盖记录在 [PTO Runtime / PTO-ISA / PyPTO Evidence Inventory](./sources/pto-runtime-isa-pypto-evidence-inventory.md)。
+将 `materials/pto-runtime-distributed.zip` 提取为 tracked source evidence `materials/pto-runtime-distributed/`，排除 archive metadata files。checksum 和材料覆盖记录在 topic-scoped evidence ledgers, starting with [Distributed Execution Evidence](./evidence/distributed-execution.md)。
 
 ## [2026-05-04] repo-profile | simpler, pto-isa, pypto documentation pass
 
@@ -26,7 +26,11 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ## [2026-05-04] repo-profile | Add non-distributed foundations after PR review
 
-根据 PR review，补充 [simpler](./repositories/simpler.md) 的 L0-L2 Ascend launch path、`tensormap_and_ringbuffer` runtime 和 L2 examples；补充 [pto-isa](./repositories/pto-isa.md) 的 tile/programming-model、baseline/CPU/kernel examples；补充 [pypto](./repositories/pypto.md) 的普通 DSL、parser、pass pipeline、compile/run path。同步扩展 [Evidence Inventory](./sources/pto-runtime-isa-pypto-evidence-inventory.md) 的非分布式基础证据。
+根据 PR review，补充 [simpler](./repositories/simpler.md) 的 L0-L2 Ascend launch path、`tensormap_and_ringbuffer` runtime 和 L2 examples；补充 [pto-isa](./repositories/pto-isa.md) 的 tile/programming-model、baseline/CPU/kernel examples；补充 [pypto](./repositories/pypto.md) 的普通 DSL、parser、pass pipeline、compile/run path。同步扩展 topic-scoped evidence ledgers 的非分布式基础证据。
+
+## [2026-05-04] navigation-update | Replace sources with topic evidence ledgers
+
+将 `wiki/sources/` 替换为 [Evidence](./evidence/) 区域。Evidence pages 按 topic 组织，用于记录 materials、GitHub references、repository anchors、claim maps、negative findings 和 open questions；raw materials 仍留在 `materials/` workspace。
 
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 

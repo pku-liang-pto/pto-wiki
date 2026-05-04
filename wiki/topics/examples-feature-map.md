@@ -5,7 +5,9 @@ status: draft
 sources:
   - repositories/simpler/examples/
   - repositories/pto-isa/demos/
+  - repositories/pypto/examples/
   - repositories/pypto/tests/st/distributed/
+  - wiki/evidence/examples-feature-map.md
 last_updated: 2026-05-04
 ---
 
@@ -19,6 +21,8 @@ last_updated: 2026-05-04
 2. 再读 `pto-isa` 的 add/GEMM/CPU demos，理解 tile/kernel 层和 operator packaging。
 3. 再读 `simpler` L2 examples，理解一个 Ascend chip 上的 launch path。
 4. 最后读 `simpler` L3 examples 和 `pypto` distributed tests，理解 distributed execution 如何建立在前三层基础上。
+
+示例选择、状态标签和“不应误读”项的证据记录在 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)。
 
 ## 示例矩阵
 

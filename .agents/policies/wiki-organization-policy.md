@@ -18,8 +18,8 @@ Update `wiki/index.md` whenever adding, renaming, or deleting a durable wiki pag
 Use stable directories for recurring page types:
 
 - `wiki/repositories/`: repository profiles.
-- `wiki/sources/`: concise summaries of user-supplied document materials used as evidence.
 - `wiki/topics/`: feature, design, workflow, issue family, or behavior syntheses.
+- `wiki/evidence/`: topic-scoped evidence ledgers for user materials, GitHub references, external documents, repository anchors, claim maps, negative findings, and open questions.
 - `wiki/concepts/`: reusable technical concepts, APIs, protocols, acronyms, and architecture ideas.
 
 Add new top-level wiki directories only when repeated pages justify the area. Prefer extending these areas before introducing a new taxonomy.
@@ -31,7 +31,7 @@ New durable pages should include lightweight YAML frontmatter:
 ```yaml
 ---
 title: "Page Title"
-type: repository | source | topic | concept | overview | index | usage
+type: repository | topic | evidence | concept | overview | index | usage
 status: draft | stable
 sources: []
 last_updated: YYYY-MM-DD
@@ -47,6 +47,8 @@ Each durable page should link to:
 - its parent area index when one exists
 - related repository, topic, or concept pages
 - source evidence near the claims it supports
+
+Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis should cite a paired `wiki/evidence/<topic>.md` page where the evidence is needed. Small topic pages based only on nearby direct repository citations do not need a paired evidence page.
 
 Use normal Markdown links for file paths and URLs. Do not require graph data or graph-specific wikilink syntax.
 

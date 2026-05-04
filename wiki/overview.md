@@ -4,7 +4,7 @@ type: overview
 status: draft
 sources:
   - config/target-set.yml
-  - wiki/sources/pto-runtime-isa-pypto-evidence-inventory.md
+  - wiki/evidence/distributed-execution.md
 last_updated: 2026-05-04
 ---
 
@@ -19,7 +19,7 @@ The current target set is defined in `config/target-set.yml`. The wiki starts as
 - [Projects](./projects.md) lists configured repositories and their target-set roles.
 - [Toolchain Map](./toolchain-map.md) records the current high-level relationship map.
 - [Repository Profiles](./repositories/) holds per-repository documentation as it is created.
-- [Sources](./sources/) holds concise summaries of user-supplied document materials used as evidence.
+- [Evidence](./evidence/) holds topic-scoped evidence ledgers for material, GitHub, and cross-repository claims.
 - [Topics](./topics/) holds feature, workflow, behavior, and issue-family syntheses.
 - [Concepts](./concepts/) holds reusable concepts, APIs, protocols, acronyms, and architecture ideas.
 - [Glossary](./glossary.md) collects terms encountered during wiki growth.

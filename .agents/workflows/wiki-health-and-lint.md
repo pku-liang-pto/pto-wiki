@@ -22,6 +22,7 @@ Use periodically or when the wiki has grown after several updates:
 - conflicting claims across pages
 - sparse pages that should be merged or expanded
 - missing topic or concept pages for terms repeatedly referenced in multiple pages
+- missing paired `wiki/evidence/<topic>.md` pages for topic pages that rely on material, GitHub, external-document, or cross-repository synthesis claims
 - data gaps where the wiki cannot answer an expected target-set question
 
 ## Scope Boundary

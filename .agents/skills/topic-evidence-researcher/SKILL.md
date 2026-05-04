@@ -33,6 +33,6 @@ Use `document-material-ingester` first when the topic starts from files, folders
 
 ## Synthesis
 
-Write or update the smallest useful `wiki/topics/` page. Explain what the topic is, which repositories and refs are involved, the timeline when relevant, what is verified, what is inferred, and which evidence was rejected to avoid overclaiming.
+Write or update the smallest useful `wiki/topics/` page. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger with source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions.
 
 Do not claim exhaustive discovery unless the search scope and queries make that defensible. Prefer listing the anchors searched and the strongest related evidence.

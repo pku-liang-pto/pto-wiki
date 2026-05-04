@@ -36,8 +36,8 @@ Also read `.agents/policies/document-material-policy.md` when user-supplied mate
 - Use the smallest relevant page.
 - Create new pages only for durable standalone scope.
 - Put repository profiles in `wiki/repositories/`.
-- Put user material source summaries in `wiki/sources/`.
 - Put feature, behavior, workflow, and issue-family synthesis in `wiki/topics/`.
+- Put topic-scoped evidence ledgers in `wiki/evidence/` when a topic uses materials, GitHub references, external documents, or cross-repository synthesis.
 - Put reusable terms and architecture concepts in `wiki/concepts/`.
 
 When navigation or synthesis changes, update `wiki/index.md`, the relevant area index, `wiki/overview.md`, and append `wiki/log.md`.

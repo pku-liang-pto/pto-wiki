@@ -1,0 +1,98 @@
+---
+title: "Distributed Execution Evidence"
+type: evidence
+status: draft
+sources:
+  - materials/pto-runtime-distributed/
+  - repositories/simpler/
+  - repositories/pto-isa/
+  - repositories/pypto/
+  - repositories/hccl/
+last_updated: 2026-05-04
+---
+
+# Distributed Execution Evidence
+
+This ledger supports [Distributed Execution](../topics/distributed-execution.md). It records why current distributed claims are labeled `implemented`, `emerging`, `design-intended`, `stale`, or `open question`.
+
+## Status Labels
+
+- `implemented`: source, test, example, or merged PR exists.
+- `emerging`: open PR/issue, skipped test, or partial implementation exists.
+- `design-intended`: material or design document describes the target, but stable source evidence is missing.
+- `stale`: older issue/material exists but later source or material supersedes it.
+- `open question`: evidence is insufficient or conflicting.
+
+## Source Set
+
+| Source | Ref / checksum | Role |
+| --- | --- | --- |
+| `materials/pto-runtime-distributed.zip` | SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0`; extracted 2026-05-04 | material bundle and design blueprint |
+| `materials/pto-runtime-distributed/` | 10 real files, 3843 lines; `__MACOSX` and `._*` excluded | extracted material evidence |
+| `repositories/simpler` | `main` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` | runtime implementation, L2/L3 examples, comm/window APIs |
+| `repositories/pto-isa` | `main` commit `a977dd1161222a8b779fb5ff5d1c8b7f4518c3a2` | tile and communication ISA evidence |
+| `repositories/pypto` | `main` commit `f21c2dd48cfe1e5c4add78b0e391a31196420862` | DSL/codegen/distributed runner evidence |
+| `repositories/hccl` | `master` commit `e8c897660d2afd02b1428b1daa2ce9576f00a5cd` | supporting collective/send/recv API evidence |
+
+## Material Routing
+
+| Material file | Distributed-execution details used | Other topic destination |
+| --- | --- | --- |
+| `00_README.md` | remote L3 worker gaps, callable registration gaps, child-worker sync limits, ABI/deployment coupling, PR/issue status | [Examples Feature Map Evidence](./examples-feature-map.md) for PR/demo routing |
+| `01_hardware_and_software_stack.md` | Ascend/CANN/HCCL/HCOMM/URMA/RoCE boundary, control-plane vs data-plane split | [Linqu Level Map Evidence](./linqu-level-map.md) for hardware hierarchy context |
+| `02_pto_isa_and_runtime_basics.md` | worker hierarchy, mailbox, TensorMap/child memory, CommContext/window, deferred completion, current-runtime limits | [Examples Feature Map Evidence](./examples-feature-map.md) for L2/L3 learning examples |
+| `03_distributed_blueprint.md` | target topology, remote worker model, rank/affinity, bootstrap, persistent run_loop, platform decoupling | [Linqu Level Map Evidence](./linqu-level-map.md) for L4-L6 design-intended labels |
+| `04_feature_deep_dives.md` | remote L3, callable registry, worker memory, comm window, deferred completion, send/recv runtime | none beyond distributed topic |
+| `05_progress_and_timeline.md` | merged/open PR and issue timeline for simpler/PyPTO distributed features | [Examples Feature Map Evidence](./examples-feature-map.md) for representative examples |
+| `06_development_tasks.md` | P0/P1/P2 future work and distributed gaps | not copied as task tracker; summarized as open questions |
+| `07_source_notes.md` | evidence trust boundary and source priority | supports all evidence pages |
+| `08_top_level_design_alignment.md` | HostWorker/DistWorker and L0-L6 mapping | [Linqu Level Map Evidence](./linqu-level-map.md) |
+| `PTO-Runtime分布式拓展文档系统设计.md` | writing priority: repo intuition, examples, repo-specific architecture, distributed as second reading layer, HCCL as supporting evidence | informs organization, not target-system facts |
+
+## Repository Anchors
+
+| Repository | Anchors |
+| --- | --- |
+| `simpler` | `README.md`; `docs/chip-level-arch.md`; `src/a2a3/docs/runtimes.md`; `docs/orchestrator.md`; `docs/scheduler.md`; `python/simpler/worker.py`; `python/simpler/task_interface.py`; `src/common/hierarchical/worker_manager.h`; `src/common/platform_comm/comm.h`; `src/common/platform_comm/comm_context.h`; `examples/workers/l3/allreduce_distributed/main.py`; `examples/workers/l3/ffn_tp_parallel/main.py` |
+| `pto-isa` | `README.md`; `include/pto/README.md`; `include/pto/comm/README.md`; `include/pto/comm/async_common/async_types.hpp`; `tests/npu/a5/comm/st/testcase/twait/twait_kernel.cpp`; `demos/baseline/allgather_async/README.md` |
+| `pypto` | `.gitmodules`; `include/pypto/ir/function.h`; `src/codegen/distributed/distributed_codegen.cpp`; `python/pypto/runtime/distributed_runner.py`; `tests/st/distributed/test_l3_distributed.py`; `tests/st/distributed/test_l3_parallel_reduce.py` |
+| `hccl` | `include/hccl.h`; `include/hccl_mc2.h`; `src/CMakeLists.txt` |
+
+## GitHub Evidence
+
+| Project | Reference | Status | Distributed conclusion |
+| --- | --- | --- | --- |
+| simpler | PR #571 | merged | FFN tensor-parallel example is `implemented`. |
+| simpler | PR #579 | merged | `child_memory`, `TensorKey`, and scheduler affinity are `implemented`. |
+| simpler | PR #592 | merged | HCCL backend for comm C API is `implemented`. |
+| simpler | PR #670/#692/#700 and issue #686 | merged/closed | deferred completion API and context are `implemented`. |
+| simpler | PR #696 | open | A2/A3 SDMA async completion is `emerging`. |
+| simpler | issue #303 | closed | early L1-L4 multi-card background; treated as `stale` for current architecture. |
+| pypto | PR #611 | merged | Linqu hierarchy distributed C++ codegen stage is `implemented`. |
+| pypto | issue #1127 | open | L3 Distributed Programming Interface Design RFC is `emerging`. |
+| pypto | issue #1189 | open | orchestration-level collectives are `design-intended`. |
+| pypto | PR #1227 | open | host_orch tensor pre-initialization for fork visibility is `emerging`. |
+| pypto | PR #1112 | merged | simpler runtime bump and HCCL/sim backend integration are `implemented`. |
+
+## Claim Map
+
+| Topic claim | Evidence | Destination |
+| --- | --- | --- |
+| Current verified path is single-host L3 execution, not remote L3. | `pypto/runtime/distributed_runner.py`; `simpler` L3 examples; material `03_distributed_blueprint.md` / `04_feature_deep_dives.md` describe remote L3 as target. | [Distributed Execution](../topics/distributed-execution.md#当前可验证路径) |
+| HCCL is data-plane/window supporting evidence, not runtime control plane. | `hccl/include/hccl.h`; `simpler/src/common/platform_comm/comm.h`; material `01_hardware_and_software_stack.md`. | [Distributed Execution](../topics/distributed-execution.md#hccl-的位置) |
+| `tensormap_and_ringbuffer`, TensorMap, and ring buffers are runtime foundations that distributed pages must build on. | `simpler/src/a2a3/docs/runtimes.md`; `simpler/docs/orchestrator.md`; `simpler/docs/scheduler.md`; material `02_pto_isa_and_runtime_basics.md`. | [simpler](../repositories/simpler.md#runtime-variants), [Distributed Execution](../topics/distributed-execution.md#当前可验证路径) |
+| Remote worker discovery, callable registration across hosts, persistent run_loop, and RoCE/URMA control channel are `design-intended`. | Material `03_distributed_blueprint.md`; material `04_feature_deep_dives.md`; no stable remote example found in inspected repos. | [Distributed Execution](../topics/distributed-execution.md#目标分布式路径) |
+| PyPTO distributed support is hierarchy-aware codegen plus L3 runner integration, not a complete remote runtime. | `pypto/src/codegen/distributed/distributed_codegen.cpp`; `pypto/python/pypto/runtime/distributed_runner.py`; tests under `pypto/tests/st/distributed/`. | [pypto](../repositories/pypto.md#distributed-extension-level--role), [Distributed Execution](../topics/distributed-execution.md#当前可验证路径) |
+
+## Negative Findings
+
+- No stable inspected source showed complete remote L3 / DistWorker lifecycle.
+- HCCL evidence supports collective/send/recv and windows, but not PTO runtime worker lifecycle or callable registry.
+- `pypto/tests/st/distributed/test_l3_parallel_reduce.py` is skipped, so it is `emerging`, not `implemented`.
+- GitHub compound search for PTO-ISA PR history hit search operator limits; PTO-ISA conclusions rely on README, headers, demos, and tests.
+
+## Open Questions
+
+- Will remote L3 live inside `simpler`, a separate distributed runtime, or PyPTO runner integration?
+- What is the stable ABI for callable identity across host boundaries?
+- How will deferred completion and SDMA/URMA async completion converge?

@@ -31,7 +31,8 @@ Materials may include prose, document files, folders, zip archives, issue or PR 
    - rejected: similar terms but unrelated
 9. Inspect primary and supporting evidence deeply enough to explain the topic in human terms.
 10. Write or update the smallest useful page under `wiki/topics/` with a synthesis, not a dump of links.
-11. Update `wiki/topics/index.md`, `wiki/index.md`, `wiki/overview.md` when warranted, and `wiki/log.md`.
+11. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger.
+12. Update `wiki/topics/index.md`, `wiki/evidence/index.md` when evidence pages change, `wiki/index.md`, `wiki/overview.md` when warranted, and `wiki/log.md`.
 
 ## Output Standard
 
@@ -43,6 +44,8 @@ The wiki should explain:
 - verified facts, inferred architecture, and unresolved questions
 - rejected or ambiguous evidence when it prevents overclaiming
 - links to related repository and concept pages when they exist
+
+Evidence ledgers should explain source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions. They support topic pages; they are not raw document mirrors.
 
 ## Citation Standard
 

@@ -40,4 +40,4 @@ Add knowledge to the smallest relevant page. Create a new page only when the top
 
 When citing local checkout evidence, include the local path, ref, commit SHA or tag inspected, and the relevant file path. Prefer upstream URLs with commits, tags, pull requests, issues, or releases when they are available.
 
-New repository profiles belong under `wiki/repositories/`. User-supplied document source summaries belong under `wiki/sources/`. Feature, behavior, workflow, and issue-family syntheses belong under `wiki/topics/`. Reusable technical terms belong under `wiki/concepts/`.
+New repository profiles belong under `wiki/repositories/`. Topic evidence ledgers belong under `wiki/evidence/` when material, GitHub, external-document, or cross-repository synthesis claims need an audit trail. Feature, behavior, workflow, and issue-family syntheses belong under `wiki/topics/`. Reusable technical terms belong under `wiki/concepts/`.

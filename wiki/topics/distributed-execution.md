@@ -8,12 +8,13 @@ sources:
   - repositories/pto-isa/
   - repositories/pypto/
   - repositories/hccl/
+  - wiki/evidence/distributed-execution.md
 last_updated: 2026-05-04
 ---
 
 # Distributed Execution
 
-本页综合 PTO Runtime、PTO-ISA、PyPTO 和 HCCL 的分布式执行证据。当前实现的重心是 single-host L3、多 chip、HCCL/sim comm backend 和 PyPTO L3 runner；remote L3、跨 host DistWorker、RoCE/URMA control plane 属于目标设计。
+本页综合 PTO Runtime、PTO-ISA、PyPTO 和 HCCL 的分布式执行证据。当前实现的重心是 single-host L3、多 chip、HCCL/sim comm backend 和 PyPTO L3 runner；remote L3、跨 host DistWorker、RoCE/URMA control plane 属于目标设计。状态标签和 material/GitHub/source-file routing 记录在 [Distributed Execution Evidence](../evidence/distributed-execution.md)。
 
 ## 总体分工
 
@@ -99,6 +100,8 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 | PyPTO L3 runner | `implemented` | `pypto/runtime/distributed_runner.py` |
 | PyPTO orchestration collectives | `design-intended` | pypto issue #1189 open |
 | Remote L3 / DistWorker | `design-intended` | material blueprint; no stable repo implementation found |
+
+这些状态判断的 claim map 见 [Distributed Execution Evidence](../evidence/distributed-execution.md#claim-map)。
 
 ## 阅读建议
 

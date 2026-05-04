@@ -8,7 +8,7 @@ Use this workflow when updating the wiki from a user-supplied document file, fol
 2. Read `.agents/policies/document-material-policy.md`.
 3. Read `.agents/policies/wiki-organization-policy.md`.
 4. Read `.agents/policies/source-and-citation-policy.md`.
-5. Read existing `wiki/index.md`, `wiki/overview.md`, `wiki/sources/index.md`, and relevant wiki pages.
+5. Read existing `wiki/index.md`, `wiki/overview.md`, `wiki/evidence/index.md` when present, and relevant wiki pages.
 
 ## Input Handling
 
@@ -22,10 +22,10 @@ Use this workflow when updating the wiki from a user-supplied document file, fol
 
 1. Read enough of each material to identify title, date, topic, key claims, entities, repositories, and concepts.
 2. Search existing `wiki/` for overlap before adding pages.
-3. Create or update `wiki/sources/<slug>.md` for durable source summaries. Use `.agents/templates/source-summary.md`.
-4. Update `wiki/sources/index.md` and `wiki/index.md`.
+3. Create or update topic-scoped `wiki/evidence/<topic>.md` ledgers when material evidence supports durable wiki claims. Use `.agents/templates/evidence-ledger.md`.
+4. Update `wiki/evidence/index.md` and `wiki/index.md`.
 5. Update `wiki/overview.md` only when the material changes broad target-set synthesis.
-6. Create or update `wiki/topics/` and `wiki/concepts/` pages when the material supports durable synthesis beyond a source summary.
+6. Create or update `wiki/topics/` and `wiki/concepts/` pages when the material supports durable synthesis beyond an evidence ledger.
 7. Flag contradictions, uncertainty, and data gaps instead of smoothing them away.
 8. Append to `wiki/log.md` with `material-ingest` and the material title or bundle name.
 9. Run wiki health checks from `.agents/workflows/wiki-health-and-lint.md`.
@@ -34,11 +34,11 @@ Use this workflow when updating the wiki from a user-supplied document file, fol
 
 The wiki update should preserve:
 
-- concise source summary, not full document copy
+- topic-scoped evidence ledger, not full document copy
 - key claims with citations
 - important quotes only when short and necessary
 - connections to repositories, topics, and concepts
 - contradictions or conflicts with existing wiki pages
 - open questions or unreadable material limitations
 
-For a folder or zip, provide a bundle-level summary and per-file source pages only for files that add durable knowledge.
+For a folder or zip, route material details into the relevant topic evidence pages. Do not create per-file wiki pages unless a single document itself becomes a durable topic.

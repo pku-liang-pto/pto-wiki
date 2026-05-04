@@ -18,7 +18,7 @@ Read:
 - `.agents/policies/source-and-citation-policy.md`
 - `wiki/index.md`
 - `wiki/overview.md`
-- `wiki/sources/index.md` when present
+- `wiki/evidence/index.md` when present
 
 ## Input Handling
 
@@ -33,9 +33,9 @@ Read:
 
 1. Read enough of every used material to identify title, date, topic, claims, repositories, people, and concepts.
 2. Search existing `wiki/` for overlap before creating pages.
-3. Create or update concise source summaries under `wiki/sources/` using `.agents/templates/source-summary.md`.
+3. Create or update topic-scoped evidence ledgers under `wiki/evidence/` using `.agents/templates/evidence-ledger.md`.
 4. Create or update `wiki/topics/` or `wiki/concepts/` only when materials support durable synthesis.
-5. Cite material evidence near claims.
+5. Cite evidence ledgers where topic claims need material/GitHub/source routing support.
 6. Preserve contradictions, stale claims, missing coverage, and open questions.
 7. Update indexes, `wiki/overview.md` when broad synthesis changes, and `wiki/log.md` with `material-ingest`.
 
