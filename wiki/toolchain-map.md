@@ -15,3 +15,21 @@ The PTO-CANN target set combines PTO projects, CANN projects, runtime components
 ## Documentation Rule
 
 This map is a starting orientation. Do not treat it as a complete architecture description until the relevant repositories have been inspected and cited.
+
+## PTO Runtime / ISA / PyPTO Pass
+
+2026-05-04 文档化 pass 在已检查 commit 上验证了如下关系：
+
+```text
+pypto DSL/codegen
+  -> simpler L3 worker/runtime
+  -> PTO-ISA tile and comm kernels
+  -> HCCL/sim communication backend
+```
+
+详细页面：
+
+- [simpler](./repositories/simpler.md)
+- [pto-isa](./repositories/pto-isa.md)
+- [pypto](./repositories/pypto.md)
+- [Distributed Execution](./topics/distributed-execution.md)

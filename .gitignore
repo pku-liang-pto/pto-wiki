@@ -2,6 +2,9 @@ node_modules/
 docs/
 materials/*
 !materials/README.md
+!materials/pto-runtime-distributed/
+!materials/pto-runtime-distributed/**
+materials/pto-runtime-distributed.zip
 wiki/.vitepress/cache/
 wiki/.vitepress/dist/
 .DS_Store

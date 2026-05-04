@@ -6,6 +6,7 @@ This repository is a reusable technical wiki template. Agents must keep reusable
 
 Before answering lookup requests, updating the wiki, or documenting repositories, read the relevant files:
 
+- `.agents/workflows/agent-command-reference.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
 - `.agents/workflows/document-material-ingestion.md`
 - `.agents/workflows/repo-documentation.md`
@@ -13,6 +14,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/github-reference-documentation.md`
 - `.agents/workflows/topic-evidence-discovery.md`
 - `.agents/workflows/wiki-health-and-lint.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
 - `.agents/policies/document-material-policy.md`
@@ -23,14 +25,18 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 ## Core Rules
 
 - Keep `wiki/` human-readable.
+- Keep `wiki/` self-contained enough to learn from directly. Source links, PRs, issues, materials, and evidence ledgers are audit support, not substitutes for explanation.
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
+- Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.
+- Put reusable agent process, command patterns, quality gates, and templates in `.agents/`; do not put agent operating instructions in rendered wiki content.
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.
-- Keep user-supplied document materials in ignored workspace paths such as `materials/`; summarize durable evidence in `wiki/` instead of committing raw documents.
+- Keep user-supplied document materials in `materials/` or another clearly named workspace. Prefer summarizing durable evidence in `wiki/`, but tracked material bundles are allowed when the user explicitly asks for them or when a pass defines them as source evidence.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
+- Treat examples as first-class documentation evidence. Example pages should provide background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, and explicit TODO/design-intended entries for important missing examples.
 - Distinguish verified facts from inferred architecture.
 - Do not copy whole upstream documents into this repository.
 - Prefer incremental wiki updates over broad rewrites unless restructuring clearly improves correctness or navigation.

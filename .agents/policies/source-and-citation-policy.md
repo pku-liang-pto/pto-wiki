@@ -2,6 +2,8 @@
 
 Factual wiki claims need evidence.
 
+Evidence supports the wiki; it does not replace explanation. Durable wiki pages should state the synthesized knowledge directly, then cite the source path, material file, PR, issue, commit, or evidence ledger that backs the statement. Avoid making readers leave the wiki just to learn the basic concept.
+
 ## Preferred Sources
 
 1. Source files in the target repository.
@@ -21,3 +23,4 @@ Factual wiki claims need evidence.
 - For topic synthesis from supplied materials, cite the materials, search anchors, GitHub issues or PRs, commits, refs, and source files that support the synthesis.
 - Mark claims as inference when they come from reading code structure rather than explicit docs.
 - Preserve conflicting evidence instead of forcing a false conclusion.
+- Do not turn source citations into a learning plan. If a page cites a source for an important concept, summarize the concept in the wiki page itself.

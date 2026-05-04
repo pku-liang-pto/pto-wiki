@@ -2,25 +2,27 @@
 
 This wiki is the human-readable knowledge base for the PTO-CANN target set.
 
-It starts as a map, not as a complete mirror of every upstream project. Pages are expanded when a concrete lookup, repository documentation pass, or toolchain investigation discovers durable knowledge that future readers are likely to need.
+It is a standalone learning layer for the configured target set. Pages explain synthesized knowledge directly, with evidence links available for audit.
 
-## Start Here
+## Core Learning Pages
 
 - [Overview](./overview.md): living synthesis across the configured target set.
+- [Basic Terms](./concepts/basic-terms.md): vocabulary for tensors, tiles, memory spaces, workers, and runtime levels.
+- [Non-Distributed Execution](./topics/non-distributed-execution.md): how a normal PyPTO/PTO-ISA/simpler program becomes device work.
+- [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md): self-contained synthesis of simpler's L2, L3+, task-flow, scheduler, and worker docs.
+- [Examples Feature Map](./topics/examples-feature-map.md): self-contained example explanations from kernel to complete NN and distributed TODOs.
+- [Distributed Execution](./topics/distributed-execution.md): hierarchy, rank/window communication, current L3 behavior, and remote-runtime boundaries.
+- [Developer Takeover Guide](./topics/developer-takeover-guide.md): maintainer ownership model, risks, and safe change boundaries.
 - [Projects](./projects.md): current PTO and CANN repository index.
-- [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.
+- [Usage](./usage.md): Pixi commands, target configuration, and workspace behavior.
 - [Toolchain Map](./toolchain-map.md): how the current projects are expected to relate.
 - [Repository Profiles](./repositories/): per-repository documentation as it is created.
-- [Sources](./sources/): concise summaries of user-supplied document materials.
+- [Evidence](./evidence/): topic-scoped evidence ledgers for material, GitHub, and cross-repository claims.
 - [Topics](./topics/): feature, workflow, behavior, and issue-family syntheses.
 - [Concepts](./concepts/): reusable technical concepts and acronyms.
 - [Glossary](./glossary.md): terms and acronyms collected during wiki growth.
 - [Wiki Log](./log.md): append-only record of durable wiki maintenance operations.
 
-## How This Wiki Grows
+## How To Read
 
-When a topic is looked up, agents first check this wiki. If the answer is missing or stale, they inspect the configured target repositories and upstream documentation. Durable, sourced findings are added back here in clear prose.
-
-The wiki should explain what is known, cite where it came from, and preserve uncertainty when evidence is incomplete.
-
-New durable pages should be reachable from this index or an area index. Broad target-set findings should also update [Overview](./overview.md) when they change the synthesis.
+Start with [Overview](./overview.md) for the target-set shape, then use concepts and topic pages for standalone explanations. Follow evidence links when you need to audit a claim against source paths, materials, PRs, issues, or inspected commits.

@@ -10,6 +10,10 @@ last_updated: YYYY-MM-DD
 
 Short summary of what the repository does and where it fits in the target set.
 
+## Mental Model
+
+Explain the repository's core idea in prose. A reader should understand the repository role before following source links.
+
 ## Role In The Target Set
 
 Explain the repository's role using source-backed facts.

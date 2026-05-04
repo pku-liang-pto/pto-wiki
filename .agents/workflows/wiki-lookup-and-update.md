@@ -17,6 +17,7 @@ Use this workflow for questions about the target set, repository behavior, depen
 11. Answer with clear human-readable explanation.
 12. Decide whether the durable knowledge should update `wiki/`.
 13. If updating `wiki/`, maintain `wiki/index.md`, relevant area indexes, `wiki/overview.md`, and `wiki/log.md` according to `.agents/policies/wiki-organization-policy.md`.
+14. If the update is about agent process, command patterns, placement rules, or reusable quality gates, update `.agents/` or `AGENTS.md` instead of rendered wiki pages.
 
 ## Update Decision
 
@@ -38,6 +39,8 @@ Do not update the wiki for:
 
 Add knowledge to the smallest relevant page. Create a new page only when the topic has enough durable scope to stand alone. Include source links or local file references with each factual section.
 
+Use `.agents/policies/wiki-content-boundary-policy.md` before writing process-heavy text. `wiki/` should explain target-set knowledge; `.agents/` should explain how agents work.
+
 When citing local checkout evidence, include the local path, ref, commit SHA or tag inspected, and the relevant file path. Prefer upstream URLs with commits, tags, pull requests, issues, or releases when they are available.
 
-New repository profiles belong under `wiki/repositories/`. User-supplied document source summaries belong under `wiki/sources/`. Feature, behavior, workflow, and issue-family syntheses belong under `wiki/topics/`. Reusable technical terms belong under `wiki/concepts/`.
+New repository profiles belong under `wiki/repositories/`. Topic evidence ledgers belong under `wiki/evidence/` when material, GitHub, external-document, or cross-repository synthesis claims need an audit trail. Feature, behavior, workflow, and issue-family syntheses belong under `wiki/topics/`. Reusable technical terms belong under `wiki/concepts/`.
