@@ -1,6 +1,6 @@
 # Repository Workspace Policy
 
-Target repository checkouts live under `repositories/` and are treated as local workspace cache, not as wiki source.
+Target repository checkouts live under `repositories/`. Repositories that are part of the documented target set may be tracked as Git submodules; additional ad hoc checkouts remain local workspace cache and are not wiki source.
 
 ## Workspace Layout
 
@@ -41,7 +41,7 @@ For pull requests, inspect the PR metadata, base branch, head branch, commits, c
 
 ## Git Hygiene
 
-Do not commit repository checkout contents into this wiki repository. The root `.gitignore` keeps checkout contents ignored while allowing a tracked workspace README.
+Do not commit raw repository checkout contents into this wiki repository. If a target repository snapshot needs to be reproducible, commit it as a Git submodule gitlink plus `.gitmodules` metadata instead of copying its files into the wiki repository. The root `.gitignore` keeps ad hoc checkout contents ignored while allowing tracked workspace metadata and intentional submodule paths.
 
 Wiki updates may cite inspected local checkouts, but citations must include:
 

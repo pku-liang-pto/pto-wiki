@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Toolchain Wiki',
   description: 'Reusable technical wiki template for a configured target set.',
+  base: process.env.VITEPRESS_BASE ?? '/',
   cleanUrls: true,
   ignoreDeadLinks: [
     /^https:\/\/github\.com\//,

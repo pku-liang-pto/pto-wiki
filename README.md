@@ -23,8 +23,8 @@ See `wiki/index.md` for the human-facing wiki entry point.
 wiki/                 Human-readable Markdown wiki and website source
 .agents/              Reusable agent workflows, policies, templates, and skills
 config/target-set.yml Current target set configuration
-materials/            Ignored workspace for user-supplied document materials
-repositories/         Local workspace for lazily cloned target repositories
+materials/            Workspace for user-supplied document materials
+repositories/         Target repository submodules and local checkout workspace
 resources/            Images and other static resources
 ```
 
@@ -54,3 +54,7 @@ pixi run docs-dev
 ```
 
 The rendered site uses `wiki/` as its source.
+
+## GitHub Pages
+
+The wiki can be deployed with GitHub Pages through `.github/workflows/pages.yml`. Configure repository settings under **Pages** to use **GitHub Actions** as the publishing source, then pushes to `main` will build `wiki/` and deploy the generated VitePress site. Pull requests run the build path without deploying.
