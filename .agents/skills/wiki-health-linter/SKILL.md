@@ -34,6 +34,8 @@ Use when the wiki has grown or after broad updates:
 - sparse pages that should be merged or expanded
 - repeated terms missing `wiki/concepts/` coverage
 - topic pages missing paired `wiki/evidence/<topic>.md` when they rely on material, GitHub, external-document, or cross-repository synthesis claims
+- distributed or advanced topics missing foundation links to basic terms, non-distributed execution, repository profiles, or examples
+- example pages missing background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, or TODO/design-intended missing-example status
 - expected target-set questions the wiki still cannot answer
 
 Save a report only when it will help future maintainers. Otherwise summarize issues in the current response.

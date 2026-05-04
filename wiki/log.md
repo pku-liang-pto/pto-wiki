@@ -36,6 +36,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 根据新一轮 PR review，新增 [Basic Terms](./concepts/basic-terms.md)、[Non-Distributed Execution](./topics/non-distributed-execution.md) 和 [Developer Takeover Guide](./topics/developer-takeover-guide.md)；将 Lingqu 拼写修正为 human-facing spelling；重写 [Examples Feature Map](./topics/examples-feature-map.md)，按 beginner-to-expert、LLM concept、common example family、optimization technique 和 missing distributed complete NN TODO 组织。
 
+## [2026-05-04] policy-update | Position wiki beyond distributed-only scope
+
+将“本 wiki 不能只覆盖 distributed features”写入 `AGENTS.md`、wiki policy、topic workflow、health checks、templates 和 [Usage](./usage.md)。明确 non-distributed foundations 是必备基础，examples 是 first-class documentation，需要 background、progression、cross-repo comparison、optimization notes 和 missing-example TODO/status。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

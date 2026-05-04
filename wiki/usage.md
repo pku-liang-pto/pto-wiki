@@ -50,6 +50,12 @@ The wiki uses a small, queryable Markdown structure:
 - `wiki/topics/`: feature, workflow, behavior, and issue-family syntheses.
 - `wiki/concepts/`: reusable technical concepts and acronyms.
 
+## Positioning Rules
+
+This wiki is not scoped only to distributed features. Distributed execution is an advanced layer that must be grounded in non-distributed foundations: basic terms, normal PyPTO/PTO-ISA/simpler execution flow, repository responsibilities, and representative examples.
+
+Examples are first-class documentation. Example pages should explain the background concept before implementation detail, order examples from beginner to expert, compare common examples across repositories, identify optimization techniques, and mark missing examples as `TODO`, `design-intended`, or `open question`.
+
 When agents add durable wiki pages, they keep the page reachable from `wiki/index.md` or an area index, cite evidence near factual claims, and append an operation entry to `wiki/log.md`. Broad synthesis changes should update `wiki/overview.md`.
 
 ## Repository Workspace

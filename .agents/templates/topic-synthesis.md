@@ -12,6 +12,10 @@ last_updated: YYYY-MM-DD
 
 Explain the topic or feature in human terms. State the repository or target-set scope.
 
+## Foundation
+
+For advanced or distributed topics, cite the basic terms, non-distributed execution flow, repository profiles, and examples that the reader should understand first. Do not let the topic appear detached from its non-distributed basis.
+
 ## Evidence Map
 
 | Evidence | Role | Notes |
@@ -23,6 +27,10 @@ For topics that rely on user materials, GitHub references, external documents, o
 ## Verified Facts
 
 - <Fact with nearby citation.>
+
+## Examples
+
+When examples are central to the topic, organize them from beginner to expert. Include the background concept, what each example demonstrates, comparable examples in other repositories, optimization techniques to notice, and missing examples marked `TODO`, `design-intended`, or `open question`.
 
 ## Inferred Architecture
 

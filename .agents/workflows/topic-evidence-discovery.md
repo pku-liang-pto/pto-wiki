@@ -29,10 +29,13 @@ Materials may include prose, document files, folders, zip archives, issue or PR 
    - primary: directly about the topic or feature
    - supporting: explains design, dependency, test, release, or context
    - rejected: similar terms but unrelated
-9. Inspect primary and supporting evidence deeply enough to explain the topic in human terms.
-10. Write or update the smallest useful page under `wiki/topics/` with a synthesis, not a dump of links.
-11. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger.
-12. Update `wiki/topics/index.md`, `wiki/evidence/index.md` when evidence pages change, `wiki/index.md`, `wiki/overview.md` when warranted, and `wiki/log.md`.
+9. Identify the foundation layer required by the topic: basic terms, non-distributed execution flow, repository roles, examples, and current implementation status.
+10. Inspect primary and supporting evidence deeply enough to explain the topic in human terms.
+11. Write or update the smallest useful page under `wiki/topics/` with a synthesis, not a dump of links.
+12. When the topic is advanced or distributed, cite or add the foundation pages needed to prevent future distributed-only bias.
+13. When the topic is example-driven, include background concepts, beginner-to-expert progression, cross-repository comparison, optimization techniques, and TODO/design-intended missing examples.
+14. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger.
+15. Update `wiki/topics/index.md`, `wiki/evidence/index.md` when evidence pages change, `wiki/index.md`, `wiki/overview.md` when warranted, and `wiki/log.md`.
 
 ## Output Standard
 
@@ -44,6 +47,8 @@ The wiki should explain:
 - verified facts, inferred architecture, and unresolved questions
 - rejected or ambiguous evidence when it prevents overclaiming
 - links to related repository and concept pages when they exist
+- foundation prerequisites for advanced or distributed behavior
+- examples with background, progression, comparison, optimization notes, and missing-example status when examples are central to the topic
 
 Evidence ledgers should explain source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions. They support topic pages; they are not raw document mirrors.
 

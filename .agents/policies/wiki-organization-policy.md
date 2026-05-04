@@ -2,6 +2,12 @@
 
 The wiki should be easy to query, browse, and update incrementally.
 
+## System Positioning
+
+This wiki is not a distributed-only documentation space. Distributed topics must be grounded in the non-distributed foundations that make them possible: basic terms, normal execution flow, repository roles, kernels, runtime launch paths, and representative examples.
+
+When a topic depends on advanced or distributed behavior, document the foundation layer first or cite an existing foundation page. Do not let a temporary project focus bias the durable wiki taxonomy.
+
 ## Core Files
 
 Maintain these root wiki files:
@@ -60,5 +66,7 @@ Before claiming a wiki update is complete, check:
 - links added by the change resolve
 - pages are not empty stubs
 - the update has source citations near factual claims
+- distributed or advanced topics have a clear foundation path through basic terms, non-distributed execution, repository profiles, or examples
+- example pages include enough background, progression, comparison, optimization context, and missing-example status to teach the reader why the examples matter
 - `wiki/log.md` has an entry for durable operations
 - broad synthesis changes are reflected in `wiki/overview.md` when warranted

@@ -23,6 +23,8 @@ Use periodically or when the wiki has grown after several updates:
 - sparse pages that should be merged or expanded
 - missing topic or concept pages for terms repeatedly referenced in multiple pages
 - missing paired `wiki/evidence/<topic>.md` pages for topic pages that rely on material, GitHub, external-document, or cross-repository synthesis claims
+- distributed or advanced topic pages without links to foundation concepts, non-distributed execution, repository profiles, or examples
+- example pages that only list coverage without explaining background concepts, beginner-to-expert ordering, cross-repository comparison, optimization techniques, and missing-example TODO/design-intended status
 - data gaps where the wiki cannot answer an expected target-set question
 
 ## Scope Boundary

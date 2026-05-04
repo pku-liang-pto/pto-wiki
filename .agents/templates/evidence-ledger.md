@@ -40,6 +40,12 @@ This ledger supports [<Topic Page>](../topics/<topic>.md). It records the source
 | --- | --- | --- |
 | <claim> | <supporting evidence> | <topic section> |
 
+## Foundation Coverage
+
+| Foundation need | Evidence | Destination |
+| --- | --- | --- |
+| <basic term / non-distributed flow / example prerequisite> | <supporting evidence> | <wiki page or section> |
+
 ## Negative Findings
 
 - <Relevant search or inspected source that did not support a possible claim.>

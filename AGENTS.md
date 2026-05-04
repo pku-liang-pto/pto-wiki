@@ -24,6 +24,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 
 - Keep `wiki/` human-readable.
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
+- Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
@@ -31,6 +32,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Keep user-supplied document materials in ignored workspace paths such as `materials/`; summarize durable evidence in `wiki/` instead of committing raw documents.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
+- Treat examples as first-class documentation evidence. Example pages should provide background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, and explicit TODO/design-intended entries for important missing examples.
 - Distinguish verified facts from inferred architecture.
 - Do not copy whole upstream documents into this repository.
 - Prefer incremental wiki updates over broad rewrites unless restructuring clearly improves correctness or navigation.

@@ -25,6 +25,12 @@ The current target set is defined in `config/target-set.yml`. The wiki starts as
 - [Concepts](./concepts/) holds reusable concepts, APIs, protocols, acronyms, and architecture ideas.
 - [Glossary](./glossary.md) collects terms encountered during wiki growth.
 
+## Positioning
+
+This wiki must cover the whole PTO/PyPTO/simpler knowledge path, not only distributed runtime work. Non-distributed features are the basis: terms, normal execution, kernel programming, L2 launch, examples, and maintainer onboarding must stay visible as first-class pages.
+
+Examples deserve high attention because they connect architecture to runnable understanding. The wiki should explain their background concepts, organize them from beginner to expert, compare similar examples across repositories, call out optimization techniques, and preserve TODO/design-intended gaps for examples that do not exist yet.
+
 ## Maintenance Notes
 
 Update this page when new evidence changes the broad synthesis of the target set. Do not rewrite it for every small page edit.
