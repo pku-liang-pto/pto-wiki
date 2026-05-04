@@ -24,6 +24,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 新增 [Examples Feature Map](./topics/examples-feature-map.md)、[Distributed Execution](./topics/distributed-execution.md)、[Linqu Level Map](./topics/linqu-level-map.md)、[Distributed Execution Terms](./concepts/distributed-execution-terms.md)。同步更新 overview 和 toolchain navigation，区分已实现的 single-host L3 behavior 与 `design-intended` remote L3 behavior。
 
+## [2026-05-04] repo-profile | Add non-distributed foundations after PR review
+
+根据 PR review，补充 [simpler](./repositories/simpler.md) 的 L0-L2 Ascend launch path、`tensormap_and_ringbuffer` runtime 和 L2 examples；补充 [pto-isa](./repositories/pto-isa.md) 的 tile/programming-model、baseline/CPU/kernel examples；补充 [pypto](./repositories/pypto.md) 的普通 DSL、parser、pass pipeline、compile/run path。同步扩展 [Evidence Inventory](./sources/pto-runtime-isa-pypto-evidence-inventory.md) 的非分布式基础证据。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

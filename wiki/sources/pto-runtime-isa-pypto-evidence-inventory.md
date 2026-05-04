@@ -14,7 +14,7 @@ last_updated: 2026-05-04
 
 # PTO Runtime / PTO-ISA / PyPTO 证据清单
 
-本页记录 2026-05-04 文档化 PTO Runtime、PTO-ISA、PyPTO 及分布式执行路径时使用的证据。结论页只写综合判断；本页保留材料覆盖、仓库快照、PR/issue、负面发现和未决问题。
+本页记录 2026-05-04 文档化 PTO Runtime、PTO-ISA、PyPTO 时使用的证据。分布式执行是第二阅读层；非分布式基础能力同样是证据清单的一等内容，因为它们解释 distributed runtime 建立在哪些普通 repo 能力上。
 
 ## 状态标签
 
@@ -54,7 +54,7 @@ last_updated: 2026-05-04
 | `00_README.md` | runtime 当前四类缺口：remote L3 worker 管理、callable 注册跨 remote 层级、child worker 同步方式、平台 ABI/部署耦合；PR #571/#579/#592/#670/#686/#692/#700/#696 状态 | [Distributed Execution](../topics/distributed-execution.md)、[simpler](../repositories/simpler.md)、本页 PR/issue map |
 | `00_README.md` | 术语速查：L1/L2/L3/L4、HostWorker、DistWorker、CommContext、window、rank、affinity | [Distributed Execution Terms](../concepts/distributed-execution-terms.md) |
 | `01_hardware_and_software_stack.md` | Ascend 硬件、CANN Runtime/ACL、HCCL/HCOMM、URMA/RoCE 的分层关系；control plane 与 data plane 边界 | [Distributed Execution](../topics/distributed-execution.md)、[Linqu Level Map](../topics/linqu-level-map.md) |
-| `02_pto_isa_and_runtime_basics.md` | PTO-ISA 通信指令、worker 层级、mailbox、TensorMap/child_memory、CommContext/window、deferred completion；为什么现有架构不能直接变成分布式 | [pto-isa](../repositories/pto-isa.md)、[simpler](../repositories/simpler.md)、[Distributed Execution](../topics/distributed-execution.md) |
+| `02_pto_isa_and_runtime_basics.md` | PTO-ISA tile/runtime basics、worker 层级、mailbox、TensorMap/child_memory、CommContext/window、deferred completion；为什么现有架构不能直接变成分布式 | [pto-isa](../repositories/pto-isa.md)、[simpler](../repositories/simpler.md)、[Distributed Execution](../topics/distributed-execution.md) |
 | `03_distributed_blueprint.md` | 目标拓扑、远程 worker model、callable registration、rank/affinity、bootstrap、persistent run_loop、deferred completion 目标、platform decoupling | [Distributed Execution](../topics/distributed-execution.md)、[Linqu Level Map](../topics/linqu-level-map.md) |
 | `04_feature_deep_dives.md` | remote L3、callable registration、worker memory、comm window、rank/device id、deferred completion、send/recv runtime、platform decoupling 深挖 | [Distributed Execution](../topics/distributed-execution.md)、[Distributed Execution Terms](../concepts/distributed-execution-terms.md) |
 | `05_progress_and_timeline.md` | 已合并和打开的 PR/issue、阶段性实现和图片线索 | 本页 PR/issue map、[Examples Feature Map](../topics/examples-feature-map.md) |
@@ -78,6 +78,11 @@ last_updated: 2026-05-04
 ### simpler
 
 - `repositories/simpler/README.md`：声明 simpler 是 Ascend 上 host/AICPU/AICore task dependency graph runtime；列出 `a2a3`、`a2a3sim`、`a5`、`a5sim` 平台和 `host_build_graph`、`tensormap_and_ringbuffer` runtime 变体。
+- `repositories/simpler/docs/chip-level-arch.md`：L2 single-chip architecture；三 program model；host runtime、AICPU scheduler、AICore worker；`run_runtime()` 中 upload binary、copy tensors、launch AICPU/AICore、sync/copy-back/cleanup。
+- `repositories/simpler/src/a2a3/docs/runtimes.md`：`host_build_graph` 与 `tensormap_and_ringbuffer` 对比；后者在 AICPU/device side 通过 TensorMap 自动推导依赖，并使用 ring buffer/task descriptor/GM heap。
+- `repositories/simpler/docs/orchestrator.md`：Orchestrator 是 DAG builder；`submit_next_level` 的 slot allocation、TensorMap lookup/insert、scope registration、wiring queue。
+- `repositories/simpler/docs/scheduler.md`：Scheduler 是 DAG executor；drain wiring/ready/completion queues，并 dispatch 到 WorkerManager。
+- `repositories/simpler/examples/workers/l2/README.md`：L2 = CHIP；`hello_worker` 和 `vector_add` 是基础 learning examples。
 - `repositories/simpler/python/simpler/worker.py`：`Worker(level=2/3/4)` factory 示例、unified mailbox 常量、process child loop 从 shared-memory mailbox 读取 callable 并执行。
 - `repositories/simpler/python/simpler/task_interface.py`：`ChipCommBootstrapConfig`、`ChipBufferSpec`、`ChipContext`、`bootstrap_context()`、`comm_init()`、`comm_alloc_windows()` 和 window buffer slicing。
 - `repositories/simpler/src/common/hierarchical/worker_manager.h`：worker pool、THREAD/PROCESS 模式、process mailbox ABI、控制命令。
@@ -88,6 +93,10 @@ last_updated: 2026-05-04
 ### pto-isa
 
 - `repositories/pto-isa/README.md`：PTO Tile Library、virtual ISA、communication extension、examples、roadmap。
+- `repositories/pto-isa/include/pto/README.md`：public header entry；`common/`、`cpu/`、`npu/`、`comm/` 目录责任。
+- `repositories/pto-isa/demos/README.md`：baseline PyTorch operator examples、CPU simulation demos、torch_jit demos。
+- `repositories/pto-isa/kernels/README.md`：manual hand-tuned kernels、custom operator scaffolding。
+- `repositories/pto-isa/demos/baseline/add/README.md`：非分布式 first example；custom PTO kernel exposed as `torch_npu` operator。
 - `repositories/pto-isa/include/pto/comm/README.md`：通信指令集布局，`TPUT/TGET/TNOTIFY/TWAIT/TTEST`、collectives、async、A2/A3/A5/CPU sim。
 - `repositories/pto-isa/include/pto/comm/async_common/async_types.hpp`：SDMA、URMA、engine-agnostic `AsyncSession`。
 - `repositories/pto-isa/tests/npu/a5/comm/st/testcase/twait/twait_kernel.cpp`：`TNOTIFY/TWAIT` 基本同步和多 rank wait 测试。
@@ -97,6 +106,11 @@ last_updated: 2026-05-04
 ### pypto
 
 - `repositories/pypto/README.md`：Python DSL、examples、tests。
+- `repositories/pypto/examples/hello_world.py`：最小非分布式 program；`@pl.program`、`InCore` `tile_add`、`Orchestration` function、`pl.load/add/store`。
+- `repositories/pypto/python/pypto/language/parser/README.md`：decorator-based parser、type annotation、control flow、SSA verification、span tracking。
+- `repositories/pypto/python/pypto/ir/pass_manager.py`：Default pass pipeline；tensor-level 到 tile/PTO-level lowering。
+- `repositories/pypto/python/pypto/ir/compile.py`：PassManager + codegen + artifact writing；只有检测到 Linqu level >= 3 才返回 `DistributedCompiledProgram`。
+- `repositories/pypto/python/pypto/runtime/runner.py`：普通 compile-and-run workflow，`RunConfig` 支持 `a2a3sim/a2a3/a5sim/a5`。
 - `repositories/pypto/.gitmodules`：`runtime` submodule 指向 `https://github.com/hw-native-sys/simpler`。
 - `repositories/pypto/include/pypto/ir/function.h`：`Level`、`Role` 与 `LevelToLinquLevel()` 映射。
 - `repositories/pypto/src/codegen/distributed/distributed_codegen.cpp`：只生成最高层 orchestrator Python 入口；同层 SubWorker 和下一层 Orchestrator call lowering。
@@ -133,10 +147,17 @@ last_updated: 2026-05-04
 
 | 示例 | 仓库 | 展示能力 | 状态 |
 | --- | --- | --- | --- |
+| `examples/workers/l2/hello_worker` | simpler | L2 `Worker.init()` / `close()` lifecycle | `implemented` |
+| `examples/workers/l2/vector_add` | simpler | L2 AIV kernel compile、`ChipCallable`、`TaskArgs`、host/device copy | `implemented` |
+| `examples/a2a3/tensormap_and_ringbuffer/paged_attention` | simpler | production runtime、TensorMap/ringbuffer、AIC/AIV task DAG | `implemented` |
+| `demos/baseline/add` | pto-isa | PTO kernel exposed as `torch_npu` custom operator | `implemented` |
+| `demos/baseline/gemm_basic` | pto-isa | tile ISA GEMM、tiling、pipeline scheduling | `implemented` |
+| `demos/cpu/*` | pto-isa | CPU simulation learning/validation path | `implemented` |
+| `examples/hello_world.py` | pypto | DSL -> IR basics、InCore tile load/add/store、orchestration function | `implemented` |
+| `examples/kernels/*` | pypto | elementwise、matmul、softmax、normalization 等 non-distributed kernels | `implemented` |
 | `examples/workers/l3/multi_chip_dispatch` | simpler | L3 host orchestrator 派发 chip task 和 SubWorker | `implemented` |
 | `examples/workers/l3/allreduce_distributed` | simpler | HCCL window scratch、rank window、device barrier、kernel 内 allreduce | `implemented` |
 | `examples/workers/l3/ffn_tp_parallel` | simpler | TensorMap stage dependency + cross-rank sum | `implemented` |
-| `demos/baseline/gemm_basic` | pto-isa | tile ISA GEMM、tiling、pipeline scheduling | `implemented` |
 | `demos/baseline/allgather_async` | pto-isa | SDMA/URMA async communication demo | `implemented` |
 | `tests/st/distributed/test_l3_distributed.py` | pypto | DSL 编译后通过 simpler L3 runner 执行 | `implemented` |
 | `tests/st/distributed/test_l3_parallel_reduce.py` | pypto | 多 chip callable + SubWorker reduce | `emerging`，测试被 skip |

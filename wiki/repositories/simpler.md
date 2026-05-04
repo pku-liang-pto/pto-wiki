@@ -4,30 +4,57 @@ type: repo-profile
 status: draft
 sources:
   - repositories/simpler/
+  - repositories/simpler/docs/chip-level-arch.md
+  - repositories/simpler/src/a2a3/docs/runtimes.md
   - materials/pto-runtime-distributed/
 last_updated: 2026-05-04
 ---
 
 # simpler
 
-`simpler` 是本轮文档中 PTO runtime 的主要实现仓库。它把 host 侧 orchestration、chip child process、AICPU/AICore callable、TensorMap 依赖发现、worker 层级和 platform comm backend 组合成一个可运行 runtime。仓库 README 将它定位为 Ascend 上执行 task dependency graph 的 runtime，并列出 `a2a3`、`a2a3sim`、`a5`、`a5sim` 平台以及 `host_build_graph`、`tensormap_and_ringbuffer` runtime 变体。
+`simpler` 是 PTO runtime 的主要实现仓库。先把它理解成“在 Ascend device 上启动和调度 task graph 的 runtime”，再看它的分布式扩展。它的基础能力是 L0-L2：host program 构造 callable/args/config，L2 `ChipWorker` 加载 host runtime、AICPU binary、AICore binary，AICPU scheduler 调度 AICore/AIV kernel。L3/L4 是在这个 L2 chip execution unit 上继续组合出来的层级 worker。
 
 本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `materials/pto-runtime-distributed/`。
 
 ## Repo 直觉
 
-`simpler` 当前最可靠的读法是：它已经能在单 host 上管理 L2/L3/L4 风格的层级 worker 和多 chip 示例，但“跨 host remote L3 runtime”仍是设计目标。材料 `00_README.md` 明确把 remote worker 管理、callable registration 跨 remote 层级、child worker sync、平台 ABI 解耦列为当前缺口。
+`simpler` 的最小自洽单元是 L2 CHIP。`docs/chip-level-arch.md` 把 L2 描述为三个 program 协作：Python application/host runtime、AICPU scheduler kernel、AICore compute kernels。`examples/workers/l2/README.md` 也把 L2 定义为一个 NPU device，由一个 on-device AICPU scheduler 和 AICore/AIVector workers 管理。
 
-核心路径：
+L3 之后不要先理解成“分布式系统”，而要先理解成“把多个 L2 worker 和 Python SubWorker 放进 host-side DAG scheduler”。材料 `00_README.md` 中的 remote L3、cross-host callable registration、RoCE/URMA control plane 是下一层设计目标，不是当前 L2-L3 基础能力。
+
+## L0-L2 Ascend 启动路径
+
+`docs/chip-level-arch.md` 给出的 L2 execution flow 是理解 `simpler` 的主线：
 
 ```text
-Python Worker(level=3)
-  -> register SubWorker / chip callable
-  -> init(): fork chip children, bootstrap comm/window
-  -> run(orchestrator): submit_next_level / submit_sub
-  -> TensorMap + scheduler
-  -> chip process / sub worker process
+Python test/example
+  -> RuntimeBuilder 取得 host.so / aicpu.so / aicore.o
+  -> KernelCompiler 编译 InCore kernel 和 orchestration .so
+  -> ChipWorker.init(): dlopen host.so, resolve C API
+  -> worker.set_device(): set device, allocate stream/context
+  -> worker.run(callable, args, CallConfig)
+  -> run_runtime()
+      -> upload kernel binaries
+      -> allocate/copy tensors
+      -> build task graph
+      -> launch AICPU init kernel
+      -> launch AICPU scheduler kernel
+      -> launch AICore worker kernel
+      -> synchronize, copy results back, cleanup
 ```
+
+在 device 侧，AICPU 负责 handshake、fanout dependency wiring、ready task detection、dispatch、completion tracking；AICore/AIV 负责等待 task assignment、读取 args/kernel address、执行 PTO-ISA kernel、写回完成信号。这个路径对应 `docs/chip-level-arch.md`、`src/common/worker/pto_runtime_c_api.h`、`src/common/worker/chip_worker.cpp`。
+
+## Runtime Variants
+
+`src/a2a3/docs/runtimes.md` 明确列出两个 runtime 变体：
+
+| Runtime | 图构建位置 | 依赖来源 | 典型用途 |
+| --- | --- | --- | --- |
+| `host_build_graph` | Host CPU | explicit edges | development/debugging；host 先构完整图，再启动 device execution |
+| `tensormap_and_ringbuffer` | AICPU/device side | TensorMap 从 tensor read/write pattern 自动推导 | production workload；支持 streaming、flow control、large batch、profiling |
+
+`tensormap_and_ringbuffer` 是当前默认用户路径。它用 `PTO2TaskDescriptor[]` ring buffer 存 task slots，用 GM heap ring 管 output buffer，用 TensorMap 自动维护 `tensor_base_ptr -> producer task`，并把 HeapRing、TaskRing、DepPool 切成 4 个独立 ring 支撑 nested scope isolation。
 
 ## 关键模块
 
@@ -35,10 +62,29 @@ Python Worker(level=3)
 | --- | --- | --- |
 | `python/simpler/worker.py` | `Worker(level=2/3/4)` factory、mailbox layout、child process loop | `implemented` |
 | `python/simpler/task_interface.py` | `TaskArgs`、`ChipCallable`、`ChipBootstrapConfig`、`ChipContext`、comm/window bootstrap | `implemented` |
+| `docs/chip-level-arch.md` | L2 host/AICPU/AICore 启动和协作路径 | `implemented` documentation |
+| `src/a2a3/docs/runtimes.md` | `host_build_graph` vs `tensormap_and_ringbuffer` runtime 设计 | `implemented` documentation |
+| `src/common/worker/chip_worker.cpp` | L2 `ChipWorker`，调用 `pto2_run_runtime` | `implemented` |
 | `src/common/hierarchical/worker_manager.h` | worker pool、THREAD/PROCESS mode、process mailbox ABI | `implemented` |
+| `src/common/hierarchical/orchestrator.*` | DAG submit、TensorMap lookup/insert、Scope/Ring 管理 | `implemented` |
+| `src/common/hierarchical/scheduler.*` | wiring queue、ready queue、completion queue、worker dispatch | `implemented` |
 | `src/common/platform_comm/comm.h` | backend-neutral C API: init/window/query/barrier/destroy | `implemented` |
 | `src/common/platform_comm/comm_context.h` | device-visible `CommContext` ABI、rank/window metadata | `implemented` |
 | `examples/workers/l3/` | L3 examples and hardware demos | `implemented`/`emerging` |
+
+## L2 示例
+
+| 示例 | 说明 | 状态 |
+| --- | --- | --- |
+| `examples/workers/l2/hello_worker` | `Worker.init()` / `close()` contract；无 kernel，适合验证 runtime plumbing | `implemented` |
+| `examples/workers/l2/vector_add` | 编译 AIV kernel 为 `ChipCallable`，构造 `TaskArgs`，host/device copy，运行并与 numpy 比较 | `implemented` |
+| `examples/a2a3/tensormap_and_ringbuffer/paged_attention` | `tensormap_and_ringbuffer` production runtime 示例，orchestration 中提交 AIC/AIV tasks | `implemented` |
+
+## Host-side DAG 层
+
+`docs/orchestrator.md` 把 Orchestrator 定义为 DAG builder。它拥有 `Ring`、`TensorMap`、`Scope`，在 `submit_next_level` / `submit_sub` 时消费 `TaskArgs` 的 tensor tags：`INPUT`/`INOUT` 做 TensorMap lookup，`OUTPUT`/`INOUT`/`OUTPUT_EXISTING` 做 insert。tags 在 submit 阶段被消费，后续 scheduler/worker 不再携带 tags。
+
+`docs/scheduler.md` 把 Scheduler 定义为 DAG executor：一个 dedicated C++ thread drain wiring queue，按 worker type 拆分 ready queue，然后由 completion queue 释放 fanout、唤醒下游 consumer，并回收 ring slot。这是 L3 host-side DAG 的通用执行内核，也解释了为什么 TensorMap/ringbuffer 是分布式页面必须先理解的基础。
 
 ## L3 Worker 模型
 

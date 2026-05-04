@@ -4,6 +4,9 @@ type: repo-profile
 status: draft
 sources:
   - repositories/pypto/
+  - repositories/pypto/README.md
+  - repositories/pypto/examples/hello_world.py
+  - repositories/pypto/python/pypto/ir/compile.py
   - repositories/simpler/
   - materials/pto-runtime-distributed/
 last_updated: 2026-05-04
@@ -11,20 +14,46 @@ last_updated: 2026-05-04
 
 # pypto
 
-`pypto` 是 PTO 的 Python DSL、IR、pass、codegen 和 runtime-facing 入口。它让用户用 Python 描述 tile kernel、orchestration function、hierarchy level 和 role，然后编译为可执行 artifact 或由 runtime runner 调用 `simpler`。
+`pypto` 是 PTO 的 Python DSL、IR、pass、codegen 和 runtime-facing 入口。先把它理解成非分布式 operator/programming framework：用户用 Python 写 `@pl.program` / `@pl.function`，parser 生成 IR，pass pipeline 把 tensor-level program 降到 tile/PTO-level code，runtime runner 编译并执行。Distributed codegen 是建立在这条普通编译执行链路之上的扩展。
 
 本页基于 `repositories/pypto` commit `f21c2dd48cfe1e5c4add78b0e391a31196420862`。
 
 ## Repo 直觉
 
-`pypto` 当前的分布式能力重点在“语言和 codegen 能表达 HOST/CHIP/SubWorker 层级，并把 L3 program 交给 simpler Worker 执行”。它还不是 remote distributed runtime 本身。
+README 把 PyPTO 定位为面向 AI accelerator 的 high-performance programming framework，核心是 PTO programming paradigm 和 Tile-based programming model。它的基础特性包括 tensor graph 到 tile graph/block graph/execution graph 的多层转换、codegen、MPMD execution scheduling、toolchain/profiling 和 Python-friendly API。
 
-`pypto/.gitmodules` 中 `runtime` submodule 指向 `https://github.com/hw-native-sys/simpler`，这与 `distributed_runner.py` 中使用 `simpler.Worker(level=3)` 的实现一致。
+所以阅读顺序应是：
+
+```text
+Python DSL (@pl.program / @pl.function)
+  -> parser builds PyPTO IR
+  -> PassManager runs tensor/tile lowering passes
+  -> backend codegen emits PTO/runtime artifacts
+  -> CompiledProgram / runtime.run executes on a2a3sim/a2a3/a5sim/a5
+  -> distributed runner only when program contains L3+ hierarchy functions
+```
+
+`pypto/.gitmodules` 中 `runtime` submodule 指向 `https://github.com/hw-native-sys/simpler`；这是 runtime integration 的基础，但普通 PyPTO 页面不应从 distributed runner 开始。
+
+## 非分布式编程模型
+
+`examples/hello_world.py` 展示最小 PyPTO program：`@pl.program` class 中有 `InCore` function，使用 `pl.load` 把 global tensor load 成 tile，`pl.add` 做 tile compute，`pl.store` 写回 output；另一个 `Orchestration` function 调用 `InCore` kernel。README 的 examples 也按复杂度组织为 hello world、kernel examples、model examples。
+
+`python/pypto/language/parser/README.md` 说明 parser 用 decorator-based parser 将 Python DSL 转成 IR，并处理 type annotations、control flow、SSA verification 和 span tracking。`python/pypto/ir/pass_manager.py` 中 `OptimizationStrategy.Default` 注册了从 `UnrollLoops`、`ConvertToSSA`、`OutlineIncoreScopes` 到 `ConvertTensorToTileOps`、`InferTileMemorySpace`、`LowerPipelineLoops`、`AllocateMemoryAddr`、`DeriveCallDirections` 等 passes。
+
+`python/pypto/ir/compile.py` 的 `compile()` 负责运行 PassManager、dump IR、调用 backend `generate()`、写 artifacts，并返回 `CompiledProgram`。只有当 transformed program 中存在 Linqu level >= 3 的 function 时，它才返回 `DistributedCompiledProgram`。
 
 ## 核心模块
 
 | 模块 | 作用 | 状态 |
 | --- | --- | --- |
+| `python/pypto/language/` | Python DSL、decorators、typing、ops、parser | `implemented` |
+| `include/pypto/ir/` / `python/pypto/ir/` | IR node、builder、compile API、pass manager、printer | `implemented` |
+| `src/ir/op/` | tensor/tile/sync op registries and implementations | `implemented` |
+| `src/codegen/pto/` | PTO codegen for non-distributed kernels | `implemented` |
+| `src/codegen/orchestration/` | orchestration codegen for runtime-facing host/device orchestration | `implemented` |
+| `python/pypto/runtime/runner.py` | compile-and-run workflow with `RunConfig` | `implemented` |
+| `examples/` | hello world、kernel examples、model examples | `implemented` |
 | `include/pypto/ir/function.h` | `Level`、`Role`、`LevelToLinquLevel()` | `implemented` |
 | `src/codegen/distributed/distributed_codegen.cpp` | 生成最高层 orchestrator Python 入口；lower hierarchy calls | `implemented` |
 | `python/pypto/runtime/distributed_runner.py` | L3 distributed program execution via `simpler.Worker(level=3)` | `implemented` |
@@ -32,7 +61,13 @@ last_updated: 2026-05-04
 | `tests/st/distributed/test_l3_parallel_reduce.py` | 多 chip callable + SubWorker reduce 设计测试 | `emerging`，当前 skip |
 | `tests/ut/codegen/test_distributed_codegen.py` | distributed codegen unit tests | `implemented` |
 
-## Level / Role
+## 普通 Runtime Path
+
+`python/pypto/runtime/runner.py` 暴露 `run(program, *tensors, config=RunConfig(...))`，默认 platform 是 `a2a3sim`，也支持 `a2a3`、`a5sim`、`a5`。`RunConfig` 控制 platform、device id、tolerance、optimization strategy、是否 dump passes、是否 codegen-only、runtime/compile profiling 等。
+
+这条路径面向普通 operator 编译执行。Distributed runner 只有在 L3+ hierarchy program 被识别时才进入。
+
+## Distributed Extension: Level / Role
 
 `function.h` 中的 `Level` 包含 `AIV`、`AIC`、`CORE_GROUP`、`CHIP_DIE`、`CHIP`、`HOST`、`CLUSTER_0`、`CLUSTER_1`、`CLUSTER_2`、`GLOBAL`，并通过 `LevelToLinquLevel()` 映射到 Linqu 层级。`Role` 目前区分 `Orchestrator` 和 `SubWorker`。
 

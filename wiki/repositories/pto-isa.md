@@ -4,34 +4,67 @@ type: repo-profile
 status: draft
 sources:
   - repositories/pto-isa/
+  - repositories/pto-isa/README.md
+  - repositories/pto-isa/include/pto/README.md
+  - repositories/pto-isa/demos/README.md
   - materials/pto-runtime-distributed/
 last_updated: 2026-05-04
 ---
 
 # pto-isa
 
-`pto-isa` 是 PTO Tile Library 和 virtual ISA 仓库。它提供 tile-oriented programming 的 C++ API、CPU/NPU 后端、基础 compute 指令以及 communication extension。本轮关注它如何支撑 PyPTO 代码生成和 simpler runtime 中 kernel 侧通信。
+`pto-isa` 是 PTO Tile Library 和 virtual ISA 仓库。先把它理解成 tile-oriented operator/kernel library：它提供 public headers、tile type system、compute/data-movement instructions、CPU simulation、NPU implementations、tests、demos 和性能样例。Communication ISA 是后续扩展层，不是这个仓库的唯一入口。
 
 本页基于 `repositories/pto-isa` commit `a977dd1161222a8b779fb5ff5d1c8b7f4518c3a2`。
 
 ## Repo 直觉
 
-`pto-isa` 不是 runtime orchestrator；它更接近“kernel 作者和 compiler target 共同使用的 tile/comm 指令层”。runtime 负责 worker、scheduler、window bootstrap 和 host/chip lifecycle；PTO-ISA 负责在 kernel 内表达 `TLOAD/TSTORE/TADD`、`TPUT/TGET/TNOTIFY/TWAIT/TTEST`、async session、collective 或 point-to-point communication。
+`pto-isa` 不是 runtime orchestrator；它是 kernel 作者、compiler backend 和 operator demo 共同依赖的 instruction/interface layer。README 将 PTO 定位为 Ascend CANN 定义的 tile-oriented virtual ISA，并强调 90+ standard tile instructions、cross-generation abstraction、CPU simulator、Auto/Manual dual-mode workflow、tile shape/mask/event/pipeline modeling。
+
+最基础的阅读路径应该从非分布式开始：
+
+```text
+include/pto/pto-inst.hpp
+  -> common Tile/Shape/Stride/GlobalTensor infrastructure
+  -> CPU simulation stubs or NPU implementation by SoC
+  -> simple add/GEMM/flash-attention demos
+  -> communication extension only after compute/data movement model is clear
+```
+
+## Tile Programming 基础
+
+`include/pto/README.md` 说明 `include/pto/` 是 public header entry：`common/` 放 platform-independent Tile 和 instruction infrastructure，`cpu/` 放 CPU simulation/debug support，`npu/` 按 SoC 拆 A2/A3/A5 implementation，`comm/` 放 communication instruction library。
+
+`include/pto/common/pto_tile.hpp` 中的 `Shape`、`Stride`、`Tile`、`GlobalTensor` 等类型是普通 compute kernel 的基础。非分布式 operator 通常先用这些类型表达 GM tensor、on-chip tile、layout 和 stride，再用 `TLOAD`、`TSTORE`、`TADD`、`TMATMUL` 等指令表达数据搬运和计算。
+
+## 非分布式示例路径
+
+| 示例 | 说明 | 状态 |
+| --- | --- | --- |
+| `demos/baseline/add` | PTO kernel 封装为 `torch_npu` 自定义 PyTorch operator；host 侧用 `TORCH_LIBRARY`/`TORCH_LIBRARY_IMPL` 注册 schema 和实现 | `implemented` |
+| `demos/baseline/gemm_basic` | 固定尺寸 GEMM，展示 tiling、per-core split、double buffering、pipeline sync | `implemented` |
+| `demos/baseline/flash_atten` | NPU baseline Flash Attention custom operator | `implemented` |
+| `demos/cpu/gemm_demo` / `flash_attention_demo` | CPU simulation demos，用于先验证算法和 instruction semantics | `implemented` |
+| `kernels/manual/*` | hand-tuned NPU kernels 和性能案例 | `implemented` |
 
 ## 主要结构
 
 | 区域 | 作用 | 状态 |
 | --- | --- | --- |
 | `include/pto/` | public PTO tile/ISA headers | `implemented` |
+| `include/pto/common/` | Tile、Shape、Stride、instruction infrastructure | `implemented` |
+| `include/pto/cpu/` | CPU simulation/debug support | `implemented` |
+| `include/pto/npu/` | SoC-specific NPU implementations for A2/A3/A5 | `implemented` |
+| `demos/baseline/` | PyTorch operator examples with CMake/wheel packaging | `implemented` |
+| `demos/cpu/` | cross-platform CPU simulation demos | `implemented` |
+| `kernels/manual/` | hand-optimized operator implementations | `implemented` |
 | `include/pto/comm/` | communication ISA public API and implementations | `implemented` |
 | `include/pto/comm/async_common/` | SDMA/URMA async session type abstraction | `implemented` |
 | `tests/npu/*/comm/st/testcase/` | NPU communication ST for A2/A3 and A5 | `implemented` |
-| `demos/baseline/gemm_basic` | fixed-size GEMM operator and PyTorch extension demo | `implemented` |
-| `demos/baseline/allgather_async` | SDMA/URMA async allgather demo | `implemented` |
 
 ## Communication ISA
 
-`include/pto/comm/README.md` 把通信指令分为 point-to-point、collective、async 和 backend-specific path。重点 API 包括 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、`TTEST`，以及 async path 的 `AsyncSession`、`AsyncEvent`。`async_types.hpp` 中可以看到 SDMA 与 URMA session/context 的并列结构和 engine-agnostic `AsyncSession`。
+在普通 tile compute model 之上，`include/pto/comm/README.md` 把通信指令分为 point-to-point、collective、async 和 backend-specific path。重点 API 包括 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、`TTEST`，以及 async path 的 `AsyncSession`、`AsyncEvent`。`async_types.hpp` 中可以看到 SDMA 与 URMA session/context 的并列结构和 engine-agnostic `AsyncSession`。
 
 状态判断：
 
@@ -42,7 +75,9 @@ last_updated: 2026-05-04
 
 | 示例 | 说明 | 读法 |
 | --- | --- | --- |
+| `demos/baseline/add` | custom PTO kernel + PyTorch operator registration + wheel build/test | first non-distributed operator 示例 |
 | `demos/baseline/gemm_basic` | 固定尺寸 `[512, 2048] x [2048, 1536]` GEMM，说明 tile shape、per-core split、double buffering 和 pipeline sync | compute ISA 示例 |
+| `kernels/manual/common/flash_atten` | hand-tuned Flash Attention operator | complex compute/performance 示例 |
 | `demos/baseline/allgather_async` | A2/A3 用 SDMA `TPUT_ASYNC/TGET_ASYNC`，A5 用 URMA `TPUT_ASYNC/TGET_ASYNC`，MPI rank 映射 device | communication ISA 示例 |
 | `tests/npu/a5/comm/st/testcase/twait/twait_kernel.cpp` | `TNOTIFY` remote signal 与 `TWAIT` local wait；多 rank atomic add/threshold wait | synchronization primitive 示例 |
 
