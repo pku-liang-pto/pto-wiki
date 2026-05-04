@@ -52,6 +52,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 根据 PR review，明确 wiki 的主要形态不是外部资料学习指南，而是可独立阅读的 synthesized learning material。更新 AGENTS、wiki organization/source citation policies 和 workflows，要求 topic/repository pages 先用 prose/diagram/example 解释知识，再用 citations/evidence ledgers 支撑审计；重写 overview、developer takeover guide、examples map、non-distributed execution 和 repo profiles 的关键段落，减少“读别处”的表达。
 
+## [2026-05-04] policy-update | Decouple wiki content from agent rules
+
+新增 `.agents/policies/wiki-content-boundary-policy.md` 和 `.agents/workflows/agent-command-reference.md`，将 human-agent command patterns、placement rules、standalone-learning quality gates 和 reusable process guidance 收拢到 `.agents/`。精简 [Usage](./usage.md)、area indexes 和 overview 中的 agent/process wording，使 rendered wiki 主要承载 PTO-CANN target-set knowledge。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

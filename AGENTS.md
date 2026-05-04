@@ -6,6 +6,7 @@ This repository is a reusable technical wiki template. Agents must keep reusable
 
 Before answering lookup requests, updating the wiki, or documenting repositories, read the relevant files:
 
+- `.agents/workflows/agent-command-reference.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
 - `.agents/workflows/document-material-ingestion.md`
 - `.agents/workflows/repo-documentation.md`
@@ -13,6 +14,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/workflows/github-reference-documentation.md`
 - `.agents/workflows/topic-evidence-discovery.md`
 - `.agents/workflows/wiki-health-and-lint.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
 - `.agents/policies/document-material-policy.md`
@@ -27,6 +29,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
 - Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.
+- Put reusable agent process, command patterns, quality gates, and templates in `.agents/`; do not put agent operating instructions in rendered wiki content.
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.

@@ -14,6 +14,10 @@ Write a short human-readable summary of the topic.
 
 Explain the scope of the page and what readers should learn here.
 
+## Mental Model
+
+Explain the concept directly in prose. Use source links as citations, not as substitutes for explanation.
+
 ## Key Concepts
 
 | Concept | Explanation | Source |

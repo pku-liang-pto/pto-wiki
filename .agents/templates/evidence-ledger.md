@@ -8,7 +8,7 @@ last_updated: YYYY-MM-DD
 
 # <Topic Name> Evidence
 
-This ledger supports [<Topic Page>](../topics/<topic>.md). It records the source set and claim map for topic claims that depend on materials, GitHub references, external documents, or cross-repository synthesis.
+This ledger supports `<Topic Page>`. It records the source set and claim map for topic claims that depend on materials, GitHub references, external documents, or cross-repository synthesis.
 
 ## Source Set
 

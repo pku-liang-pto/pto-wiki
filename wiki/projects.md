@@ -27,7 +27,7 @@ This page lists the current PTO-CANN target repositories. Roles are intentionall
 
 ## Documentation Status
 
-Repository profile pages should be created under [repositories](./repositories/) when a documentation pass inspects source layout, dependencies, build files, tests, examples, and upstream documentation.
+Profile status below indicates how much source-backed wiki coverage exists for each configured repository.
 
 | Repository | Profile status | Inspected ref / confidence | Next documentation need |
 | --- | --- | --- | --- |

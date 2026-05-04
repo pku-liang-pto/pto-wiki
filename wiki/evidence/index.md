@@ -8,13 +8,11 @@ last_updated: 2026-05-04
 
 # Evidence
 
-This area holds topic-scoped evidence ledgers. Evidence pages are not document libraries and do not copy raw materials. They record the source set, material routing, repository anchors, GitHub references, claim map, negative findings, and open questions that support synthesized topic pages.
-
-Create an evidence page when a topic page depends on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis that needs an audit trail.
+This area holds topic-scoped evidence ledgers. Evidence pages are not document libraries and do not copy raw materials. They record source sets, material routing, repository anchors, GitHub references, claim maps, negative findings, and open questions that support synthesized topic pages.
 
 ## Status Labels
 
-Use these labels consistently across topic pages, repository profiles, and evidence ledgers:
+These labels describe the status of target-set claims across topic pages, repository profiles, and evidence ledgers:
 
 | Label | Meaning |
 | --- | --- |

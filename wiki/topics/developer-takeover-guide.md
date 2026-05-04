@@ -110,4 +110,4 @@ Before adding a durable claim, capture:
 - material file and checksum when material-derived
 - GitHub issue/PR/commit URL when status-derived
 - whether the claim is implemented, emerging, design-intended, TODO, stale, inferred, not-run, or open question
-- which topic page and evidence page should carry it
+- which target-set behavior or open question the claim changes

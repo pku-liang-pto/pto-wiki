@@ -2,7 +2,7 @@
 
 This wiki is the human-readable knowledge base for the PTO-CANN target set.
 
-It is a standalone learning layer, not only a pointer map to repositories and review threads. Pages explain the synthesized knowledge directly, then cite source paths, PRs, issues, materials, and evidence ledgers so maintainers can audit the claims.
+It is a standalone learning layer for the configured target set. Pages explain synthesized knowledge directly, with evidence links available for audit.
 
 ## Core Learning Pages
 
@@ -13,7 +13,7 @@ It is a standalone learning layer, not only a pointer map to repositories and re
 - [Distributed Execution](./topics/distributed-execution.md): hierarchy, rank/window communication, current L3 behavior, and remote-runtime boundaries.
 - [Developer Takeover Guide](./topics/developer-takeover-guide.md): maintainer ownership model, risks, and safe change boundaries.
 - [Projects](./projects.md): current PTO and CANN repository index.
-- [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.
+- [Usage](./usage.md): Pixi commands, target configuration, and workspace behavior.
 - [Toolchain Map](./toolchain-map.md): how the current projects are expected to relate.
 - [Repository Profiles](./repositories/): per-repository documentation as it is created.
 - [Evidence](./evidence/): topic-scoped evidence ledgers for material, GitHub, and cross-repository claims.
@@ -22,10 +22,6 @@ It is a standalone learning layer, not only a pointer map to repositories and re
 - [Glossary](./glossary.md): terms and acronyms collected during wiki growth.
 - [Wiki Log](./log.md): append-only record of durable wiki maintenance operations.
 
-## How This Wiki Grows
+## How To Read
 
-When a topic is looked up, agents first check this wiki. If the answer is missing or stale, they inspect the configured target repositories and upstream documentation. Durable, sourced findings are added back here in clear prose.
-
-The wiki should explain what is known, cite where it came from, and preserve uncertainty when evidence is incomplete.
-
-New durable pages should be reachable from this index or an area index. Broad target-set findings should also update [Overview](./overview.md) when they change the synthesis.
+Start with [Overview](./overview.md) for the target-set shape, then use concepts and topic pages for standalone explanations. Follow evidence links when you need to audit a claim against source paths, materials, PRs, issues, or inspected commits.

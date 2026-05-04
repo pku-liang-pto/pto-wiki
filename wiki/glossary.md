@@ -19,4 +19,4 @@ This glossary grows as terms are encountered during lookup and repository docume
 | TensorMap | simpler runtime dependency map that records tensor producers and connects later consumers. | [Basic Terms](./concepts/basic-terms.md) |
 | Ring buffer | Runtime storage pattern for task/output/dependency queues in `tensormap_and_ringbuffer`. | [Basic Terms](./concepts/basic-terms.md) |
 | Target set | The configured group of repositories and concepts documented by this reusable wiki template. | `config/target-set.yml` |
-| Repository profile | A wiki page that explains one repository's role, structure, dependencies, entry points, and open questions. | `.agents/templates/repo-profile.md` |
+| Repository profile | A wiki page that explains one repository's role, structure, dependencies, entry points, and open questions. | [Repository Profiles](./repositories/) |

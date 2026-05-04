@@ -2,6 +2,8 @@
 
 The wiki grows incrementally from real lookup and documentation work.
 
+Use `.agents/policies/wiki-content-boundary-policy.md` to keep reusable agent requirements out of rendered wiki content.
+
 ## Allowed Updates
 
 - Add sourced durable knowledge.

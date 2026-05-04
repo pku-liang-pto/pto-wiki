@@ -11,31 +11,9 @@ last_updated: 2026-05-04
 
 # Overview
 
-This page is the living synthesis for the configured target set. It summarizes durable knowledge that cuts across individual pages and teaches the project shape before sending readers to source evidence.
+This page is the living synthesis for the configured target set. It summarizes durable knowledge that cuts across individual pages and teaches the project shape.
 
-The current target set is defined in `config/target-set.yml`. The wiki is meant to be standalone learning material: source paths, PRs, issues, and materials remain visible so maintainers can audit claims, but the main explanation should live in `wiki/` itself.
-
-## Current Shape
-
-- [Projects](./projects.md) lists configured repositories and their target-set roles.
-- [Toolchain Map](./toolchain-map.md) records the current high-level relationship map.
-- [Repository Profiles](./repositories/) holds per-repository documentation as it is created.
-- [Evidence](./evidence/) holds topic-scoped evidence ledgers for material, GitHub, and cross-repository claims.
-- [Topics](./topics/) holds feature, workflow, behavior, and issue-family syntheses.
-- [Concepts](./concepts/) holds reusable concepts, APIs, protocols, acronyms, and architecture ideas.
-- [Glossary](./glossary.md) collects terms encountered during wiki growth.
-
-## Positioning
-
-This wiki must cover the whole PTO/PyPTO/simpler knowledge path, not only distributed runtime work. Non-distributed features are the basis: terms, normal execution, kernel programming, L2 launch, examples, and maintainer onboarding must stay visible as first-class pages.
-
-Examples deserve high attention because they connect architecture to runnable understanding. The wiki should explain their background concepts, organize them from beginner to expert, compare similar examples across repositories, call out optimization techniques, and preserve TODO/design-intended gaps for examples that do not exist yet.
-
-The desired form is explanatory prose plus compact diagrams, with tables used for comparison and audit summaries. A page should not only say “read this repo file”; it should explain the idea, then cite the repo file or evidence ledger as support.
-
-## Maintenance Notes
-
-Update this page when new evidence changes the broad synthesis of the target set. Do not rewrite it for every small page edit.
+The current target set is defined in `config/target-set.yml`.
 
 ## Current PTO Runtime Synthesis
 

@@ -6,8 +6,9 @@ Use this workflow when updating the wiki from a user-supplied document file, fol
 
 1. Read `AGENTS.md`.
 2. Read `.agents/policies/document-material-policy.md`.
-3. Read `.agents/policies/wiki-organization-policy.md`.
-4. Read `.agents/policies/source-and-citation-policy.md`.
+3. Read `.agents/policies/wiki-content-boundary-policy.md`.
+4. Read `.agents/policies/wiki-organization-policy.md`.
+5. Read `.agents/policies/source-and-citation-policy.md`.
 5. Read existing `wiki/index.md`, `wiki/overview.md`, `wiki/evidence/index.md` when present, and relevant wiki pages.
 
 ## Input Handling

@@ -12,6 +12,10 @@ last_updated: YYYY-MM-DD
 
 Explain the topic or feature in human terms. State the repository or target-set scope.
 
+## Mental Model
+
+Explain the concept directly, using prose and a small ASCII diagram when helpful. Do not make evidence links or tables carry the teaching burden.
+
 ## Foundation
 
 For advanced or distributed topics, cite the basic terms, non-distributed execution flow, repository profiles, and examples that the reader should understand first. Do not let the topic appear detached from its non-distributed basis.

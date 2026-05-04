@@ -13,6 +13,7 @@ Read these before acting:
 
 - `AGENTS.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
@@ -30,6 +31,7 @@ Also read `.agents/policies/document-material-policy.md` when user-supplied mate
 5. Record the inspected path, ref, commit SHA, PR, issue, tag, release, material path, checksum, or retrieval date when freshness matters.
 6. Separate verified facts, inferred architecture, stale evidence, conflicts, and open questions.
 7. Update `wiki/` only when the finding is durable, source-backed, and useful without replaying raw research.
+8. Keep reusable agent requirements in `.agents/`, not in rendered wiki pages.
 
 ## Update Shape
 
@@ -45,6 +47,7 @@ When navigation or synthesis changes, update `wiki/index.md`, the relevant area 
 ## Boundaries
 
 - Do not put target-specific facts in `.agents/`.
+- Do not put reusable agent operating instructions in `wiki/`.
 - Do not copy whole upstream or user-supplied documents into `wiki/`.
 - Do not update the wiki for one-off debugging state, unsupported guesses, or transient command output.
 - Keep GitHub task state separate from durable wiki knowledge unless it explains durable design or compatibility.

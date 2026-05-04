@@ -14,6 +14,7 @@ Read:
 - `AGENTS.md`
 - `.agents/workflows/document-material-ingestion.md`
 - `.agents/policies/document-material-policy.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `wiki/index.md`

@@ -15,6 +15,7 @@ Read:
 - `.agents/workflows/topic-evidence-discovery.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
 - `.agents/workflows/github-reference-documentation.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
 - `config/target-set.yml`
@@ -33,6 +34,6 @@ Use `document-material-ingester` first when the topic starts from files, folders
 
 ## Synthesis
 
-Write or update the smallest useful `wiki/topics/` page. For advanced or distributed topics, cite or add the foundation layer first: basic terms, non-distributed execution, repository roles, and representative examples. When examples are central, include background concepts, beginner-to-expert progression, cross-repository comparison, optimization techniques, and TODO/design-intended missing examples. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger with source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions.
+Write or update the smallest useful `wiki/topics/` page. For advanced or distributed topics, cite or add the foundation layer first: basic terms, non-distributed execution, repository roles, and representative examples. When examples are central, include background concepts, beginner-to-expert progression, cross-repository comparison, optimization techniques, and TODO/design-intended missing examples. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger with source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions. Keep reusable process requirements in `.agents/`, not in topic pages.
 
 Do not claim exhaustive discovery unless the search scope and queries make that defensible. Prefer listing the anchors searched and the strongest related evidence.

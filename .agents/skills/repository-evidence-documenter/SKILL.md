@@ -14,6 +14,7 @@ Read:
 - `AGENTS.md`
 - `.agents/workflows/repo-documentation.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
+- `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/template-reuse-policy.md`
@@ -44,4 +45,4 @@ Inspect enough of these to support each claim:
 
 ## Output
 
-For new repository pages, use `.agents/templates/repo-profile.md`. Explain what the repo does, where it fits, which modules and entry points matter, what examples demonstrate, which relationships are verified, and which claims remain inferred or open.
+For new repository pages, use `.agents/templates/repo-profile.md`. Explain what the repo does, where it fits, which modules and entry points matter, what examples demonstrate, which relationships are verified, and which claims remain inferred or open. Keep reusable documentation process in `.agents/`, not in the rendered wiki page.
