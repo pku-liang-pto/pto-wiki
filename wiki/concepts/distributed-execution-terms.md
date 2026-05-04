@@ -39,6 +39,8 @@ last_updated: 2026-05-04
 | HCOMM | 材料中更底层通信/transport 相关名词；本轮未深入源码确认 | `open question` |
 | URMA/RoCE | remote memory/network data movement 相关目标能力；PTO-ISA 有 URMA async demo，remote runtime control plane 未完成 | `implemented` at primitive/demo level, `design-intended` at runtime level |
 
+Status evidence for these rows is summarized from [Distributed Execution Evidence](../evidence/distributed-execution.md#claim-map), [Lingqu Level Map Evidence](../evidence/lingqu-level-map.md), and [Non-Distributed Execution Evidence](../evidence/non-distributed-execution.md). When a term's status changes, update the paired evidence ledger first, then this concept page.
+
 ## 使用规则
 
 - 写 `implemented` 分布式能力时，必须能落到源码、测试、示例或合并 PR。

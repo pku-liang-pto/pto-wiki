@@ -13,7 +13,7 @@ last_updated: 2026-05-04
 
 # Examples Feature Map
 
-本页把 PTO Runtime、PTO-ISA 和 PyPTO 的代表性例子排成 beginner-to-expert 学习路径。它同时覆盖非分布式和分布式例子，并把相似例子放在一起比较。示例选择、状态标签和缺口记录在 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)。
+本页把 PTO Runtime、PTO-ISA 和 PyPTO 的代表性例子排成 beginner-to-expert 学习路径。它同时覆盖非分布式和分布式例子，并把相似例子放在一起比较。示例选择、状态标签和缺口记录在 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)；`implemented` 表示源码/文档/测试中存在对应例子，不表示本 wiki pass 已本地运行，运行状态见 [Run Surface And Caveats](#run-surface-and-caveats)。
 
 ## LLM Intuition Before Examples
 
@@ -41,19 +41,32 @@ tokens
 
 ## Beginner-To-Expert Path
 
-| Level | Example | Repository | What it teaches | Status |
+| Level | Example | Repository | Prerequisite concepts | What it teaches | Status |
+| --- | --- | --- | --- | --- | --- |
+| 0. Hello | `examples/hello_world.py` | PyPTO | `@pl.program`, Tensor, Tile | `InCore`, `Orchestration`, `pl.load/add/store` | `implemented` |
+| 1. Scalar/vector kernel | `examples/kernels/01_elementwise.py`; `demos/baseline/add` | PyPTO / PTO-ISA | Tile, GM, `TLOAD/TSTORE` | same basic add-like idea in Python DSL vs PTO kernel/operator package | `implemented` |
+| 2. GEMM | `examples/kernels/03_matmul.py`; `demos/baseline/gemm_basic` | PyPTO / PTO-ISA | Tile shape, L1/L0, pipeline | matmul API, tile movement, pipeline/double-buffering optimization | `implemented` |
+| 3. Softmax/norm | `examples/kernels/06_softmax.py`; `07_normalization.py` | PyPTO | row reduction, tensor/tile lowering | vector reductions used by attention and transformer layers | `implemented` |
+| 4. Single-chip runtime | `examples/workers/l2/vector_add` | simpler | `ChipWorker`, `TaskArgs`, `ChipCallable` | kernel compile/load/run/copy-back | `implemented` |
+| 5. Production runtime | `examples/a2a3/tensormap_and_ringbuffer/paged_attention` | simpler | TensorMap, ring buffer, AIC/AIV | AIC/AIV DAG and flow-control-oriented runtime | `implemented` |
+| 6. Attention model | `examples/models/03_flash_attention.py`; `04_paged_attention.py` | PyPTO | GEMM, softmax, KV cache | online softmax, QK/PV pipeline, KV cache block access | `implemented` |
+| 7. Complete NN baseline | `examples/models/08_llama_mini.py` | PyPTO | RMSNorm, RoPE, FFN, LM head | simplified LLaMA-style decoder layer | `implemented` |
+| 8. Multi-chip runtime | `examples/workers/l3/allreduce_distributed`; `ffn_tp_parallel` | simpler | rank, comm window, HCCL data plane | cross-rank sum and TensorMap stage dependency | `implemented` |
+| 9. PyPTO hierarchy | `tests/st/distributed/test_l3_distributed.py` | PyPTO | HOST/CHIP/SubWorker roles | hierarchy DSL compiled to simpler L3 runner | `implemented` |
+| 10. Complete distributed NN | design target: distributed LLaMA/FFN/attention vertical slice | PyPTO + simpler + PTO-ISA | all prior concepts | model-level graph + distributed runtime + kernel-level optimization | `TODO` / `design-intended` |
+
+## Examples-First Command Lanes
+
+This is a practical ladder for readers who learn by running or inspecting examples. Commands are source-documented and were not executed in this wiki pass unless explicitly noted.
+
+| Lane | First command or action | Requires hardware | Expected output / done signal | Next modification |
 | --- | --- | --- | --- | --- |
-| 0. Hello | `examples/hello_world.py` | PyPTO | `@pl.program`, `InCore`, `Orchestration`, `pl.load/add/store` | `implemented` |
-| 1. Scalar/vector kernel | `examples/kernels/01_elementwise.py`; `demos/baseline/add` | PyPTO / PTO-ISA | same basic add-like idea in Python DSL vs PTO kernel/operator package | `implemented` |
-| 2. GEMM | `examples/kernels/03_matmul.py`; `demos/baseline/gemm_basic` | PyPTO / PTO-ISA | matmul API, tile movement, pipeline/double-buffering optimization | `implemented` |
-| 3. Softmax/norm | `examples/kernels/06_softmax.py`; `07_normalization.py` | PyPTO | vector reductions used by attention and transformer layers | `implemented` |
-| 4. Single-chip runtime | `examples/workers/l2/vector_add` | simpler | `ChipWorker`, `TaskArgs`, kernel compile/load/run/copy-back | `implemented` |
-| 5. Production runtime | `examples/a2a3/tensormap_and_ringbuffer/paged_attention` | simpler | TensorMap, ring buffers, AIC/AIV DAG, flow-control-oriented runtime | `implemented` |
-| 6. Attention model | `examples/models/03_flash_attention.py`; `04_paged_attention.py` | PyPTO | online softmax, QK/PV pipeline, KV cache block access | `implemented` |
-| 7. Complete NN baseline | `examples/models/08_llama_mini.py` | PyPTO | simplified LLaMA-style decoder layer, RMSNorm, QKV, RoPE, MLP, LM head | `implemented` |
-| 8. Multi-chip runtime | `examples/workers/l3/allreduce_distributed`; `ffn_tp_parallel` | simpler | HCCL window scratch, TensorMap stage dependency, cross-rank sum | `implemented` |
-| 9. PyPTO hierarchy | `tests/st/distributed/test_l3_distributed.py` | PyPTO | HOST/CHIP/SubWorker DSL compiled to simpler L3 runner | `implemented` |
-| 10. Complete distributed NN | design target: distributed LLaMA/FFN/attention vertical slice | PyPTO + simpler + PTO-ISA | model-level graph + distributed runtime + kernel-level optimization | `TODO` / `design-intended` |
+| Source-only PyPTO print | `python examples/hello_world.py` in `repositories/pypto` | no | prints generated Python/IR representation | change tensor shape or replace `pl.add` with another elementwise op |
+| Source-only PyPTO model | `python examples/models/03_flash_attention.py` | no | prints function representation | inspect loop-carried state and online softmax updates |
+| Simulator simpler L2 | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` in `repositories/simpler` | no NPU, but runtime binaries/build cache needed | golden check passes in vector_add output | change vector size or add another tensor input |
+| Single-device PTO-ISA | `./run.sh` or README build/test sequence in `repositories/pto-isa/demos/baseline/add` | yes for NPU path | wheel builds, installs, and `test.py` passes | replace add kernel with another elementwise operator |
+| Multi-device communication | `./run.sh 2 Ascend950PR_9599` in `repositories/pto-isa/demos/baseline/allgather_async` or pytest simpler L3 examples | yes, multi-device + MPI/HCCL | all ranks report pass / pytest passes | compare allgather primitive with simpler L3 allreduce |
+| Substitute expert exercise | read `pypto/examples/models/08_llama_mini.py` beside `simpler/examples/workers/l3/ffn_tp_parallel` | no for reading | identify which model stages would need distributed tensor-parallel support | write a design note for the missing complete distributed NN vertical slice |
 
 ## Common Example Families
 
@@ -89,12 +102,12 @@ tokens
 
 | Technique | Where to see it | Why it matters |
 | --- | --- | --- |
-| Tiling and memory-space movement | PTO-ISA GEMM, PyPTO matmul kernels | turns tensor ops into hardware-shaped tile movement and compute |
-| pipeline / double buffering | PTO-ISA GEMM and Flash Attention examples | overlaps movement and compute for throughput |
-| online softmax | PyPTO Flash Attention / Paged Attention | avoids materializing full attention state and supports block-wise KV processing |
-| TensorMap dependency discovery | simpler `ffn_tp_parallel`, paged attention runtime | avoids explicit manual edges when producer/consumer tensors share addresses |
-| ring-buffer task/output storage | simpler `tensormap_and_ringbuffer` examples | supports streaming tasks and production-oriented flow control |
-| HCCL window scratch | simpler `allreduce_distributed` | provides device-visible cross-rank data plane without making HCCL the runtime control plane |
+| Tiling and memory-space movement | PTO-ISA GEMM, PyPTO matmul kernels | read after Tile/GM/L1/L0; look for GM -> tile -> compute -> store |
+| pipeline / double buffering | PTO-ISA GEMM and Flash Attention examples | read after GEMM; look for staged load/compute/store overlap |
+| online softmax | PyPTO Flash Attention / Paged Attention | read after softmax/norm; look for running max/sum and block-wise KV processing |
+| TensorMap dependency discovery | simpler `ffn_tp_parallel`, paged attention runtime | read after `TaskArgs`; look for shared tensor address producer/consumer edges |
+| ring-buffer task/output storage | simpler `tensormap_and_ringbuffer` examples | read after L2 runtime; look for task slots, output heap, and flow control |
+| HCCL window scratch | simpler `allreduce_distributed` | read after `CommContext`; look for device-visible rank/window data plane without treating HCCL as control plane |
 
 ## Missing Example Roadmap
 
@@ -104,6 +117,7 @@ tokens
 | PyPTO orchestration-level collective example | `pl.all_reduce` / `all_gather` style API lowered to runtime/kernel support | `design-intended` |
 | Remote L3 example | HostWorker -> DistWorker -> remote chip workers with persistent run loop | `design-intended` |
 | Maintainer golden path | one command sequence that runs hello, L2 vector add, paged attention, L3 allreduce, and LLaMA mini | `TODO` |
+| CANN/HCCL bridge example | compare HCCL collective examples with PTO-ISA allgather and simpler allreduce | `TODO` |
 
 ## What Not To Infer
 

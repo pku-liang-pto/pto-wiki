@@ -86,6 +86,16 @@ README 将 examples 明确分成 hello world、kernel examples 和 model example
 
 这些例子构成 distributed 页面必须依赖的 foundation layer：如果不能解释普通 `@pl.program`、tile lowering、model examples 和 runtime runner，就不应直接从 L3 distributed runner 开始讲 PyPTO。
 
+## Try First
+
+| Goal | Command / action | Expected signal | Common blocker |
+| --- | --- | --- | --- |
+| smallest DSL print | `python examples/hello_world.py` | generated program text prints | package not installed in current environment |
+| kernel family scan | `python examples/kernels/06_softmax.py` | generated softmax program text prints | missing dev install |
+| model control-flow scan | `python examples/models/03_flash_attention.py` | function representation prints | advanced DSL concepts not yet read |
+| unit-test confidence | `python -m pytest tests/ut -n auto --maxprocesses 8 -v` | unit tests pass | dev dependencies missing |
+| complete NN reading | inspect `examples/models/08_llama_mini.py` | can identify RMSNorm, QKV, RoPE, MLP, LM head | no CLI entrypoint in inspected file |
+
 ## Distributed Extension: Level / Role
 
 `function.h` 中的 `Level` 包含 `AIV`、`AIC`、`CORE_GROUP`、`CHIP_DIE`、`CHIP`、`HOST`、`CLUSTER_0`、`CLUSTER_1`、`CLUSTER_2`、`GLOBAL`，并通过 `LevelToLinquLevel()` 映射到 Lingqu 层级。`Role` 目前区分 `Orchestrator` 和 `SubWorker`。

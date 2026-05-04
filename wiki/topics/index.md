@@ -14,6 +14,7 @@ Create a topic page when evidence spans multiple repositories, issues, PRs, comm
 
 ## Pages
 
+- Examples-first reader path: [Examples Feature Map](./examples-feature-map.md) should be read after [Basic Terms](../concepts/basic-terms.md) and [Non-Distributed Execution](./non-distributed-execution.md), then followed by [Distributed Execution](./distributed-execution.md).
 - [Non-Distributed Execution](./non-distributed-execution.md): PyPTO、PTO-ISA、simpler L2 的普通编译、kernel 和单 chip execution flow。
 - [Examples Feature Map](./examples-feature-map.md): simpler、pto-isa、pypto 的代表性示例与特性映射。
 - [Distributed Execution](./distributed-execution.md): 跨仓库分布式执行综合说明。

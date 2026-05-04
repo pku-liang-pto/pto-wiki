@@ -93,12 +93,12 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 | 主题 | 状态 | 证据 |
 | --- | --- | --- |
 | L3 host orchestration | `implemented` | `simpler/examples/workers/l3/README.md` |
-| HCCL comm API backend | `implemented` | simpler PR #592；`src/common/platform_comm/comm.h` |
-| Device-resident tensor affinity | `implemented` | simpler PR #579；`child_memory=True` examples |
-| Deferred completion | `implemented` | simpler PR #670/#692/#700；issue #686 |
-| SDMA async completion | `emerging` | simpler PR #696 open |
+| HCCL comm API backend | `implemented` | [simpler PR #592](https://github.com/hw-native-sys/simpler/pull/592)；`src/common/platform_comm/comm.h` |
+| Device-resident tensor affinity | `implemented` | [simpler PR #579](https://github.com/hw-native-sys/simpler/pull/579)；`child_memory=True` examples |
+| Deferred completion | `implemented` | [simpler PR #670](https://github.com/hw-native-sys/simpler/pull/670)、[#692](https://github.com/hw-native-sys/simpler/pull/692)、[#700](https://github.com/hw-native-sys/simpler/pull/700)；[issue #686](https://github.com/hw-native-sys/simpler/issues/686) |
+| SDMA async completion | `emerging` | [simpler PR #696](https://github.com/hw-native-sys/simpler/pull/696) open |
 | PyPTO L3 runner | `implemented` | `pypto/runtime/distributed_runner.py` |
-| PyPTO orchestration collectives | `design-intended` | pypto issue #1189 open |
+| PyPTO orchestration collectives | `design-intended` | [pypto issue #1189](https://github.com/hw-native-sys/pypto/issues/1189) open |
 | Remote L3 / DistWorker | `design-intended` | material blueprint; no stable repo implementation found |
 
 这些状态判断的 claim map 见 [Distributed Execution Evidence](../evidence/distributed-execution.md#claim-map)。

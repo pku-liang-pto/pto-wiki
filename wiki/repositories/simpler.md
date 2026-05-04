@@ -80,6 +80,14 @@ Python test/example
 | `examples/workers/l2/vector_add` | 编译 AIV kernel 为 `ChipCallable`，构造 `TaskArgs`，host/device copy，运行并与 numpy 比较 | `implemented` |
 | `examples/a2a3/tensormap_and_ringbuffer/paged_attention` | `tensormap_and_ringbuffer` production runtime 示例，orchestration 中提交 AIC/AIV tasks | `implemented` |
 
+## Try First
+
+| Goal | Command / action | Expected signal | Common blocker |
+| --- | --- | --- | --- |
+| lifecycle check | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | worker init, malloc/free, close complete | runtime binaries not built |
+| smallest full L2 run | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | golden check passes | PTO-ISA headers/build cache missing on first run |
+| L3 hardware reading path | inspect `examples/workers/l3/allreduce_distributed` and `ffn_tp_parallel` before running | can explain rank/window and TensorMap dependency | requires A2/A3 multi-device hardware |
+
 ## Host-side DAG 层
 
 `docs/orchestrator.md` 把 Orchestrator 定义为 DAG builder。它拥有 `Ring`、`TensorMap`、`Scope`，在 `submit_next_level` / `submit_sub` 时消费 `TaskArgs` 的 tensor tags：`INPUT`/`INOUT` 做 TensorMap lookup，`OUTPUT`/`INOUT`/`OUTPUT_EXISTING` 做 insert。tags 在 submit 阶段被消费，后续 scheduler/worker 不再携带 tags。
@@ -105,16 +113,16 @@ Python test/example
 | `examples/workers/l3/multi_chip_dispatch` | 两个 chip + 一个 SubWorker，展示 host orchestration dispatch | `implemented` |
 | `examples/workers/l3/allreduce_distributed/main.py` | two-chip hardware allreduce；cross-rank communication 在 kernel 内经 HCCL window scratch 完成 | `implemented` |
 | `examples/workers/l3/ffn_tp_parallel/main.py` | Stage 1 AIC matmul + Stage 2 AIV reduce；TensorMap 通过相同 `buffer.addr` 自动链接 producer/consumer | `implemented` |
-| `examples/workers/l3/ffn_tp_parallel` from PR #571 | FFN tensor-parallel end-to-end demo | `implemented` |
+| `examples/workers/l3/ffn_tp_parallel` from [PR #571](https://github.com/hw-native-sys/simpler/pull/571) | FFN tensor-parallel end-to-end demo | `implemented` |
 
 ## 分布式相关进展
 
 | 证据 | 结论 |
 | --- | --- |
-| PR #579 | `child_memory`、`TensorKey`、scheduler affinity 支撑 device-resident tensor。`implemented` |
-| PR #592 | HCCL backend for comm C API。`implemented` |
-| PR #670/#692/#700 与 issue #686 | deferred completion API 和 context 已经历数轮合并。`implemented` |
-| PR #696 | SDMA async completion 仍打开。`emerging` |
+| [PR #579](https://github.com/hw-native-sys/simpler/pull/579) | `child_memory`、`TensorKey`、scheduler affinity 支撑 device-resident tensor。`implemented` |
+| [PR #592](https://github.com/hw-native-sys/simpler/pull/592) | HCCL backend for comm C API。`implemented` |
+| [PR #670](https://github.com/hw-native-sys/simpler/pull/670) / [#692](https://github.com/hw-native-sys/simpler/pull/692) / [#700](https://github.com/hw-native-sys/simpler/pull/700) 与 [issue #686](https://github.com/hw-native-sys/simpler/issues/686) | deferred completion API 和 context 已经历数轮合并。`implemented` |
+| [PR #696](https://github.com/hw-native-sys/simpler/pull/696) | SDMA async completion 仍打开。`emerging` |
 | 材料 `03_distributed_blueprint.md`/`04_feature_deep_dives.md` | remote L3 worker、persistent run_loop、callable registry、platform decoupling 是目标蓝图。`design-intended` |
 
 ## 架构边界

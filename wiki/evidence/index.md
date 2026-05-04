@@ -12,6 +12,21 @@ This area holds topic-scoped evidence ledgers. Evidence pages are not document l
 
 Create an evidence page when a topic page depends on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis that needs an audit trail.
 
+## Status Labels
+
+Use these labels consistently across topic pages, repository profiles, and evidence ledgers:
+
+| Label | Meaning |
+| --- | --- |
+| `implemented` | Source, test, example, documentation, or merged PR exists. It does not mean this wiki pass ran the code locally. |
+| `emerging` | Open PR/issue, skipped test, partial implementation, or unstable interface exists. |
+| `design-intended` | Materials or design docs describe the target, but stable source evidence is missing. |
+| `TODO` | The wiki or target project explicitly lacks an example, guide, or implementation slice. |
+| `stale` | Older issue/material exists but newer source, PR, or material supersedes it. |
+| `inferred` | Architecture conclusion derived from source structure rather than explicit upstream wording. |
+| `open question` | Evidence is insufficient, conflicting, or not yet inspected. |
+| `not-run` | The example or command was documented from source/README evidence but not executed during the wiki pass. |
+
 ## Pages
 
 - [Distributed Execution Evidence](./distributed-execution.md): evidence for the distributed execution synthesis, material routing, GitHub status labels, and negative findings.

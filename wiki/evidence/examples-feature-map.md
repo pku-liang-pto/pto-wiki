@@ -52,6 +52,14 @@ This ledger supports [Examples Feature Map](../topics/examples-feature-map.md). 
 | `allreduce_distributed` and `ffn_tp_parallel` demonstrate current L3/multi-chip distributed data-plane behavior, not remote multi-host runtime. | simpler L3 example files; material `05_progress_and_timeline.md`; [Distributed Execution Evidence](./distributed-execution.md). | [Examples Feature Map](../topics/examples-feature-map.md#what-not-to-infer) |
 | `test_l3_parallel_reduce.py` is `emerging` because the test is skipped. | `pypto/tests/st/distributed/test_l3_parallel_reduce.py`. | [Examples Feature Map](../topics/examples-feature-map.md#what-not-to-infer) |
 
+## Material Routing
+
+| Material file | Details used | Destination |
+| --- | --- | --- |
+| `materials/pto-runtime-distributed/05_progress_and_timeline.md` | PR/demo timeline and distributed example status, especially FFN TP, HCCL backend, deferred completion, SDMA async completion | beginner-to-expert distributed rows and missing-example roadmap |
+| `materials/pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计.md` | writing priority: examples are high-value maintainer evidence and distributed is a second reading layer | examples-first structure and non-distributed-before-distributed ordering |
+| `materials/pto-runtime-distributed/02_pto_isa_and_runtime_basics.md` | L2/L3 runtime concepts, TensorMap, comm window, deferred completion | optimization notes and L2/L3 example interpretation |
+
 ## Negative Findings
 
 - The matrix is not a complete example index.

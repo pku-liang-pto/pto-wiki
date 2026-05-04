@@ -81,6 +81,14 @@ include/pto/pto-inst.hpp
 | `demos/baseline/allgather_async` | A2/A3 用 SDMA `TPUT_ASYNC/TGET_ASYNC`，A5 用 URMA `TPUT_ASYNC/TGET_ASYNC`，MPI rank 映射 device | communication ISA 示例 |
 | `tests/npu/a5/comm/st/testcase/twait/twait_kernel.cpp` | `TNOTIFY` remote signal 与 `TWAIT` local wait；多 rank atomic add/threshold wait | synchronization primitive 示例 |
 
+## Try First
+
+| Goal | Command / action | Expected signal | Common blocker |
+| --- | --- | --- | --- |
+| custom operator baseline | follow `demos/baseline/add/README.md` or run `./run.sh` in that directory | wheel builds, installs, and `test/test.py` passes | CANN, `torch_npu`, `PTO_LIB_PATH`, target SoC |
+| GEMM optimization reading | inspect `demos/baseline/gemm_basic/README.md` and `test/test.py` | can explain fixed shapes, per-core split, double buffering | hardware/software stack unavailable for run |
+| communication primitive demo | `./run.sh 2 Ascend950PR_9599` in `demos/baseline/allgather_async` | allgather demos pass for ranks | CANN Toolkit/Ops, MPICH, enough NPU devices |
+
 ## 与 simpler 的关系
 
 `simpler` 的 L3 hardware examples 会通过 `simpler_setup.pto_isa.ensure_pto_isa_root()` 获取 PTO-ISA root，再用 `KernelCompiler.compile_incore()` 编译 AIC/AIV kernel。也就是说，PTO-ISA 是 kernel-level target；simpler 是运行和调度这些 kernel 的 runtime。

@@ -6,6 +6,8 @@ It starts as a map, not as a complete mirror of every upstream project. Pages ar
 
 ## Start Here
 
+- New to PTO-CANN: [Basic Terms](./concepts/basic-terms.md) -> [Non-Distributed Execution](./topics/non-distributed-execution.md) -> [Examples Feature Map](./topics/examples-feature-map.md) -> [Repository Profiles](./repositories/) -> [Distributed Execution](./topics/distributed-execution.md).
+- Examples-first path: [Examples Feature Map](./topics/examples-feature-map.md) starts from source-only examples, then simulator, single-device hardware, and multi-device communication lanes.
 - [Overview](./overview.md): living synthesis across the configured target set.
 - [Projects](./projects.md): current PTO and CANN repository index.
 - [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.

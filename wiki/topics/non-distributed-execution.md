@@ -50,6 +50,33 @@ Key non-distributed stages:
 4. Generate artifacts for simulator or hardware platform.
 5. Execute through `runtime.run()` with `RunConfig`.
 
+## Hello World End-To-End
+
+Use `repositories/pypto/examples/hello_world.py` as the smallest concrete path:
+
+```text
+HelloWorldProgram
+  -> tile_add(a, b, c)
+      -> pl.load(a) / pl.load(b)
+      -> pl.add(tile_a, tile_b)
+      -> pl.store(tile_c, c)
+  -> orchestrator(...)
+      -> self.tile_add(...)
+  -> HelloWorldProgram.as_python()
+```
+
+What this teaches:
+
+| Step | Evidence | Reader check |
+| --- | --- | --- |
+| DSL shape | `@pl.program`, `@pl.function(type=InCore)`, `pl.Tensor`, `pl.Tile`, `pl.Out` in `hello_world.py` | identify which function is kernel-level and which is orchestration-level |
+| IR / pass path | `python/pypto/ir/compile.py`, `python/pypto/ir/pass_manager.py` | confirm ordinary programs return `CompiledProgram`, not `DistributedCompiledProgram` |
+| Runtime handoff | `python/pypto/runtime/runner.py` and `RunConfig` | see where platform/device choices enter |
+| L2 execution foundation | [simpler](../repositories/simpler.md#l0-l2-ascend-启动路径) | understand where host/AICPU/AICore launch begins |
+| Kernel instruction layer | [pto-isa](../repositories/pto-isa.md#tile-programming-基础) | connect `load/add/store` to tile memory and instruction concepts |
+
+This hello path is mostly source/IR-print oriented. It is the prerequisite for reading examples that actually run through simulator, hardware, L3 orchestration, or communication windows.
+
 ## Normal PTO-ISA Flow
 
 PTO-ISA starts below PyPTO: it gives kernel authors and compiler backends a tile-oriented instruction layer. The basic examples are `demos/baseline/add`, `demos/baseline/gemm_basic`, CPU demos, and manual kernels. They show:

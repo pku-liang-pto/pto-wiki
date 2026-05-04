@@ -44,6 +44,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 补齐 [Examples Feature Map](./topics/examples-feature-map.md) 的 run surface、environment assumptions 和 not-run caveats；扩展 [Distributed Execution Terms](./concepts/distributed-execution-terms.md) 的 cross-repository name map；在 repository profiles 中补充 evidence-based interpretation，明确 non-distributed foundations 与 distributed extension 的阅读边界。
 
+## [2026-05-04] review-update | Add role-based wiki content review and fixes
+
+新增 `.agents/agents/` reviewer profiles，并根据 project-newbie、next-maintainer、examples-first developer、evidence-auditor 四类反馈补充 newcomer/examples navigation、project documentation status、glossary/CANN foundation、maintainer action tables、repo Try First blocks、GitHub evidence URLs、material manifest 和 status-label centralization。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.
