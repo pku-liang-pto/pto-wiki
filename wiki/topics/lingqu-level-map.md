@@ -1,22 +1,22 @@
 ---
-title: "Linqu Level Map"
+title: "Lingqu Level Map"
 type: topic
 status: draft
 sources:
   - repositories/pypto_top_level_documents/linqu_runtime_design.md
   - repositories/pypto/include/pypto/ir/function.h
   - materials/pto-runtime-distributed/08_top_level_design_alignment.md
-  - wiki/evidence/linqu-level-map.md
+  - wiki/evidence/lingqu-level-map.md
 last_updated: 2026-05-04
 ---
 
-# Linqu Level Map
+# Lingqu Level Map
 
-本页把 top-level Linqu runtime design、PyPTO `Level` enum 和 simpler worker 层级放在一张表里，避免把“代码里能表达的层级”和“runtime 已经可运行的层级”混为一谈。
+本页把 top-level Lingqu runtime design、PyPTO `Level` enum 和 simpler worker 层级放在一张表里，避免把“代码里能表达的层级”和“runtime 已经可运行的层级”混为一谈。
 
 ## 层级映射
 
-| Linqu level | PyPTO level | runtime 读法 | 当前状态 |
+| Lingqu level | PyPTO level | runtime 读法 | 当前状态 |
 | --- | --- | --- | --- |
 | L0 | `AIV` / `AIC` / `CORE_GROUP` | InCore / tile-level kernel | `implemented` through PTO-ISA and PyPTO kernel path |
 | L1 | `CHIP_DIE` | chip 内更高一级 scope | `implemented`/partial，具体边界依赖 runtime |
@@ -37,7 +37,7 @@ last_updated: 2026-05-04
 - L4-L6：只能写设计目标，不能写成当前实现。
 - `GLOBAL`：PyPTO enum 存在，但 runtime 语义需要后续证据。
 
-这些状态标签的证据边界见 [Linqu Level Map Evidence](../evidence/linqu-level-map.md#claim-map)。
+这些状态标签的证据边界见 [Lingqu Level Map Evidence](../evidence/lingqu-level-map.md#claim-map)。
 
 ## 术语对齐
 

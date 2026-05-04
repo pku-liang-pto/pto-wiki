@@ -41,7 +41,7 @@ Python DSL (@pl.program / @pl.function)
 
 `python/pypto/language/parser/README.md` 说明 parser 用 decorator-based parser 将 Python DSL 转成 IR，并处理 type annotations、control flow、SSA verification 和 span tracking。`python/pypto/ir/pass_manager.py` 中 `OptimizationStrategy.Default` 注册了从 `UnrollLoops`、`ConvertToSSA`、`OutlineIncoreScopes` 到 `ConvertTensorToTileOps`、`InferTileMemorySpace`、`LowerPipelineLoops`、`AllocateMemoryAddr`、`DeriveCallDirections` 等 passes。
 
-`python/pypto/ir/compile.py` 的 `compile()` 负责运行 PassManager、dump IR、调用 backend `generate()`、写 artifacts，并返回 `CompiledProgram`。只有当 transformed program 中存在 Linqu level >= 3 的 function 时，它才返回 `DistributedCompiledProgram`。
+`python/pypto/ir/compile.py` 的 `compile()` 负责运行 PassManager、dump IR、调用 backend `generate()`、写 artifacts，并返回 `CompiledProgram`。只有当 transformed program 中存在 Lingqu level >= 3 的 function 时，它才返回 `DistributedCompiledProgram`。
 
 ## 核心模块
 
@@ -69,7 +69,7 @@ Python DSL (@pl.program / @pl.function)
 
 ## Distributed Extension: Level / Role
 
-`function.h` 中的 `Level` 包含 `AIV`、`AIC`、`CORE_GROUP`、`CHIP_DIE`、`CHIP`、`HOST`、`CLUSTER_0`、`CLUSTER_1`、`CLUSTER_2`、`GLOBAL`，并通过 `LevelToLinquLevel()` 映射到 Linqu 层级。`Role` 目前区分 `Orchestrator` 和 `SubWorker`。
+`function.h` 中的 `Level` 包含 `AIV`、`AIC`、`CORE_GROUP`、`CHIP_DIE`、`CHIP`、`HOST`、`CLUSTER_0`、`CLUSTER_1`、`CLUSTER_2`、`GLOBAL`，并通过 `LevelToLinquLevel()` 映射到 Lingqu 层级。`Role` 目前区分 `Orchestrator` 和 `SubWorker`。
 
 当前代码能表达比 L3 更高的枚举，但 runtime runner 的稳定执行路径主要是 L3。L4-L6 应标为 `design-intended`，除非后续源码提供可运行测试。
 
@@ -102,9 +102,9 @@ DistributedCompiledProgram
 | `tests/st/distributed/test_l3_parallel_reduce.py` | 两个 independent chip tasks + SubWorker reduce，期望输出 `2a` | `emerging`，测试 skip because runtime support pending |
 | `tests/ut/codegen/test_distributed_codegen.py` | hierarchy call lowering、SubWorker inline body、tensor arg tags | `implemented` |
 
-## 与 Linqu 设计的关系
+## 与 Lingqu 设计的关系
 
-PyPTO 的 `LevelToLinquLevel()` 与 top-level design 中的 L0-L6 方向一致，但当前实现和测试的重心是 HOST/CHIP/CORE_GROUP 附近。Linqu L4-L6 在本轮证据中仍应写为 `design-intended` 或 `open question`。
+PyPTO 的 `LevelToLinquLevel()` 与 top-level design 中的 L0-L6 方向一致，但当前实现和测试的重心是 HOST/CHIP/CORE_GROUP 附近。Lingqu L4-L6 在本轮证据中仍应写为 `design-intended` 或 `open question`。
 
 ## 未决问题
 

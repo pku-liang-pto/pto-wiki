@@ -39,14 +39,14 @@ This ledger supports [Distributed Execution](../topics/distributed-execution.md)
 | Material file | Distributed-execution details used | Other topic destination |
 | --- | --- | --- |
 | `00_README.md` | remote L3 worker gaps, callable registration gaps, child-worker sync limits, ABI/deployment coupling, PR/issue status | [Examples Feature Map Evidence](./examples-feature-map.md) for PR/demo routing |
-| `01_hardware_and_software_stack.md` | Ascend/CANN/HCCL/HCOMM/URMA/RoCE boundary, control-plane vs data-plane split | [Linqu Level Map Evidence](./linqu-level-map.md) for hardware hierarchy context |
+| `01_hardware_and_software_stack.md` | Ascend/CANN/HCCL/HCOMM/URMA/RoCE boundary, control-plane vs data-plane split | [Lingqu Level Map Evidence](./lingqu-level-map.md) for hardware hierarchy context |
 | `02_pto_isa_and_runtime_basics.md` | worker hierarchy, mailbox, TensorMap/child memory, CommContext/window, deferred completion, current-runtime limits | [Examples Feature Map Evidence](./examples-feature-map.md) for L2/L3 learning examples |
-| `03_distributed_blueprint.md` | target topology, remote worker model, rank/affinity, bootstrap, persistent run_loop, platform decoupling | [Linqu Level Map Evidence](./linqu-level-map.md) for L4-L6 design-intended labels |
+| `03_distributed_blueprint.md` | target topology, remote worker model, rank/affinity, bootstrap, persistent run_loop, platform decoupling | [Lingqu Level Map Evidence](./lingqu-level-map.md) for L4-L6 design-intended labels |
 | `04_feature_deep_dives.md` | remote L3, callable registry, worker memory, comm window, deferred completion, send/recv runtime | none beyond distributed topic |
 | `05_progress_and_timeline.md` | merged/open PR and issue timeline for simpler/PyPTO distributed features | [Examples Feature Map Evidence](./examples-feature-map.md) for representative examples |
 | `06_development_tasks.md` | P0/P1/P2 future work and distributed gaps | not copied as task tracker; summarized as open questions |
 | `07_source_notes.md` | evidence trust boundary and source priority | supports all evidence pages |
-| `08_top_level_design_alignment.md` | HostWorker/DistWorker and L0-L6 mapping | [Linqu Level Map Evidence](./linqu-level-map.md) |
+| `08_top_level_design_alignment.md` | HostWorker/DistWorker and L0-L6 mapping | [Lingqu Level Map Evidence](./lingqu-level-map.md) |
 | `PTO-Runtime分布式拓展文档系统设计.md` | writing priority: repo intuition, examples, repo-specific architecture, distributed as second reading layer, HCCL as supporting evidence | informs organization, not target-system facts |
 
 ## Repository Anchors
@@ -68,7 +68,7 @@ This ledger supports [Distributed Execution](../topics/distributed-execution.md)
 | simpler | PR #670/#692/#700 and issue #686 | merged/closed | deferred completion API and context are `implemented`. |
 | simpler | PR #696 | open | A2/A3 SDMA async completion is `emerging`. |
 | simpler | issue #303 | closed | early L1-L4 multi-card background; treated as `stale` for current architecture. |
-| pypto | PR #611 | merged | Linqu hierarchy distributed C++ codegen stage is `implemented`. |
+| pypto | PR #611 | merged | Lingqu hierarchy distributed C++ codegen stage is `implemented`. |
 | pypto | issue #1127 | open | L3 Distributed Programming Interface Design RFC is `emerging`. |
 | pypto | issue #1189 | open | orchestration-level collectives are `design-intended`. |
 | pypto | PR #1227 | open | host_orch tensor pre-initialization for fork visibility is `emerging`. |

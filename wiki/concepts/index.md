@@ -14,4 +14,5 @@ Create a concept page when a term is used across multiple pages and needs a stab
 
 ## Pages
 
+- [Basic Terms](./basic-terms.md): 非分布式阅读路径中的 PyPTO、PTO-ISA、tile、runtime 和 L2 launch 基础术语。
 - [Distributed Execution Terms](./distributed-execution-terms.md): 分布式 runtime 文档中的标准术语和状态标签。

@@ -16,4 +16,6 @@ Create an evidence page when a topic page depends on user-supplied materials, Gi
 
 - [Distributed Execution Evidence](./distributed-execution.md): evidence for the distributed execution synthesis, material routing, GitHub status labels, and negative findings.
 - [Examples Feature Map Evidence](./examples-feature-map.md): evidence for the representative example ordering and feature/status matrix.
-- [Linqu Level Map Evidence](./linqu-level-map.md): evidence for Linqu/PyPTO/runtime level alignment and implementation status labels.
+- [Lingqu Level Map Evidence](./lingqu-level-map.md): evidence for Lingqu/PyPTO/runtime level alignment and implementation status labels.
+- [Non-Distributed Execution Evidence](./non-distributed-execution.md): evidence for the normal PyPTO -> PTO-ISA -> simpler L2 execution path.
+- [Developer Takeover Guide Evidence](./developer-takeover-guide.md): evidence for maintainer onboarding, ownership boundaries, and high-risk follow-up areas.

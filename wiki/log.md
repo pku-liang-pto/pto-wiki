@@ -22,7 +22,7 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ## [2026-05-04] topic-synthesis | PTO distributed execution synthesis
 
-新增 [Examples Feature Map](./topics/examples-feature-map.md)、[Distributed Execution](./topics/distributed-execution.md)、[Linqu Level Map](./topics/linqu-level-map.md)、[Distributed Execution Terms](./concepts/distributed-execution-terms.md)。同步更新 overview 和 toolchain navigation，区分已实现的 single-host L3 behavior 与 `design-intended` remote L3 behavior。
+新增 [Examples Feature Map](./topics/examples-feature-map.md)、[Distributed Execution](./topics/distributed-execution.md)、[Lingqu Level Map](./topics/lingqu-level-map.md)、[Distributed Execution Terms](./concepts/distributed-execution-terms.md)。同步更新 overview 和 toolchain navigation，区分已实现的 single-host L3 behavior 与 `design-intended` remote L3 behavior。
 
 ## [2026-05-04] repo-profile | Add non-distributed foundations after PR review
 
@@ -31,6 +31,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 ## [2026-05-04] navigation-update | Replace sources with topic evidence ledgers
 
 将 `wiki/sources/` 替换为 [Evidence](./evidence/) 区域。Evidence pages 按 topic 组织，用于记录 materials、GitHub references、repository anchors、claim maps、negative findings 和 open questions；raw materials 仍留在 `materials/` workspace。
+
+## [2026-05-04] review-update | Add non-distributed and maintainer reading layers
+
+根据新一轮 PR review，新增 [Basic Terms](./concepts/basic-terms.md)、[Non-Distributed Execution](./topics/non-distributed-execution.md) 和 [Developer Takeover Guide](./topics/developer-takeover-guide.md)；将 Lingqu 拼写修正为 human-facing spelling；重写 [Examples Feature Map](./topics/examples-feature-map.md)，按 beginner-to-expert、LLM concept、common example family、optimization technique 和 missing distributed complete NN TODO 组织。
 
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 

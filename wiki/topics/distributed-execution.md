@@ -107,7 +107,7 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 
 - 想理解 repo 责任边界：先读 [simpler](../repositories/simpler.md)、[pto-isa](../repositories/pto-isa.md)、[pypto](../repositories/pypto.md)。
 - 想看具体例子：读 [Examples Feature Map](./examples-feature-map.md)。
-- 想对齐层级术语：读 [Linqu Level Map](./linqu-level-map.md) 和 [Distributed Execution Terms](../concepts/distributed-execution-terms.md)。
+- 想对齐层级术语：读 [Lingqu Level Map](./lingqu-level-map.md) 和 [Distributed Execution Terms](../concepts/distributed-execution-terms.md)。
 
 ## 未决问题
 
