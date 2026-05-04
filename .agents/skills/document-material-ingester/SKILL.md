@@ -41,6 +41,6 @@ Read:
 
 ## Boundaries
 
-- Do not commit raw supplied documents or extracted archive contents unless the user explicitly asks for a tracked artifact.
+- Do not commit raw supplied documents or extracted archive contents by accident. Commit a material bundle only when the user explicitly asks for it or the current documentation pass defines it as tracked source evidence.
 - Do not copy whole documents into the wiki.
 - Do not smooth over conflicts between materials and repository evidence.

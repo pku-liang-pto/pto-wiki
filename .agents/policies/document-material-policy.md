@@ -4,9 +4,9 @@ Document materials are user-supplied evidence files, folders, or archives used t
 
 ## Storage
 
-Use `materials/` as an optional local workspace for supplied documents and extracted archives. The directory is ignored by git except for `materials/README.md`.
+Use `materials/` as an optional local workspace for supplied documents and extracted archives. By default, keep ad hoc materials untracked, but allow explicit tracked material bundles when the user requests them or a documentation pass defines them as source evidence.
 
-Do not commit raw supplied documents, extracted archive contents, or converted full-text copies unless the user explicitly asks for a specific tracked artifact.
+Do not commit raw supplied documents, extracted archive contents, or converted full-text copies by accident. When committing a material bundle intentionally, record why it is tracked and cite it as source evidence rather than copying it into `wiki/`.
 
 ## Supported Inputs
 
@@ -26,8 +26,8 @@ For zip archives:
 
 - list archive contents before extraction
 - reject or skip unsafe paths with absolute paths or `..`
-- extract to a temporary or ignored workspace path
-- avoid committing extracted files
+- extract to a temporary or materials workspace path
+- avoid committing extracted files unless the bundle is intentionally tracked as source evidence
 - cite the archive path and individual member paths used as evidence
 
 ## Evidence Records

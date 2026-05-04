@@ -29,7 +29,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.
-- Keep user-supplied document materials in ignored workspace paths such as `materials/`; summarize durable evidence in `wiki/` instead of committing raw documents.
+- Keep user-supplied document materials in `materials/` or another clearly named workspace. Prefer summarizing durable evidence in `wiki/`, but tracked material bundles are allowed when the user explicitly asks for them or when a pass defines them as source evidence.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
 - Treat examples as first-class documentation evidence. Example pages should provide background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, and explicit TODO/design-intended entries for important missing examples.
