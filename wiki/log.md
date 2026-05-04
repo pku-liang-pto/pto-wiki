@@ -48,6 +48,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 新增 `.agents/agents/` reviewer profiles，并根据 project-newbie、next-maintainer、examples-first developer、evidence-auditor 四类反馈补充 newcomer/examples navigation、project documentation status、glossary/CANN foundation、maintainer action tables、repo Try First blocks、GitHub evidence URLs、material manifest 和 status-label centralization。
 
+## [2026-05-04] review-update | Reposition wiki as standalone learning material
+
+根据 PR review，明确 wiki 的主要形态不是外部资料学习指南，而是可独立阅读的 synthesized learning material。更新 AGENTS、wiki organization/source citation policies 和 workflows，要求 topic/repository pages 先用 prose/diagram/example 解释知识，再用 citations/evidence ledgers 支撑审计；重写 overview、developer takeover guide、examples map、non-distributed execution 和 repo profiles 的关键段落，减少“读别处”的表达。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

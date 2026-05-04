@@ -31,7 +31,7 @@ Materials may include prose, document files, folders, zip archives, issue or PR 
    - rejected: similar terms but unrelated
 9. Identify the foundation layer required by the topic: basic terms, non-distributed execution flow, repository roles, examples, and current implementation status.
 10. Inspect primary and supporting evidence deeply enough to explain the topic in human terms.
-11. Write or update the smallest useful page under `wiki/topics/` with a synthesis, not a dump of links.
+11. Write or update the smallest useful page under `wiki/topics/` with standalone synthesis, not a dump of links.
 12. When the topic is advanced or distributed, cite or add the foundation pages needed to prevent future distributed-only bias.
 13. When the topic is example-driven, include background concepts, beginner-to-expert progression, cross-repository comparison, optimization techniques, and TODO/design-intended missing examples.
 14. When the topic uses material, GitHub, external-document, or cross-repository evidence, create or update the paired `wiki/evidence/<topic>.md` ledger.
@@ -42,6 +42,7 @@ Materials may include prose, document files, folders, zip archives, issue or PR 
 The wiki should explain:
 
 - what the topic or feature is
+- the topic's mental model in prose and, when useful, a compact ASCII diagram
 - which repositories, branches, issues, PRs, commits, and files are involved
 - the timeline or evolution when that matters
 - verified facts, inferred architecture, and unresolved questions
@@ -51,6 +52,8 @@ The wiki should explain:
 - examples with background, progression, comparison, optimization notes, and missing-example status when examples are central to the topic
 
 Evidence ledgers should explain source set, material routing, repository anchors, GitHub evidence, claim map, negative findings, and open questions. They support topic pages; they are not raw document mirrors.
+
+Topic pages should remain understandable when evidence links are not opened. Evidence ledgers answer “why do we trust this?”; topic pages answer “what does this mean?”.
 
 ## Citation Standard
 

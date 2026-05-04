@@ -11,9 +11,9 @@ last_updated: 2026-05-04
 
 # Overview
 
-This page is the living synthesis for the configured target set. It should summarize durable knowledge that cuts across individual pages and help readers decide where to go next.
+This page is the living synthesis for the configured target set. It summarizes durable knowledge that cuts across individual pages and teaches the project shape before sending readers to source evidence.
 
-The current target set is defined in `config/target-set.yml`. The wiki starts as a map and grows through source-backed lookup, repository documentation, dependency analysis, and topic synthesis work.
+The current target set is defined in `config/target-set.yml`. The wiki is meant to be standalone learning material: source paths, PRs, issues, and materials remain visible so maintainers can audit claims, but the main explanation should live in `wiki/` itself.
 
 ## Current Shape
 
@@ -31,7 +31,7 @@ This wiki must cover the whole PTO/PyPTO/simpler knowledge path, not only distri
 
 Examples deserve high attention because they connect architecture to runnable understanding. The wiki should explain their background concepts, organize them from beginner to expert, compare similar examples across repositories, call out optimization techniques, and preserve TODO/design-intended gaps for examples that do not exist yet.
 
-For a first reading, use [Basic Terms](./concepts/basic-terms.md) -> [Non-Distributed Execution](./topics/non-distributed-execution.md) -> [Examples Feature Map](./topics/examples-feature-map.md) -> [Repository Profiles](./repositories/) -> [Distributed Execution](./topics/distributed-execution.md). For a practical maintainer path, use [Developer Takeover Guide](./topics/developer-takeover-guide.md).
+The desired form is explanatory prose plus compact diagrams, with tables used for comparison and audit summaries. A page should not only say “read this repo file”; it should explain the idea, then cite the repo file or evidence ledger as support.
 
 ## Maintenance Notes
 
@@ -39,8 +39,29 @@ Update this page when new evidence changes the broad synthesis of the target set
 
 ## Current PTO Runtime Synthesis
 
-当前阅读顺序应先从 non-distributed execution 开始：PyPTO 表达 DSL/IR/pass/codegen，PTO-ISA 提供 kernel-level tile instructions，simpler L2 负责 single-chip launch、AICPU scheduler 和 AICore/AIV execution。
+PTO 的学习主线从一个普通、非分布式程序开始。用户在 PyPTO 中写 Python DSL；PyPTO parser 和 pass pipeline 把它变成 IR 与 tile/runtime-facing artifact；PTO-ISA 提供 kernel 内的 tile load/compute/store/communication 指令；simpler L2 把 host runtime、AICPU scheduler 和 AICore/AIV kernel 启动到一个 Ascend device 上。这个基础路径解释了“一个 program 如何真正跑起来”，也是所有 distributed execution 的前提。
+
+```text
+PyPTO DSL
+  -> PyPTO IR / passes / codegen
+  -> PTO-ISA tile kernel interface
+  -> simpler L2 ChipWorker
+  -> host runtime + AICPU scheduler + AICore/AIV kernels
+  -> result copied back to host
+```
 
 在这层基础上，当前已验证的 distributed path 是 single-host L3 execution：PyPTO 表达 hierarchy programs，PyPTO distributed codegen/runner 调用 `simpler.Worker(level=3)`，`simpler` 管理 local host/chip/SubWorker execution，PTO-ISA 提供 kernel-level tile 和 communication primitives。HCCL 支撑 data-plane communication/window behavior，但不替代 PTO Runtime control plane。证据见 [Distributed Execution Evidence](./evidence/distributed-execution.md#claim-map)。
 
 Remote L3、DistWorker、cross-host callable registration、RoCE/URMA-backed remote runtime control 在仓库证据改变前都记录为 `design-intended`，不能写成已实现能力；对应 negative findings 和 open questions 见 [Distributed Execution Evidence](./evidence/distributed-execution.md#negative-findings)。
+
+## Standalone Learning Spine
+
+The wiki teaches the target set in four layers.
+
+First, [Basic Terms](./concepts/basic-terms.md) and [Non-Distributed Execution](./topics/non-distributed-execution.md) define the vocabulary: tensor, tile, GM/on-chip memory, AICPU/AICore/AIV, `InCore`, `Orchestration`, `ChipWorker`, TensorMap, ring buffer, and runtime levels.
+
+Second, the repository profiles explain each subsystem as a component, not just a directory listing. [pypto](./repositories/pypto.md) is the language/compiler/runtime-facing entry; [pto-isa](./repositories/pto-isa.md) is the tile/kernel instruction layer; [simpler](./repositories/simpler.md) is the runtime that launches and schedules chip work.
+
+Third, [Examples Feature Map](./topics/examples-feature-map.md) teaches the system through examples from kernel to complete NN: hello world, elementwise, GEMM, softmax, attention, LLaMA mini, L2 runtime launch, TensorMap/ring-buffer runtime, allreduce, and tensor-parallel FFN.
+
+Fourth, [Distributed Execution](./topics/distributed-execution.md) adds hierarchy, rank/window communication, HCCL data-plane support, and the boundary between implemented single-host L3 and design-intended remote L3.

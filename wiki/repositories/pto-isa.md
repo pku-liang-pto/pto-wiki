@@ -37,6 +37,23 @@ include/pto/pto-inst.hpp
 
 `include/pto/common/pto_tile.hpp` 中的 `Shape`、`Stride`、`Tile`、`GlobalTensor` 等类型是普通 compute kernel 的基础。非分布式 operator 通常先用这些类型表达 GM tensor、on-chip tile、layout 和 stride，再用 `TLOAD`、`TSTORE`、`TADD`、`TMATMUL` 等指令表达数据搬运和计算。
 
+可以把一个 PTO-ISA operator 想成下面的结构：
+
+```text
+host/operator wrapper
+  -> declare PyTorch/custom-op interface
+  -> build and launch kernel artifact
+kernel body
+  -> describe global tensor and tile shape
+  -> TLOAD GM data into on-chip tile
+  -> compute with tile instructions
+  -> TSTORE result back to GM
+test script
+  -> compare device result with PyTorch/numpy golden output
+```
+
+这说明 PTO-ISA 的核心价值不只是“有一组头文件”。它把 kernel 作者需要处理的 memory space、tile shape、mask、pipeline、event 和 SoC-specific backend 包在一个虚拟 ISA 里，让同一类 kernel pattern 可以在 CPU simulation、A2/A3、A5 等环境中有对应实现。
+
 ## 非分布式示例路径
 
 | 示例 | 说明 | 状态 |
@@ -65,6 +82,8 @@ include/pto/pto-inst.hpp
 ## Communication ISA
 
 在普通 tile compute model 之上，`include/pto/comm/README.md` 把通信指令分为 point-to-point、collective、async 和 backend-specific path。重点 API 包括 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、`TTEST`，以及 async path 的 `AsyncSession`、`AsyncEvent`。`async_types.hpp` 中可以看到 SDMA 与 URMA session/context 的并列结构和 engine-agnostic `AsyncSession`。
+
+Communication ISA 应读作“kernel 内可以表达跨 rank / remote memory / async event 的 primitive”。它不自动等价于 PyPTO 有高层 `pl.all_reduce` API，也不自动等价于 simpler 已经有 remote worker control plane。PTO-ISA 证明的是 kernel/data movement primitive；编译器 API 和 runtime lifecycle 需要分别由 PyPTO 与 simpler 的证据证明。
 
 状态判断：
 

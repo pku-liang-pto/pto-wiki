@@ -45,6 +45,10 @@ Python test/example
 
 在 device 侧，AICPU 负责 handshake、fanout dependency wiring、ready task detection、dispatch、completion tracking；AICore/AIV 负责等待 task assignment、读取 args/kernel address、执行 PTO-ISA kernel、写回完成信号。这个路径对应 `docs/chip-level-arch.md`、`src/common/worker/pto_runtime_c_api.h`、`src/common/worker/chip_worker.cpp`。
 
+从维护角度看，L2 不是一个黑盒 launch API，而是 host 与 device 的协作协议。host 负责准备 shared descriptors、binary blobs、tensor buffers 和 callable metadata；AICPU 是 device-side scheduler；AICore/AIV 是真正执行 compute kernel 的 worker。一个 L2 bug 通常要先判断状态卡在哪个边界：Python/C++ host binding、C API、device initialization、AICPU scheduler、kernel execution，还是 copy-back/sync。
+
+`examples/workers/l2/vector_add` 是这条路径的最小完整故事：host 编译 AIV add kernel，创建 `ChipCallable`，为输入输出构造 `TaskArgs`，把数据拷到 device，调用 worker run，最后把结果拷回并和 numpy golden 比较。这个例子比 distributed allreduce 更适合作为 runtime 入口，因为它包含了 launch 的完整闭环，但没有 rank/window/communication 干扰。
+
 ## Runtime Variants
 
 `src/a2a3/docs/runtimes.md` 明确列出两个 runtime 变体：
@@ -55,6 +59,8 @@ Python test/example
 | `tensormap_and_ringbuffer` | AICPU/device side | TensorMap 从 tensor read/write pattern 自动推导 | production workload；支持 streaming、flow control、large batch、profiling |
 
 `tensormap_and_ringbuffer` 是当前默认用户路径。它用 `PTO2TaskDescriptor[]` ring buffer 存 task slots，用 GM heap ring 管 output buffer，用 TensorMap 自动维护 `tensor_base_ptr -> producer task`，并把 HeapRing、TaskRing、DepPool 切成 4 个独立 ring 支撑 nested scope isolation。
+
+`host_build_graph` 与 `tensormap_and_ringbuffer` 的差异不只是“图在哪里构建”。前者更像把 DAG 一次性显式准备好，适合调试和验证；后者把 dependency discovery 和资源复用推到 runtime/device 侧，更接近持续提交任务的生产模型。TensorMap 让相同 tensor address 成为 dependency 的线索，ring buffer 让 task/output/dependency 记录可以循环复用。这就是为什么 paged attention 和 FFN tensor parallel 不能只看 kernel，还必须看 runtime 的数据结构。
 
 ## 关键模块
 
@@ -86,7 +92,7 @@ Python test/example
 | --- | --- | --- | --- |
 | lifecycle check | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | worker init, malloc/free, close complete | runtime binaries not built |
 | smallest full L2 run | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | golden check passes | PTO-ISA headers/build cache missing on first run |
-| L3 hardware reading path | inspect `examples/workers/l3/allreduce_distributed` and `ffn_tp_parallel` before running | can explain rank/window and TensorMap dependency | requires A2/A3 multi-device hardware |
+| L3 hardware context | inspect `examples/workers/l3/allreduce_distributed` and `ffn_tp_parallel` before running | can explain rank/window and TensorMap dependency | requires A2/A3 multi-device hardware |
 
 ## Host-side DAG 层
 

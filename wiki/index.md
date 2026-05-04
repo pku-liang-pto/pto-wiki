@@ -2,13 +2,16 @@
 
 This wiki is the human-readable knowledge base for the PTO-CANN target set.
 
-It starts as a map, not as a complete mirror of every upstream project. Pages are expanded when a concrete lookup, repository documentation pass, or toolchain investigation discovers durable knowledge that future readers are likely to need.
+It is a standalone learning layer, not only a pointer map to repositories and review threads. Pages explain the synthesized knowledge directly, then cite source paths, PRs, issues, materials, and evidence ledgers so maintainers can audit the claims.
 
-## Start Here
+## Core Learning Pages
 
-- New to PTO-CANN: [Basic Terms](./concepts/basic-terms.md) -> [Non-Distributed Execution](./topics/non-distributed-execution.md) -> [Examples Feature Map](./topics/examples-feature-map.md) -> [Repository Profiles](./repositories/) -> [Distributed Execution](./topics/distributed-execution.md).
-- Examples-first path: [Examples Feature Map](./topics/examples-feature-map.md) starts from source-only examples, then simulator, single-device hardware, and multi-device communication lanes.
 - [Overview](./overview.md): living synthesis across the configured target set.
+- [Basic Terms](./concepts/basic-terms.md): vocabulary for tensors, tiles, memory spaces, workers, and runtime levels.
+- [Non-Distributed Execution](./topics/non-distributed-execution.md): how a normal PyPTO/PTO-ISA/simpler program becomes device work.
+- [Examples Feature Map](./topics/examples-feature-map.md): self-contained example explanations from kernel to complete NN and distributed TODOs.
+- [Distributed Execution](./topics/distributed-execution.md): hierarchy, rank/window communication, current L3 behavior, and remote-runtime boundaries.
+- [Developer Takeover Guide](./topics/developer-takeover-guide.md): maintainer ownership model, risks, and safe change boundaries.
 - [Projects](./projects.md): current PTO and CANN repository index.
 - [Usage](./usage.md): Pixi commands, target configuration, workspace behavior, and agent lookup patterns.
 - [Toolchain Map](./toolchain-map.md): how the current projects are expected to relate.

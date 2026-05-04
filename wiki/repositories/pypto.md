@@ -39,6 +39,20 @@ Python DSL (@pl.program / @pl.function)
 
 `examples/hello_world.py` 展示最小 PyPTO program：`@pl.program` class 中有 `InCore` function，使用 `pl.load` 把 global tensor load 成 tile，`pl.add` 做 tile compute，`pl.store` 写回 output；另一个 `Orchestration` function 调用 `InCore` kernel。README 的 examples 也按复杂度组织为 hello world、kernel examples、model examples。
 
+把一个 PyPTO program 想成两层函数。内层函数接近 hardware kernel：它关注 tile shape、load/store、elementwise 或 matmul compute。外层函数接近 model/operator graph：它决定调用哪些 kernel、tensor 作为输入输出如何传递、是否有 loop 或 control flow。parser 把这两层 Python code 转成 IR；pass pipeline 再把 tensor-level 描述逐步降成 tile-level 和 runtime-facing 描述。
+
+```text
+@pl.program class
+  -> InCore function
+       tensor/tile load, compute, store
+  -> Orchestration function
+       calls InCore kernels and connects tensors
+  -> compile()
+       parser -> IR -> passes -> backend generate
+  -> runtime.run()
+       execute normal compiled program
+```
+
 `python/pypto/language/parser/README.md` 说明 parser 用 decorator-based parser 将 Python DSL 转成 IR，并处理 type annotations、control flow、SSA verification 和 span tracking。`python/pypto/ir/pass_manager.py` 中 `OptimizationStrategy.Default` 注册了从 `UnrollLoops`、`ConvertToSSA`、`OutlineIncoreScopes` 到 `ConvertTensorToTileOps`、`InferTileMemorySpace`、`LowerPipelineLoops`、`AllocateMemoryAddr`、`DeriveCallDirections` 等 passes。
 
 `python/pypto/ir/compile.py` 的 `compile()` 负责运行 PassManager、dump IR、调用 backend `generate()`、写 artifacts，并返回 `CompiledProgram`。只有当 transformed program 中存在 Lingqu level >= 3 的 function 时，它才返回 `DistributedCompiledProgram`。
@@ -66,6 +80,8 @@ Python DSL (@pl.program / @pl.function)
 `python/pypto/runtime/runner.py` 暴露 `run(program, *tensors, config=RunConfig(...))`，默认 platform 是 `a2a3sim`，也支持 `a2a3`、`a5sim`、`a5`。`RunConfig` 控制 platform、device id、tolerance、optimization strategy、是否 dump passes、是否 codegen-only、runtime/compile profiling 等。
 
 这条路径面向普通 operator 编译执行。Distributed runner 只有在 L3+ hierarchy program 被识别时才进入。
+
+普通 path 的判断标准很简单：如果 program 只描述普通 kernel/orchestration，`compile()` 返回 `CompiledProgram`，runner 按 `RunConfig` 选择 simulator 或 hardware backend；如果 transformed program 中出现 Lingqu level >= 3 的 hierarchy function，才会走 `DistributedCompiledProgram` 和 distributed runner。这个分叉很重要，因为它防止把所有 PyPTO 行为都误读成 distributed runtime 行为。
 
 ## 非分布式示例和测试表面
 

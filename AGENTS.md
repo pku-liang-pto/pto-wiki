@@ -23,6 +23,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 ## Core Rules
 
 - Keep `wiki/` human-readable.
+- Keep `wiki/` self-contained enough to learn from directly. Source links, PRs, issues, materials, and evidence ledgers are audit support, not substitutes for explanation.
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
 - Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.

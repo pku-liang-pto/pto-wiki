@@ -8,6 +8,16 @@ This wiki is not a distributed-only documentation space. Distributed topics must
 
 When a topic depends on advanced or distributed behavior, document the foundation layer first or cite an existing foundation page. Do not let a temporary project focus bias the durable wiki taxonomy.
 
+The wiki is standalone learning material, not only a reading guide over repositories, issues, PRs, or user-supplied documents. A reader should be able to understand the main architecture, concepts, examples, and current status from `wiki/` itself. External references, source paths, and evidence pages are audit support: they justify claims and help maintainers verify details, but they must not be the only place where the knowledge is explained.
+
+Prefer this page shape for durable learning pages:
+
+1. Explain the concept in prose first.
+2. Add a small ASCII diagram or concrete example when it makes the idea easier to learn.
+3. Use tables as summaries or comparison aids, not as the primary explanation.
+4. Put citations close to the claims they support.
+5. Keep links to source/evidence, but avoid sentences that only tell readers to go elsewhere.
+
 ## Core Files
 
 Maintain these root wiki files:
@@ -65,6 +75,8 @@ Before claiming a wiki update is complete, check:
 - no new page is orphaned from `wiki/index.md` or an area index
 - links added by the change resolve
 - pages are not empty stubs
+- major topic and repository pages are understandable as standalone learning material before source links are followed
+- tables summarize prose instead of replacing it
 - the update has source citations near factual claims
 - distributed or advanced topics have a clear foundation path through basic terms, non-distributed execution, repository profiles, or examples
 - example pages include enough background, progression, comparison, optimization context, and missing-example status to teach the reader why the examples matter

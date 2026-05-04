@@ -34,7 +34,7 @@ Repository profile pages should be created under [repositories](./repositories/)
 | `simpler` | [profiled](./repositories/simpler.md) | commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7`; high for L2/L3 local runtime | add future remote-L3 updates when source lands |
 | `pto-isa` | [profiled](./repositories/pto-isa.md) | commit `a977dd1161222a8b779fb5ff5d1c8b7f4518c3a2`; high for tile/comm examples | deepen CPU/manual kernel and roadmap coverage |
 | `pypto` | [profiled](./repositories/pypto.md) | commit `f21c2dd48cfe1e5c4add78b0e391a31196420862`; high for DSL/compile/L3 runner | update when distributed API issues close |
-| `pypto_top_level_documents` | evidence-only | `linqu_runtime_design.md` at commit `7faac0b910e40989a6bbd381a80595b65ab29708`; partial | create profile if top-level design docs become a primary reading path |
+| `pypto_top_level_documents` | evidence-only | `linqu_runtime_design.md` at commit `7faac0b910e40989a6bbd381a80595b65ab29708`; partial | create a standalone concept/profile if top-level design docs become primary learning material |
 | `distributed-runtime` | not profiled | material mentions only; low | inspect repo before assigning remote L3 ownership |
 | `serving-lib`, `pto-li`, `ptoas` | not profiled | target-set config only; low | document only when serving/library/toolchain questions require them |
 | `hccl` | partial evidence | `master` commit `e8c897660d2afd02b1428b1daa2ce9576f00a5cd`; partial for communication support | create CANN communication profile if data-plane claims expand |

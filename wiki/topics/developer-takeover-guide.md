@@ -13,36 +13,47 @@ last_updated: 2026-05-04
 
 # Developer Takeover Guide
 
-本页面向准备接手 PTO Runtime / PTO-ISA / PyPTO 工作的开发者和维护者。目标不是替代 repo README，而是给出接手顺序、边界判断、风险点和下一步工作入口。证据 ledger 见 [Developer Takeover Guide Evidence](../evidence/developer-takeover-guide.md)。
+本页面面向准备接手 PTO Runtime / PTO-ISA / PyPTO 工作的开发者和维护者。它不是“第几天读什么”的计划，而是把接手所需的系统内容讲清楚：系统由哪些层组成、每层负责什么、哪些能力已经实现、哪些能力只是设计目标，以及维护者在修改代码前必须保护哪些边界。证据 ledger 见 [Developer Takeover Guide Evidence](../evidence/developer-takeover-guide.md)。
 
-## First Week Reading Path
+## Maintainer Knowledge Model
+
+接手这个系统时，最重要的不是先挑一个 repo，而是先建立层次模型。PyPTO 决定用户能表达什么 program；PTO-ISA 决定 kernel 内能表达什么 tile operation；simpler 决定 program 如何在 host、AICPU、AICore/AIV 和多 chip worker 上被启动和调度。Distributed execution 不是一条独立主线，而是在这些基础层之上增加 hierarchy、rank/window communication、SubWorker 和未来 remote control plane。
 
 ```text
-Day 1: Basic Terms + Non-Distributed Execution
-Day 2: simpler L0-L2 launch path and tensormap_and_ringbuffer
-Day 3: PyPTO DSL -> IR -> compile/run
-Day 4: PTO-ISA tile examples and comm primitives
-Day 5: Distributed Execution + Lingqu Level Map + open questions
+user program / model idea
+  -> PyPTO language and compiler
+       owns DSL, IR, passes, codegen, runtime-facing program object
+  -> PTO-ISA kernel layer
+       owns tile types, load/store/compute instructions, kernel comm primitives
+  -> simpler runtime
+       owns worker lifecycle, L2 launch, DAG scheduling, TensorMap, ring buffers
+  -> CANN/HCCL support layer
+       owns communication/data-plane substrate where inspected
 ```
 
-Start here:
+This guide still links to the detailed pages, but the ownership model above is the self-contained rule: do not fix a compiler symptom in the runtime without proving the compiler artifact is correct; do not infer runtime scheduling from a kernel primitive; do not mark remote distributed behavior as implemented because a local HCCL window or kernel communication primitive exists.
 
-1. [Basic Terms](../concepts/basic-terms.md)
-2. [Non-Distributed Execution](./non-distributed-execution.md)
-3. [simpler](../repositories/simpler.md)
-4. [pypto](../repositories/pypto.md)
-5. [pto-isa](../repositories/pto-isa.md)
-6. [Distributed Execution](./distributed-execution.md)
-7. [Examples Feature Map](./examples-feature-map.md)
+## Content Inventory
+
+The wiki now covers four kinds of durable maintainer knowledge.
+
+Foundation knowledge explains normal execution: PyPTO DSL and compiler flow, PTO-ISA tile programming, and simpler L2 launch on Ascend. This is the material a maintainer needs before reading any distributed claim.
+
+Example knowledge explains the system by concrete cases. Hello world and elementwise examples teach syntax and tile operations; GEMM and attention examples teach memory movement and optimization; L2 vector add teaches runtime launch; TensorMap/ring-buffer examples teach production scheduling; allreduce and FFN tensor parallel examples teach current single-host distributed behavior.
+
+Boundary knowledge explains what each project owns. PyPTO owns expression and lowering; PTO-ISA owns kernel instruction semantics; simpler owns runtime lifecycle and scheduling; HCCL/HCOMM/URMA support data movement, not PTO worker ownership.
+
+Risk knowledge records what is not yet stable: remote L3/DistWorker, orchestration-level collectives, complete distributed NN examples, and CANN-side repository ownership.
 
 ## Ownership Boundaries
 
-| Area | Primary owner mindset | Watch for |
-| --- | --- | --- |
-| PyPTO | compiler/runtime-facing DSL owner | whether a feature is syntax, IR lowering, codegen, or runtime execution |
-| PTO-ISA | kernel instruction and operator-demo owner | whether a claim is kernel-level only or implies host scheduler behavior |
-| simpler | runtime/worker/scheduler owner | whether behavior is L2 local, L3 single-host, or remote design-intended |
-| HCCL / HCOMM / URMA | data-plane support evidence | do not treat comm backend as runtime control plane |
+PyPTO is the place to look when a feature is about syntax, type annotations, `@pl.program`, `@pl.function`, IR shape, pass ordering, code generation, `RunConfig`, or whether a program becomes a normal `CompiledProgram` or a `DistributedCompiledProgram`. Its output is only one side of execution; if the generated artifact is correct but device scheduling fails, the runtime layer may own the bug.
+
+PTO-ISA is the place to look when a feature is about tiles, memory spaces, instruction semantics, custom operator kernels, CPU/NPU implementations, or kernel-level communication primitives such as `TWAIT`, `TNOTIFY`, `TPUT`, and `TGET`. It can prove that a kernel primitive exists. By itself, it does not prove host worker lifecycle, DAG scheduling, callable registration, or remote orchestration.
+
+simpler is the place to look when a feature is about `Worker(level=2/3/4)`, `ChipWorker`, runtime binary loading, AICPU scheduler behavior, TensorMap dependency discovery, ring-buffer queues, child worker registration, SubWorker execution, comm window bootstrap, or deferred completion.
+
+CANN/HCCL/HCOMM/URMA evidence is supporting evidence for communication and memory movement. It should be treated as data-plane substrate unless a future source pass proves higher-level runtime ownership.
 
 ## Target-Set Coverage And Ownership Gaps
 
@@ -50,7 +61,7 @@ This wiki currently profiles only part of the configured target set. Do not assi
 
 | Area | Current wiki coverage | Maintainer implication |
 | --- | --- | --- |
-| `simpler`, `pto-isa`, `pypto` | profiled with source commits and examples | safe primary reading path for this documentation pass |
+| `simpler`, `pto-isa`, `pypto` | profiled with source commits and examples | primary documented surface for this documentation pass |
 | `pypto_top_level_documents` | evidence-only through Lingqu design file | useful for design alignment, not full repo ownership |
 | `distributed-runtime` | not profiled | inspect before deciding remote L3 / DistWorker ownership |
 | `serving-lib`, `pto-li`, `ptoas` | not profiled | do not infer serving/library/toolchain behavior yet |
@@ -61,15 +72,17 @@ This wiki currently profiles only part of the configured target set. Do not assi
 
 Use the shared labels in [Evidence Status Labels](../evidence/#status-labels). For maintainer work, the key distinction is: `implemented` means source/test/example/merged PR evidence exists; it does not mean the wiki pass ran the code locally. Use `not-run` for documented example commands that were not executed during the pass.
 
-## Safe First Tasks
+## Safe First Changes
 
-| Task | Repo | First command / action | Done signal | Update target |
-| --- | --- | --- | --- | --- |
-| Reproduce a source-only PyPTO example | `pypto` | `python examples/hello_world.py` | `HelloWorldProgram.as_python()` prints | [Examples Feature Map](./examples-feature-map.md#run-surface-and-caveats) if command changes |
-| Reproduce a simulator runtime example | `simpler` | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | vector_add golden check passes | [simpler](../repositories/simpler.md#try-first) |
-| Reproduce a kernel/operator package | `pto-isa` | follow `demos/baseline/add/README.md` or `./run.sh` | wheel installs and `test.py` passes | [pto-isa](../repositories/pto-isa.md#try-first) |
-| Trace TensorMap dependency | `simpler` | read `docs/orchestrator.md` and `examples/workers/l3/ffn_tp_parallel` | producer/consumer relation is explainable from tensor address | [Distributed Execution](./distributed-execution.md) or evidence ledger |
-| Classify a distributed claim | cross-repo | compare source/PR/material with [status labels](../evidence/#status-labels) | label is `implemented`, `emerging`, `design-intended`, `TODO`, `stale`, or `open question` | paired topic + evidence pages |
+The safest first changes are those that stay inside one ownership boundary and have a small example or unit-test surface.
+
+For PyPTO, a safe first change is usually a DSL, parser, pass, codegen, or example adjustment that can be checked through `examples/hello_world.py`, a kernel example, or `tests/ut`. The maintainer should be able to explain how the change moves through parser, IR, passes, and backend generation before touching runtime behavior.
+
+For PTO-ISA, a safe first change is usually an operator-demo or instruction-level change that can be reasoned about through add, GEMM, CPU demo, or a focused NPU communication testcase. The maintainer should state whether the change affects compute/data movement only, communication primitive semantics, or public headers.
+
+For simpler, a safe first change is usually an L2 example/runtime path, TensorMap/ring-buffer behavior, or local L3 scheduling fix. The maintainer should trace which process owns the state: Python host, C++ orchestrator, scheduler thread, child process mailbox, AICPU scheduler, or AICore/AIV worker.
+
+For distributed behavior, a safe first change must state its status label. If the evidence is an open issue, skipped test, material blueprint, or open PR, the wiki should preserve `emerging`, `design-intended`, or `TODO` instead of turning the behavior into `implemented`.
 
 ## Maintenance Rules
 
