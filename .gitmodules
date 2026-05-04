@@ -1,0 +1,15 @@
+[submodule "repositories/hccl"]
+	path = repositories/hccl
+	url = https://gitcode.com/cann/hccl
+[submodule "repositories/pto-isa"]
+	path = repositories/pto-isa
+	url = https://github.com/PTO-ISA/pto-isa
+[submodule "repositories/pypto"]
+	path = repositories/pypto
+	url = https://github.com/hw-native-sys/pypto
+[submodule "repositories/pypto_top_level_documents"]
+	path = repositories/pypto_top_level_documents
+	url = https://github.com/hengliao1972/pypto_top_level_design_documents
+[submodule "repositories/simpler"]
+	path = repositories/simpler
+	url = https://github.com/hw-native-sys/simpler

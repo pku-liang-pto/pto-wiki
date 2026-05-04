@@ -10,3 +10,8 @@ wiki/.vitepress/dist/
 .DS_Store
 repositories/*
 !repositories/README.md
+!repositories/hccl
+!repositories/pto-isa
+!repositories/pypto
+!repositories/pypto_top_level_documents
+!repositories/simpler
