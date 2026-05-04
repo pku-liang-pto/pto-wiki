@@ -6,7 +6,7 @@ sources:
   - repositories/simpler/
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
 last_updated: 2026-05-04
 ---
 
@@ -14,7 +14,7 @@ last_updated: 2026-05-04
 
 `simpler` 是 PTO runtime 的主要实现仓库。先把它理解成“在 Ascend device 上启动和调度 task graph 的 runtime”，再看它的分布式扩展。它的基础能力是 L0-L2：host program 构造 callable/args/config，L2 `ChipWorker` 加载 host runtime、AICPU binary、AICore binary，AICPU scheduler 调度 AICore/AIV kernel。L3/L4 是在这个 L2 chip execution unit 上继续组合出来的层级 worker。
 
-本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `materials/pto-runtime-distributed/`。
+本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `wiki/materials/pto-runtime-distributed/`。
 
 ## Repo 直觉
 
@@ -36,7 +36,7 @@ L3 之后不要先理解成“分布式系统”，而要先理解成“把多�
 | `docs/orchestrator.md` | TensorMap、Ring、Scope 和 `submit_*` 的 7-step flow | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#tensormap-ring-and-scope) |
 | `docs/scheduler.md` | wiring queue、ready queue、completion queue 和 fanout release | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components) |
 | `docs/worker-manager.md` | THREAD/PROCESS mode、fork ordering、shared-memory mailbox、nested Worker children | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#thread-and-process-modes) |
-| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [Examples Feature Map](../topics/examples-feature-map.md), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
+| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [Examples](../examples/), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
 
 ## L0-L2 Ascend 启动路径
 

@@ -64,6 +64,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 清理 tracked material extraction 中触发 `git diff --check` 的 trailing whitespace，并同步更新 [Distributed Execution Evidence](./evidence/distributed-execution.md) 中对应 extracted file checksums。Archive checksum 保持不变。
 
+## [2026-05-05] navigation-update | Public learning navigation and examples area
+
+将 public top nav 和 sidebar 对齐为 Home、Repositories、Examples、Topics、Concepts、Materials。新增 [Examples](./examples/) 区域并把示例学习内容拆分为 learning path、run surfaces、cross-repository families 和 missing roadmap；将原始材料移动到 [Materials](./materials/) 作为公开 audit source；新增 wiki writing style policy，要求 public narrative 以中文为主、保留 English technical identifiers、prose-first、self-contained、concise but information-rich。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

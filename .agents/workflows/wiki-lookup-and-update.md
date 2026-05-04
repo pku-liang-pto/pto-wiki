@@ -14,7 +14,7 @@ Use this workflow for questions about the target set, repository behavior, depen
 8. For branch, issue, or PR questions, inspect the requested GitHub object and the relevant ref instead of assuming the default branch.
 9. For material-driven topic questions, use `.agents/workflows/topic-evidence-discovery.md` to search related issues, PRs, commits, branches, and files before synthesizing wiki knowledge.
 10. When local checkout evidence is used, record the checkout path, ref, and commit SHA in the answer or wiki citation.
-11. Answer with clear human-readable explanation.
+11. Answer with clear human-readable explanation. For public wiki updates, follow `.agents/policies/wiki-writing-style-policy.md`: Chinese narrative by default, English technical identifiers preserved, prose-first, self-contained, and concise but information-rich.
 12. Decide whether the durable knowledge should update `wiki/`.
 13. If updating `wiki/`, maintain `wiki/index.md`, relevant area indexes, `wiki/overview.md`, and `wiki/log.md` according to `.agents/policies/wiki-organization-policy.md`.
 14. If the update is about agent process, command patterns, placement rules, or reusable quality gates, update `.agents/` or `AGENTS.md` instead of rendered wiki pages.

@@ -14,6 +14,7 @@ Read:
 - `.agents/workflows/wiki-health-and-lint.md`
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
+- `.agents/policies/wiki-writing-style-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 
 ## Structural Checks

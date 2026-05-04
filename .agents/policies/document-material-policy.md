@@ -4,9 +4,9 @@ Document materials are user-supplied evidence files, folders, or archives used t
 
 ## Storage
 
-Use `materials/` as an optional local workspace for supplied documents and extracted archives. By default, keep ad hoc materials untracked, but allow explicit tracked material bundles when the user requests them or a documentation pass defines them as source evidence.
+Use `materials/` as an optional local workspace for supplied documents and extracted archives. Use `wiki/materials/` only for material bundles that the user explicitly wants to publish as public audit sources. By default, keep ad hoc materials untracked.
 
-Do not commit raw supplied documents, extracted archive contents, or converted full-text copies by accident. When committing a material bundle intentionally, record why it is tracked and cite it as source evidence rather than copying it into `wiki/`.
+Do not commit raw supplied documents, extracted archive contents, or converted full-text copies by accident. When committing a material bundle intentionally, record why it is tracked, expose it through a small `wiki/materials/` index, and cite it as source evidence. Public learning pages should summarize the material instead of copying long passages from it.
 
 ## Supported Inputs
 
@@ -27,6 +27,7 @@ For zip archives:
 - list archive contents before extraction
 - reject or skip unsafe paths with absolute paths or `..`
 - extract to a temporary or materials workspace path
+- move or copy into `wiki/materials/` only when the bundle is intentionally public
 - avoid committing extracted files unless the bundle is intentionally tracked as source evidence
 - cite the archive path and individual member paths used as evidence
 
@@ -41,4 +42,4 @@ For each material or material bundle used for durable wiki facts, record:
 - conversion tool or method when conversion was needed
 - limitations, unreadable files, or excluded files
 
-Do not copy whole upstream or user-supplied documents into `wiki/`. Record durable material evidence in topic-scoped `wiki/evidence/` ledgers and cite material evidence near factual claims.
+Do not copy whole upstream or user-supplied documents into learning pages. If the user requests public raw materials, store them under `wiki/materials/` with an index page and keep synthesized durable evidence in topic-scoped `wiki/evidence/` ledgers.

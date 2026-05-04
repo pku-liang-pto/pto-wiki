@@ -3,7 +3,7 @@ title: "Distributed Execution"
 type: topic
 status: draft
 sources:
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/
@@ -56,7 +56,7 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 
 这个路径的状态是 `implemented`，证据包括 `simpler` L3 examples、`pypto` L3 ST、PTO-ISA comm tests 和 HCCL-backed comm API。
 
-`implemented` 在本页表示 source/test/example/merged PR 证据存在，不表示本 wiki pass 已本地运行对应命令。运行状态和 caveats 见 [Examples Feature Map](./examples-feature-map.md#run-surface-and-caveats)；status label definition 见 [Evidence](../evidence/#status-labels)。
+`implemented` 在本页表示 source/test/example/merged PR 证据存在，不表示本 wiki pass 已本地运行对应命令。运行状态和 caveats 见 [Example Run Surfaces](../examples/run-surfaces.md)；status label definition 见 [Evidence](../evidence/#status-labels)。
 
 ## Current Single-Host L3 Sequence
 
@@ -135,7 +135,7 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 ## 阅读建议
 
 - 想理解 repo 责任边界：先读 [simpler](../repositories/simpler.md)、[pto-isa](../repositories/pto-isa.md)、[pypto](../repositories/pypto.md)。
-- 想看具体例子：读 [Examples Feature Map](./examples-feature-map.md)。
+- 想看具体例子：读 [Examples](../examples/)。
 - 想对齐层级术语：读 [Lingqu Level Map](./lingqu-level-map.md) 和 [Distributed Execution Terms](../concepts/distributed-execution-terms.md)。
 
 ## 未决问题

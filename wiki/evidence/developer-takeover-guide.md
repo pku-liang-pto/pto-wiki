@@ -3,7 +3,7 @@ title: "Developer Takeover Guide Evidence"
 type: evidence
 status: draft
 sources:
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/
@@ -18,9 +18,9 @@ This ledger supports [Developer Takeover Guide](../topics/developer-takeover-gui
 
 | Source | Ref / checksum | Role |
 | --- | --- | --- |
-| `materials/pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计.md` | bundle SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0` | audience and writing-priority guidance |
-| `materials/pto-runtime-distributed/00_README.md` | same bundle | runtime gaps and current state summary |
-| `materials/pto-runtime-distributed/06_development_tasks.md` | same bundle | P0/P1/P2 follow-up task framing |
+| `wiki/materials/pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计.md` | bundle SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0` | audience and writing-priority guidance |
+| `wiki/materials/pto-runtime-distributed/00_README.md` | same bundle | runtime gaps and current state summary |
+| `wiki/materials/pto-runtime-distributed/06_development_tasks.md` | same bundle | P0/P1/P2 follow-up task framing |
 | repository profile pages | current wiki repo profiles | repo-specific standalone explanations and boundaries |
 | topic evidence pages | current `wiki/evidence/` | status labels and open questions |
 | PR review feedback on this wiki PR | [pku-liang-pto/pto-wiki PR #1](https://github.com/pku-liang-pto/pto-wiki/pull/1), inspected 2026-05-04 | reviewer priority: non-distributed foundations, examples, maintainer onboarding, evidence by topic |

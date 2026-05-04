@@ -8,7 +8,7 @@ sources:
   - repositories/pypto/examples/hello_world.py
   - repositories/pypto/python/pypto/ir/compile.py
   - repositories/simpler/
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
 last_updated: 2026-05-04
 ---
 
@@ -159,4 +159,4 @@ PyPTO 的 `LevelToLinquLevel()` 与 top-level design 中的 L0-L6 方向一致�
 
 - PyPTO 打开的 L3 Distributed Programming Interface RFC 会如何稳定 `pl.at`、functional style 和 inline style？
 - orchestration-level collectives issue 中的 `pl.all_reduce` 等 API 会落在 PyPTO codegen、simpler runtime，还是 PTO-ISA communication primitive 的组合？
-- `test_l3_parallel_reduce.py` 的 skip 消除后，需要同步更新本页和 [Examples Feature Map](../topics/examples-feature-map.md)。
+- `test_l3_parallel_reduce.py` 的 skip 消除后，需要同步更新本页和 [Examples](../examples/)。

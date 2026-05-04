@@ -10,17 +10,19 @@ last_updated: YYYY-MM-DD
 
 ## Summary
 
-Explain the topic or feature in human terms. State the repository or target-set scope.
+用中文解释这个 topic 或 feature。说明它属于哪些 repository / target-set scope。保留 code identifiers、API names、file paths 和 source-native terms 的英文。
 
 ## Mental Model
 
-Explain the concept directly, using prose and a small ASCII diagram when helpful. Do not make evidence links or tables carry the teaching burden.
+Explain the concept directly, using concise Chinese prose and a small ASCII diagram when helpful. Do not make evidence links or tables carry the teaching burden.
 
 ## Foundation
 
 For advanced or distributed topics, cite the basic terms, non-distributed execution flow, repository profiles, and examples that the reader should understand first. Do not let the topic appear detached from its non-distributed basis.
 
 ## Evidence Map
+
+Evidence map 是审计支持，不是正文主体。只有在 prose 已经讲清楚后再放表。
 
 | Evidence | Role | Notes |
 | --- | --- | --- |

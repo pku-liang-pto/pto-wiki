@@ -11,8 +11,9 @@ Run these checks before and after durable wiki maintenance:
 3. Check Markdown links changed in the update for broken local targets.
 4. Check new pages have meaningful body content beyond headings and frontmatter.
 5. Check major topic and repository pages explain the knowledge directly, not only through tables or links to external sources.
-6. Check durable factual claims include nearby citations.
-7. Check `wiki/log.md` has an append-only entry for the operation.
+6. Check public learning pages follow the writing style policy: mostly Chinese narrative, English technical identifiers preserved, concise but information-rich prose, and diagrams/examples where they reduce cognitive load.
+7. Check durable factual claims include nearby citations.
+8. Check `wiki/log.md` has an append-only entry for the operation.
 
 ## Content Lint
 
@@ -23,6 +24,7 @@ Use periodically or when the wiki has grown after several updates:
 - conflicting claims across pages
 - sparse pages that should be merged or expanded
 - pages that read like a learning guide to outside sources instead of standalone learning material
+- public pages written primarily as English/internal process prose when Chinese learning narrative would be clearer for this wiki
 - pages where tables are the only explanation for core concepts
 - missing topic or concept pages for terms repeatedly referenced in multiple pages
 - missing paired `wiki/evidence/<topic>.md` pages for topic pages that rely on material, GitHub, external-document, or cross-repository synthesis claims

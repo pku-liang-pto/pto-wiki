@@ -5,7 +5,7 @@ status: draft
 sources:
   - repositories/pypto_top_level_documents/linqu_runtime_design.md
   - repositories/pypto/include/pypto/ir/function.h
-  - materials/pto-runtime-distributed/08_top_level_design_alignment.md
+  - wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md
   - wiki/evidence/lingqu-level-map.md
 last_updated: 2026-05-04
 ---

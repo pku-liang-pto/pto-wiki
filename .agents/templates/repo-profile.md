@@ -8,11 +8,11 @@ last_updated: YYYY-MM-DD
 
 # Repository Name
 
-Short summary of what the repository does and where it fits in the target set.
+用中文简短说明这个 repository 做什么、在 target set 中处于哪一层。保留 repository names、APIs、classes、functions、paths 的英文。
 
 ## Mental Model
 
-Explain the repository's core idea in prose. A reader should understand the repository role before following source links.
+Explain the repository's core idea in concise Chinese prose. A reader should understand the repository role before following source links.
 
 ## Role In The Target Set
 
@@ -36,7 +36,7 @@ Explain important directories, entry points, public APIs, modules, and extension
 
 ## Tests, Examples, And Scripts
 
-Summarize evidence that shows intended usage or supported workflows.
+Summarize examples as learning material: background concept, beginner-to-expert position, what the example proves, and what it does not prove.
 
 ## Verified Facts
 

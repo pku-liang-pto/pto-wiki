@@ -16,6 +16,7 @@ Read these before acting:
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
+- `.agents/policies/wiki-writing-style-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
 - `config/target-set.yml`
@@ -48,6 +49,6 @@ When navigation or synthesis changes, update `wiki/index.md`, the relevant area 
 
 - Do not put target-specific facts in `.agents/`.
 - Do not put reusable agent operating instructions in `wiki/`.
-- Do not copy whole upstream or user-supplied documents into `wiki/`.
+- Do not copy whole upstream or user-supplied documents into learning pages. If the user explicitly wants public raw materials, place them under `wiki/materials/` with an index and cite them as audit sources.
 - Do not update the wiki for one-off debugging state, unsupported guesses, or transient command output.
 - Keep GitHub task state separate from durable wiki knowledge unless it explains durable design or compatibility.

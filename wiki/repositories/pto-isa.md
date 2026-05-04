@@ -7,7 +7,7 @@ sources:
   - repositories/pto-isa/README.md
   - repositories/pto-isa/include/pto/README.md
   - repositories/pto-isa/demos/README.md
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
 last_updated: 2026-05-04
 ---
 

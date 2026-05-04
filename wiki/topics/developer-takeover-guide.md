@@ -3,7 +3,7 @@ title: "Developer Takeover Guide"
 type: topic
 status: draft
 sources:
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/

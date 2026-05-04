@@ -3,7 +3,7 @@ title: "Distributed Execution Terms"
 type: concept
 status: draft
 sources:
-  - materials/pto-runtime-distributed/00_README.md
+  - wiki/materials/pto-runtime-distributed/00_README.md
   - repositories/simpler/
   - repositories/pypto/
   - repositories/pto-isa/

@@ -8,15 +8,15 @@ last_updated: YYYY-MM-DD
 
 # Page Title
 
-Write a short human-readable summary of the topic.
+用中文写一段简短说明：本页教什么、读者读完应能判断什么。保留 source-native English identifiers。
 
 ## What It Covers
 
-Explain the scope of the page and what readers should learn here.
+说明范围和不覆盖的内容。不要把 source link 当作正文。
 
 ## Mental Model
 
-Explain the concept directly in prose. Use source links as citations, not as substitutes for explanation.
+先用中文 prose 解释 mental model。关系复杂时加一个小 ASCII diagram。Use source links as citations, not as substitutes for explanation.
 
 ## Key Concepts
 
@@ -26,7 +26,7 @@ Explain the concept directly in prose. Use source links as citations, not as sub
 
 ## Details
 
-Add sourced explanation in clear prose. Separate verified facts from inferred relationships.
+Add sourced explanation in concise, information-rich Chinese prose. Separate verified facts from inferred relationships and design-intended targets.
 
 ## Sources
 
