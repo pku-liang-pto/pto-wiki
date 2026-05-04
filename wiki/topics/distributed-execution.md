@@ -42,7 +42,8 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 | Local control plane | `simpler.Worker(level=3)`、fork child、mailbox、`submit_next_level`、`submit_sub` | `implemented` |
 | Remote control plane | remote L3 worker discovery、remote callable registry、persistent run_loop、RoCE/HCOMM control channel | `design-intended` |
 | Data plane | HCCL window、rank/window metadata、PTO-ISA `TPUT/TGET/TWAIT/TNOTIFY`、SDMA/URMA async demos | `implemented` at local/multi-chip level |
-| Completion plane | deferred completion PRs merged；SDMA async completion PR still open | `implemented` + `emerging` |
+| Deferred completion plane | merged deferred completion PRs and context changes | `implemented` |
+| SDMA async completion plane | SDMA async completion PR still open | `emerging` |
 
 ## 当前可验证路径
 
@@ -54,6 +55,33 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 6. Chip kernel 使用 PTO-ISA tile/comm API；HCCL/sim backend 提供 window/rank/barrier。
 
 这个路径的状态是 `implemented`，证据包括 `simpler` L3 examples、`pypto` L3 ST、PTO-ISA comm tests 和 HCCL-backed comm API。
+
+`implemented` 在本页表示 source/test/example/merged PR 证据存在，不表示本 wiki pass 已本地运行对应命令。运行状态和 caveats 见 [Examples Feature Map](./examples-feature-map.md#run-surface-and-caveats)；status label definition 见 [Evidence](../evidence/#status-labels)。
+
+## Current Single-Host L3 Sequence
+
+当前最重要的 distributed mental model 是 single-host L3，而不是 remote L3。它的 process/data boundaries 可以这样读：
+
+```text
+parent Python process
+  creates Worker(level=3)
+  registers Python callables before init()
+  init()
+    -> pre-fork chip child process(es)
+    -> pre-fork SubWorker process(es)
+    -> start C++ Scheduler thread and WorkerThread pools
+  run(orchestration_fn, TaskArgs, CallConfig)
+    -> Orchestrator consumes TaskArgs tags
+    -> TensorMap links producer/consumer tensor addresses
+    -> Scheduler moves slot through wiring/ready/completion queues
+    -> WorkerThread writes callable/config/args into shm mailbox
+    -> chip child calls ChipWorker.run(...)
+         -> L2 host runtime / AICPU scheduler / AICore-AIV kernels
+    -> HCCL or sim comm backend supplies rank/window data plane when needed
+    -> completion wakes downstream slots and Worker.run drains
+```
+
+The same sequence explains why current L3 evidence is strong but local: fork inheritance, shared-memory mailbox, TensorMap addresses, and process-local callable registry all assume one host process tree. A remote L3 implementation would need an explicit replacement for each of those local assumptions.
 
 ## 目标分布式路径
 
@@ -98,8 +126,9 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 | Deferred completion | `implemented` | [simpler PR #670](https://github.com/hw-native-sys/simpler/pull/670)、[#692](https://github.com/hw-native-sys/simpler/pull/692)、[#700](https://github.com/hw-native-sys/simpler/pull/700)；[issue #686](https://github.com/hw-native-sys/simpler/issues/686) |
 | SDMA async completion | `emerging` | [simpler PR #696](https://github.com/hw-native-sys/simpler/pull/696) open |
 | PyPTO L3 runner | `implemented` | `pypto/runtime/distributed_runner.py` |
-| PyPTO orchestration collectives | `design-intended` | [pypto issue #1189](https://github.com/hw-native-sys/pypto/issues/1189) open |
+| PyPTO orchestration collectives | `design-intended` | [pypto issue #1189](https://github.com/hw-native-sys/pypto/issues/1189) open API/design discussion; no stable implementation evidence in this pass |
 | Remote L3 / DistWorker | `design-intended` | material blueprint; no stable repo implementation found |
+| `distributed-runtime` repository ownership | `open question` | configured target-set repo exists, but no repository profile/source pass has been completed in this wiki |
 
 这些状态判断的 claim map 见 [Distributed Execution Evidence](../evidence/distributed-execution.md#claim-map)。
 

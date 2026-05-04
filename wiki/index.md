@@ -9,6 +9,7 @@ It is a standalone learning layer for the configured target set. Pages explain s
 - [Overview](./overview.md): living synthesis across the configured target set.
 - [Basic Terms](./concepts/basic-terms.md): vocabulary for tensors, tiles, memory spaces, workers, and runtime levels.
 - [Non-Distributed Execution](./topics/non-distributed-execution.md): how a normal PyPTO/PTO-ISA/simpler program becomes device work.
+- [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md): self-contained synthesis of simpler's L2, L3+, task-flow, scheduler, and worker docs.
 - [Examples Feature Map](./topics/examples-feature-map.md): self-contained example explanations from kernel to complete NN and distributed TODOs.
 - [Distributed Execution](./topics/distributed-execution.md): hierarchy, rank/window communication, current L3 behavior, and remote-runtime boundaries.
 - [Developer Takeover Guide](./topics/developer-takeover-guide.md): maintainer ownership model, risks, and safe change boundaries.

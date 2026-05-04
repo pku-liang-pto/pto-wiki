@@ -38,7 +38,7 @@ The wiki teaches the target set in four layers.
 
 First, [Basic Terms](./concepts/basic-terms.md) and [Non-Distributed Execution](./topics/non-distributed-execution.md) define the vocabulary: tensor, tile, GM/on-chip memory, AICPU/AICore/AIV, `InCore`, `Orchestration`, `ChipWorker`, TensorMap, ring buffer, and runtime levels.
 
-Second, the repository profiles explain each subsystem as a component, not just a directory listing. [pypto](./repositories/pypto.md) is the language/compiler/runtime-facing entry; [pto-isa](./repositories/pto-isa.md) is the tile/kernel instruction layer; [simpler](./repositories/simpler.md) is the runtime that launches and schedules chip work.
+Second, the repository profiles explain each subsystem as a component, not just a directory listing. [pypto](./repositories/pypto.md) is the language/compiler/runtime-facing entry; [pto-isa](./repositories/pto-isa.md) is the tile/kernel instruction layer; [simpler](./repositories/simpler.md) is the runtime that launches and schedules chip work. `simpler` also has unusually strong upstream architecture docs, now synthesized in [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md): L2 three-program launch, L3+ Orchestrator/Scheduler/Worker composition, `TaskArgs` flow, TensorMap/ring behavior, THREAD/PROCESS mode, and worker examples.
 
 Third, [Examples Feature Map](./topics/examples-feature-map.md) teaches the system through examples from kernel to complete NN: hello world, elementwise, GEMM, softmax, attention, LLaMA mini, L2 runtime launch, TensorMap/ring-buffer runtime, allreduce, and tensor-parallel FFN.
 

@@ -77,18 +77,75 @@ single kernel
 | 9. PyPTO hierarchy | `tests/st/distributed/test_l3_distributed.py` | PyPTO | HOST/CHIP/SubWorker roles | hierarchy DSL compiled to simpler L3 runner | `implemented` |
 | 10. Complete distributed NN | design target: distributed LLaMA/FFN/attention vertical slice | PyPTO + simpler + PTO-ISA | all prior concepts | model-level graph + distributed runtime + kernel-level optimization | `TODO` / `design-intended` |
 
+## Environment Matrix
+
+Examples in this target set do not all mean the same thing by “run.” A source-only PyPTO example can teach DSL/lowering without proving device execution. A simulator `simpler` example can prove runtime plumbing without NPU hardware. A hardware communication example can prove rank/window data-plane behavior without proving remote multi-host control plane.
+
+| Surface | Hardware needed | Typical prerequisites | Good for | Not enough for |
+| --- | --- | --- | --- | --- |
+| Source-only PyPTO print | no | importable PyPTO Python environment | DSL, IR, function structure, generated program printout | runtime scheduling or hardware validation |
+| `simpler` simulator | no NPU | installed `simpler`, built sim runtime binaries, Linux host for L3 fork paths | L2/L3 runtime lifecycle, task args, TensorMap shape, golden checks on sim | CANN/HCCL hardware behavior |
+| PTO-ISA CPU/simulation demos | no NPU for CPU path | PTO-ISA build deps and demo-specific setup | tile/kernel semantics without Ascend hardware | `torch_npu` operator behavior |
+| Single NPU hardware | yes, one Ascend device | CANN, `ASCEND_HOME_PATH`, device access, runtime binaries | actual device launch, AICPU/AICore path, copy-back | multi-rank communication |
+| Multi-NPU hardware | yes, multiple Ascend devices | CANN/HCCL, device pool, MPI where demo requires it | allreduce/allgather, rank/window, tensor-parallel examples | remote multi-host DistWorker |
+
+## Wiki-Only Mini Walkthroughs
+
+These walkthroughs are deliberately prose-first. The command or path is an audit anchor; the learning target is the shape of the example.
+
+### PyPTO Hello
+
+`repositories/pypto/examples/hello_world.py` is the smallest language example. A reader should see one `@pl.program`, one `InCore` function, and one `Orchestration` function. The `InCore` side loads input tensors into tiles, applies an elementwise op, and stores the output. The `Orchestration` side creates or wires tensors and calls the kernel. Done means the script can print the generated Python/IR representation; it does not prove hardware execution. A safe edit is changing shape or replacing an elementwise op, then confirming the generated representation still has the expected load/compute/store structure.
+
+### simpler L2 Hello And Vector Add
+
+`examples/workers/l2/hello_worker` is the runtime smoke test: construct `Worker(level=2)`, call `init()`, do `malloc/free`, and close in `finally`. Expected output reports init, malloc/free round trip, and close completion. If this fails, the problem is likely environment, runtime binary lookup, device setup, or lifecycle cleanup before any kernel logic is involved.
+
+`examples/workers/l2/vector_add` is the smallest full L2 run. It compiles one AIV kernel, wraps it into a `CoreCallable`, wraps orchestration plus child kernel into a `ChipCallable`, allocates device buffers, copies two 128x128 float32 inputs, builds `ChipStorageTaskArgs`, runs the worker, copies output back, and compares against numpy. Expected output includes a max error line and a golden-check pass line. Safe edits are changing the vector shape, adding a scalar argument, or changing the elementwise operation, while preserving signature/order agreement between `ChipCallable` and `TaskArgs`.
+
+### PTO-ISA Add And GEMM
+
+PTO-ISA `demos/baseline/add` teaches custom operator packaging: kernel source, host-side PyTorch registration, wheel build, install, and Python test. The success signal is that the wheel builds/installs and `test.py` passes through `torch_npu`.
+
+PTO-ISA `demos/baseline/gemm_basic` teaches performance structure. It fixes GEMM shapes `[512,2048] x [2048,1536]`, splits work across 24 cores as `4 x 6`, then further tiles K into blocks of 64. The important concept is not only matmul correctness; it is how GM/L1/L0 movement, per-core work partitioning, and double buffering become an operator implementation.
+
+### PyPTO LLaMA Mini
+
+`examples/models/08_llama_mini.py` is the current complete NN expression baseline. It is a simplified single-head LLaMA-style decoder with default `seq_len=16`, `head_dim=64`, and `vocab_size=64`. Its flow is:
+
+```text
+hidden [S,D]
+  -> RMSNorm
+  -> Q, K, V projections
+  -> RoPE on Q/K
+  -> Q @ K^T, scale, mask, softmax
+  -> probs @ V, dense projection, residual
+  -> RMSNorm
+  -> SwiGLU MLP, residual
+  -> final RMSNorm
+  -> LM head [S,D] @ [D,V]
+  -> logits [S,V]
+```
+
+Safe edits are changing `seq_len` or `vocab_size`, while preserving the source constraint that `head_dim` must be divisible by 16 for the K-tiled transpose matmul. This example proves PyPTO can express a compact full-model flow; it does not prove distributed execution of that model.
+
+### simpler L3 Allreduce And FFN TP
+
+The current multi-chip examples are single-host L3 examples. They use `Worker(level=3)` to manage chip children and optionally Python SubWorkers, with TensorMap and rank/window setup handling dependencies and communication. Allreduce proves a rank/window data-plane path; FFN tensor parallel proves a staged model block where producer/consumer relationship can be discovered from tensor addresses. Expected success is a hardware pytest/example pass on two A2/A3 devices. These examples do not prove remote multi-host lifecycle, DistWorker discovery, or cross-host callable registry.
+
 ## Examples-First Command Lanes
 
 This is a practical ladder for readers who learn by running or inspecting examples. Commands are source-documented and were not executed in this wiki pass unless explicitly noted.
 
 | Lane | First command or action | Requires hardware | Expected output / done signal | Next modification |
 | --- | --- | --- | --- | --- |
-| Source-only PyPTO print | `python examples/hello_world.py` in `repositories/pypto` | no | prints generated Python/IR representation | change tensor shape or replace `pl.add` with another elementwise op |
-| Source-only PyPTO model | `python examples/models/03_flash_attention.py` | no | prints function representation | inspect loop-carried state and online softmax updates |
-| Simulator simpler L2 | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` in `repositories/simpler` | no NPU, but runtime binaries/build cache needed | golden check passes in vector_add output | change vector size or add another tensor input |
-| Single-device PTO-ISA | `./run.sh` or README build/test sequence in `repositories/pto-isa/demos/baseline/add` | yes for NPU path | wheel builds, installs, and `test.py` passes | replace add kernel with another elementwise operator |
-| Multi-device communication | `./run.sh 2 Ascend950PR_9599` in `repositories/pto-isa/demos/baseline/allgather_async` or pytest simpler L3 examples | yes, multi-device + MPI/HCCL | all ranks report pass / pytest passes | compare allgather primitive with simpler L3 allreduce |
-| Substitute expert exercise | read `pypto/examples/models/08_llama_mini.py` beside `simpler/examples/workers/l3/ffn_tp_parallel` | no for reading | identify which model stages would need distributed tensor-parallel support | write a design note for the missing complete distributed NN vertical slice |
+| Source-only PyPTO print | `python examples/hello_world.py` in `repositories/pypto` | no | generated program text shows `InCore` load/compute/store and orchestration call structure | change tensor shape or replace `pl.add`; confirm generated representation changes only where expected |
+| Source-only PyPTO model | `python examples/models/03_flash_attention.py` | no | generated function/program representation contains block-wise attention state such as running max/sum | inspect loop-carried state and online softmax updates |
+| Simulator simpler L2 hello | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` in `repositories/simpler` | no NPU, but runtime binaries/build cache needed | output reports init, malloc/free round trip, and close completion | intentionally break platform/runtime name to learn environment failure shape |
+| Simulator simpler L2 vector add | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` in `repositories/simpler` | no NPU, but runtime binaries/build cache needed | output reports max error and golden check passed | change vector shape or add another tensor input while keeping signature/order aligned |
+| Single-device PTO-ISA | `./run.sh` or README build/test sequence in `repositories/pto-isa/demos/baseline/add` | yes for NPU path | wheel builds, installs, and `test.py` passes through `torch_npu` | replace add kernel with another elementwise operator |
+| Multi-device communication | `./run.sh 2 Ascend950PR_9599` in `repositories/pto-isa/demos/baseline/allgather_async` or pytest simpler L3 examples | yes, multi-device + MPI/HCCL | all ranks report pass / pytest passes | compare kernel primitive allgather with simpler L3 allreduce data-plane behavior |
+| Substitute expert exercise | read `pypto/examples/models/08_llama_mini.py` beside `simpler/examples/workers/l3/ffn_tp_parallel` | no for reading | identify which model stages would need partitioning, rank/window, collective, and TensorMap support | write an acceptance checklist for the missing complete distributed NN vertical slice |
 
 ## Common Example Families
 
@@ -134,19 +191,19 @@ The important learning point is that optimization is distributed across layers. 
 
 | Example | Documented entrypoint | Environment assumption | Local run in this pass | Caveat |
 | --- | --- | --- | --- | --- |
-| PyPTO hello | `python examples/hello_world.py` | PyPTO Python package importable；该脚本打印 `HelloWorldProgram.as_python()` | not run | 证明 DSL/IR print path，不证明 hardware execution。 |
-| PyPTO kernel examples | `python examples/kernels/06_softmax.py` and sibling kernel scripts | PyPTO Python environment；README 也给出 `python examples/kernels/06_softmax.py` | not run | 多数 kernel scripts 打印 generated program；system/runtime execution 另见 `tests/st`。 |
-| PyPTO FFN / Flash Attention | `python examples/models/01_ffn.py`; `python examples/models/03_flash_attention.py` | PyPTO Python environment；Flash Attention 示例在 docstring 中记录 run command | not run | 主要说明 model-level DSL/control-flow/online softmax。 |
-| PyPTO Paged Attention | `python examples/models/04_paged_attention.py` | `torch`/runtime stack、Ascend platform config、`RunConfig(platform="a2a3", device_id=11, ...)` in source | not run | 该脚本包含 golden validation，但需要对应设备和 runtime 环境。 |
-| PyPTO Paged Attention SPMD | `python examples/models/09_paged_attention_spmd.py -p <platform> -d <device>` style parser path | platform/device CLI、Ascend backend chosen from platform prefix | not run | SPMD variant is an implemented non-remote runtime example, not remote L3 proof. |
-| PyPTO LLaMA mini | import/use `build_llama_mini_program()` from `examples/models/08_llama_mini.py` | PyPTO DSL environment；file defines a parameterized program builder | not run | It is the complete NN expression baseline; no `__main__` run command is present in inspected file. |
-| PTO-ISA add | `./run.sh` or README build/install/test sequence ending in `cd test && python3 test.py` | CANN, `torch_npu`, `ASCEND_HOME_PATH`, `PTO_LIB_PATH`, target `SOC_VERSION` | not run | Demonstrates custom PyTorch operator packaging around a PTO kernel. |
-| PTO-ISA GEMM | README sequence: build wheel, install `dist/*.whl`, then `cd test && python3 test.py` | A2/A3, CANN, `torch_npu`, PTO Tile Lib path | not run | Fixed-shape `[512,2048] x [2048,1536]` GEMM with tiling/pipeline detail. |
-| PTO-ISA allgather async | `./run.sh`, `./run.sh 4`, `./run.sh 2 Ascend950PR_9599` | CANN Toolkit/Ops >= 9.0.0, MPICH, enough NPU devices/ranks | not run | Proves communication primitive demos; does not prove PyPTO collective API. |
-| simpler L2 hello | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | installed `simpler`, built runtime binaries; sim variants do not need NPU | not run | Lifecycle-only: `Worker.init()`, malloc/free, close. |
-| simpler L2 vector add | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | sim or hardware platform, runtime binaries, PTO-ISA headers auto-cloned on first run | not run | Smallest full L2 Worker API example with compile/load/run/copy-back. |
-| simpler production paged attention | `SceneTestCase.run_module(__name__)` / pytest scene-test path | CANN/runtime build cache and selected platform/device | not run | Shows `tensormap_and_ringbuffer` DAG behavior; not a beginner path. |
-| simpler L3 allreduce / FFN TP | pytest examples with `requires_hardware`, `platforms(["a2a3"])`, `device_count(2)` | two A2/A3 NPU devices, HCCL/window bootstrap, hardware runtime | not run | Proves single-host multi-chip data-plane behavior, not remote multi-host control plane. |
+| PyPTO hello | `python examples/hello_world.py` | PyPTO Python package importable；该脚本打印 `HelloWorldProgram.as_python()` | `not-run` | 证明 DSL/IR print path，不证明 hardware execution。 |
+| PyPTO kernel examples | `python examples/kernels/06_softmax.py` and sibling kernel scripts | PyPTO Python environment；README 也给出 `python examples/kernels/06_softmax.py` | `not-run` | 多数 kernel scripts 打印 generated program；system/runtime execution 另见 `tests/st`。 |
+| PyPTO FFN / Flash Attention | `python examples/models/01_ffn.py`; `python examples/models/03_flash_attention.py` | PyPTO Python environment；Flash Attention 示例在 docstring 中记录 run command | `not-run` | 主要说明 model-level DSL/control-flow/online softmax。 |
+| PyPTO Paged Attention | `python examples/models/04_paged_attention.py` | `torch`/runtime stack、Ascend platform config、`RunConfig(platform="a2a3", device_id=11, ...)` in source | `not-run` | 该脚本包含 golden validation，但需要对应设备和 runtime 环境。 |
+| PyPTO Paged Attention SPMD | `python examples/models/09_paged_attention_spmd.py -p <platform> -d <device>` style parser path | platform/device CLI、Ascend backend chosen from platform prefix | `not-run` | SPMD variant is an implemented non-remote runtime example, not remote L3 proof. |
+| PyPTO LLaMA mini | import/use `build_llama_mini_program()` from `examples/models/08_llama_mini.py` | PyPTO DSL environment；file defines a parameterized program builder | `not-run` | It is the complete NN expression baseline; no `__main__` run command is present in inspected file. |
+| PTO-ISA add | `./run.sh` or README build/install/test sequence ending in `cd test && python3 test.py` | CANN, `torch_npu`, `ASCEND_HOME_PATH`, `PTO_LIB_PATH`, target `SOC_VERSION` | `not-run` | Demonstrates custom PyTorch operator packaging around a PTO kernel. |
+| PTO-ISA GEMM | README sequence: build wheel, install `dist/*.whl`, then `cd test && python3 test.py` | A2/A3, CANN, `torch_npu`, PTO Tile Lib path | `not-run` | Fixed-shape `[512,2048] x [2048,1536]` GEMM with tiling/pipeline detail. |
+| PTO-ISA allgather async | `./run.sh`, `./run.sh 4`, `./run.sh 2 Ascend950PR_9599` | CANN Toolkit/Ops >= 9.0.0, MPICH, enough NPU devices/ranks | `not-run` | Proves communication primitive demos; does not prove PyPTO collective API. |
+| simpler L2 hello | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | installed `simpler`, built runtime binaries; sim variants do not need NPU | `not-run` | Lifecycle-only: `Worker.init()`, malloc/free, close. |
+| simpler L2 vector add | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | sim or hardware platform, runtime binaries, PTO-ISA headers auto-cloned on first run | `not-run` | Smallest full L2 Worker API example with compile/load/run/copy-back. |
+| simpler production paged attention | `SceneTestCase.run_module(__name__)` / pytest scene-test path | CANN/runtime build cache and selected platform/device | `not-run` | Shows `tensormap_and_ringbuffer` DAG behavior; not a beginner path. |
+| simpler L3 allreduce / FFN TP | pytest examples with `requires_hardware`, `platforms(["a2a3"])`, `device_count(2)` | two A2/A3 NPU devices, HCCL/window bootstrap, hardware runtime | `not-run` | Proves single-host multi-chip data-plane behavior, not remote multi-host control plane. |
 
 ## Optimization Techniques To Notice
 
@@ -160,6 +217,17 @@ Optimization examples should be read as design patterns, not only as files. Tili
 | TensorMap dependency discovery | simpler `ffn_tp_parallel`, paged attention runtime | read after `TaskArgs`; look for shared tensor address producer/consumer edges |
 | ring-buffer task/output storage | simpler `tensormap_and_ringbuffer` examples | read after L2 runtime; look for task slots, output heap, and flow control |
 | HCCL window scratch | simpler `allreduce_distributed` | read after `CommContext`; look for device-visible rank/window data plane without treating HCCL as control plane |
+
+Actionable exercises:
+
+| Technique | What to change | What should improve or reveal | What can break |
+| --- | --- | --- | --- |
+| Tiling | change GEMM tile/block shape in a local experiment | whether per-core work split still covers output shape | L0/L1 capacity, alignment, or shape constraints |
+| Double buffering | compare a buffered and unbuffered GEMM/attention variant if both exist | overlap between data movement and compute | missing sync or stale tile data |
+| Online softmax | change attention block size or inspect running max/sum state | numerical stability without full score matrix materialization | wrong normalization across blocks |
+| TensorMap | add or change tensor tags in a simpler orchestration path | automatic producer/consumer edge wiring | missing dependency if a tensor is marked `NO_DEP` or output tag is wrong |
+| Ring buffer / scope | add nested scope or more intermediate outputs | bounded reuse and lifetime behavior | slot exhaustion, premature release, or stale producer mapping |
+| Rank/window communication | compare local allreduce and PTO-ISA allgather behavior | difference between runtime-level rank/window setup and kernel-level comm primitive | overclaiming PyPTO collectives or remote control plane |
 
 ## Missing Example Roadmap
 
@@ -183,6 +251,18 @@ PyPTO model graph
 | Remote L3 example | HostWorker -> DistWorker -> remote chip workers with persistent run loop | `design-intended` |
 | Maintainer golden path | one command sequence that runs hello, L2 vector add, paged attention, L3 allreduce, and LLaMA mini | `TODO` |
 | CANN/HCCL bridge example | compare HCCL collective examples with PTO-ISA allgather and simpler allreduce | `TODO` |
+
+A minimal complete distributed NN vertical slice should have these acceptance checks before the wiki upgrades it from `TODO`:
+
+| Acceptance item | What must be visible |
+| --- | --- |
+| Model slice | a concrete LLaMA/FFN/attention-derived graph with documented shapes and golden output |
+| Partitioning | rank-local tensor ownership and weight/activation split are explicit |
+| PyPTO lowering | hierarchy-aware program generation or runtime-facing artifact is source-backed |
+| simpler execution | `Worker(level=3)` or higher runs the graph through child workers rather than only printing code |
+| PTO-ISA kernels | compute and communication primitives used by the slice are identified |
+| Cross-rank validation | outputs are checked across ranks/devices, not only rank-local smoke tests |
+| Status evidence | command/example/test/PR/source ref is recorded in the evidence ledger |
 
 ## What Not To Infer
 

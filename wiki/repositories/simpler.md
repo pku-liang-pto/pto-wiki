@@ -22,6 +22,22 @@ last_updated: 2026-05-04
 
 L3 之后不要先理解成“分布式系统”，而要先理解成“把多个 L2 worker 和 Python SubWorker 放进 host-side DAG scheduler”。材料 `00_README.md` 中的 remote L3、cross-host callable registration、RoCE/URMA control plane 是下一层设计目标，不是当前 L2-L3 基础能力。
 
+上游 `simpler/docs/` 本身是本 wiki 的重要学习材料。更完整的 runtime mechanics synthesis 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；本 repo profile 只保留仓库级定位和主要入口。
+
+## Upstream Docs To Preserve In The Wiki
+
+`simpler` 的 docs 质量比普通 README 索引更高：它们分层解释了 L2 chip launch、L3+ hierarchy、task data flow、DAG construction、scheduler dispatch 和 worker process model。wiki 后续维护时不应只摘路径表，而要保留这些文档里的 mental model。
+
+| Upstream doc | What it teaches | Wiki destination |
+| --- | --- | --- |
+| `docs/chip-level-arch.md` | L2 三程序模型：host runtime、AICPU scheduler、AICore/AIV kernels；以及 Python/C/C++ API layers | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l2-three-program-model), [Non-Distributed Execution](../topics/non-distributed-execution.md) |
+| `docs/hierarchical_level_runtime.md` | L0-L6 level model；L3+ 的 Orchestrator/Scheduler/Worker component composition | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components), [Lingqu Level Map](../topics/lingqu-level-map.md) |
+| `docs/task-flow.md` | `Callable`、`TaskArgs`、`CallConfig` 在 submit、slot、mailbox、L2 ABI edge 的形态变化 | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#task-data-flow) |
+| `docs/orchestrator.md` | TensorMap、Ring、Scope 和 `submit_*` 的 7-step flow | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#tensormap-ring-and-scope) |
+| `docs/scheduler.md` | wiring queue、ready queue、completion queue 和 fanout release | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components) |
+| `docs/worker-manager.md` | THREAD/PROCESS mode、fork ordering、shared-memory mailbox、nested Worker children | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#thread-and-process-modes) |
+| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [Examples Feature Map](../topics/examples-feature-map.md), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
+
 ## L0-L2 Ascend 启动路径
 
 `docs/chip-level-arch.md` 给出的 L2 execution flow 是理解 `simpler` 的主线：

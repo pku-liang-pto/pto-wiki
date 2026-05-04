@@ -28,12 +28,12 @@ This ledger supports [Non-Distributed Execution](../topics/non-distributed-execu
 
 ## Claim Map
 
-| Topic claim | Evidence | Destination |
-| --- | --- | --- |
-| Normal flow starts with PyPTO DSL/parser/IR/pass/codegen before runtime execution. | PyPTO README, `hello_world.py`, `compile.py`, `runner.py`. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-pypto-flow) |
-| PTO-ISA is the kernel/tile instruction layer, not the worker scheduler. | PTO-ISA README, `include/pto/README.md`, baseline demos. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-pto-isa-flow) |
-| simpler L2 owns device launch and task graph execution. | `simpler/docs/chip-level-arch.md`; L2 examples. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-simpler-l2-flow) |
-| Distributed execution should be read as a later layer on top of these foundations. | `compile.py` only returns `DistributedCompiledProgram` for Lingqu level >= 3; simpler L3 examples compose L2 workers. | [Non-Distributed Execution](../topics/non-distributed-execution.md#what-this-foundation-enables) |
+| Claim ID | Topic claim | Observed facts | Evidence | Destination |
+| --- | --- | --- | --- | --- |
+| ND-001 | Normal flow starts with PyPTO DSL/parser/IR/pass/codegen before runtime execution. | PyPTO README and examples expose Python DSL/program examples; `compile.py` contains ordinary compile behavior and a separate distributed branch; `runner.py` provides runtime-facing execution config. | PyPTO README, `hello_world.py`, `compile.py`, `runner.py`. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-pypto-flow) |
+| ND-002 | PTO-ISA is the kernel/tile instruction layer, not the worker scheduler. | PTO-ISA README/header docs describe tile-oriented APIs; baseline demos package kernels/operators; no PTO-ISA evidence owns `Worker` lifecycle or host DAG scheduling. | PTO-ISA README, `include/pto/README.md`, baseline demos. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-pto-isa-flow) |
+| ND-003 | simpler L2 owns device launch and task graph execution. | `chip-level-arch.md` describes host runtime, AICPU scheduler, AICore/AIV kernels, C/Python API layers, and execution flow; L2 worker examples show lifecycle and vector add launch. | `simpler/docs/chip-level-arch.md`; L2 examples. | [Non-Distributed Execution](../topics/non-distributed-execution.md#normal-simpler-l2-flow) |
+| ND-004 | Distributed execution should be read as a later layer on top of these foundations. | `compile.py` only returns `DistributedCompiledProgram` for Lingqu level >= 3; `simpler` L3 examples compose L2 chip workers and SubWorkers rather than replacing L2. | `compile.py`; simpler L3 examples and docs. | [Non-Distributed Execution](../topics/non-distributed-execution.md#what-this-foundation-enables) |
 
 ## Negative Findings
 

@@ -56,6 +56,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 新增 `.agents/policies/wiki-content-boundary-policy.md` 和 `.agents/workflows/agent-command-reference.md`，将 human-agent command patterns、placement rules、standalone-learning quality gates 和 reusable process guidance 收拢到 `.agents/`。精简 [Usage](./usage.md)、area indexes 和 overview 中的 agent/process wording，使 rendered wiki 主要承载 PTO-CANN target-set knowledge。
 
+## [2026-05-04] review-update | Strengthen standalone learner risks and simpler docs synthesis
+
+根据 wiki-only learner review，新增 [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md)，把 `simpler/docs/` 的 L2 三程序模型、L3+ component composition、TaskArgs data flow、TensorMap/ring、Scheduler、WorkerManager、THREAD/PROCESS mode 和 worker examples 合成到 wiki。同步扩展 [Basic Terms](./concepts/basic-terms.md)、[Examples Feature Map](./topics/examples-feature-map.md)、[Distributed Execution](./topics/distributed-execution.md)、[CANN Foundation](./concepts/cann-foundation.md) 和 evidence claim maps，使示例、基础概念、status labels 和 evidence summaries 更接近 self-contained learning material。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

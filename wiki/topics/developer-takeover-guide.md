@@ -84,30 +84,26 @@ For simpler, a safe first change is usually an L2 example/runtime path, TensorMa
 
 For distributed behavior, a safe first change must state its status label. If the evidence is an open issue, skipped test, material blueprint, or open PR, the wiki should preserve `emerging`, `design-intended`, or `TODO` instead of turning the behavior into `implemented`.
 
-## Maintenance Rules
+## First Maintainer Tasks
 
-- Preserve source-native code identifiers and file paths, even when product terminology uses corrected spelling.
-- Treat materials as evidence inputs, not ground truth when source code disagrees.
-- Status labels are part of the API of this wiki. Do not mark remote runtime behavior as `implemented` without a stable example, test, or merged PR.
-- Keep raw materials in `materials/`; put topic evidence in `wiki/evidence/`.
-- Update topic pages and evidence ledgers together when material/GitHub/cross-repo synthesis changes.
+These are not assignments; they are low-risk practice tasks that teach the system boundary before larger changes.
+
+| Area | First task | Minimal verification signal | Risk boundary |
+| --- | --- | --- | --- |
+| PyPTO | Modify `examples/hello_world.py` shape or elementwise op, then inspect generated output | generated program still has expected `InCore` load/compute/store and orchestration call | language/compiler only; do not infer runtime success |
+| PTO-ISA | Change an add-like demo kernel or inspect GEMM tiling parameters | demo build/test path remains explainable; for hardware, `test.py` passes when run in proper environment | kernel/operator package only; do not infer PyPTO API support |
+| simpler L2 | Run or inspect `examples/workers/l2/hello_worker` then `vector_add` | hello lifecycle completes; vector add golden check passes when run | L2 launch/copy-back only; no rank/window claims |
+| simpler L3 | Inspect `multi_chip_dispatch` before allreduce/FFN TP | can explain pre-fork registration, mailbox, TensorMap, and SubWorker/chip worker split | single-host process tree only; no remote DistWorker claim |
+| Distributed topic | Split one mixed claim into implemented/emerging/design-intended subclaims | status label and evidence row each cover one behavior | avoid upgrading design target to implemented without merged source/test/example evidence |
+| CANN-side | Add a scoped source pass for one CANN repo before using it as authority | repository profile or evidence ledger names inspected ref and observed facts | HCCL support does not imply HCOMM/SHMEM/HIXL ownership |
 
 ## Current High-Risk Areas
 
 | Risk | Why it matters | Current status | Next maintainer action | Evidence needed to change status |
 | --- | --- | --- | --- | --- |
 | Remote L3 / DistWorker | Easy to overstate from design docs | `design-intended` | inspect `distributed-runtime` and future `simpler` remote-worker PRs | stable remote worker example, merged PR, or source docs |
-| PyPTO collectives | API issues exist, but implementation boundary is not settled | `design-intended` / `emerging` | follow PyPTO issue `#1189` and codegen/runtime changes | merged API + lowering tests + runtime example |
-| deferred + async completion | Multiple PRs exist; final ABI still needs follow-up | `implemented` + `emerging` | track [simpler PR #696](https://github.com/hw-native-sys/simpler/pull/696) and any replacement completion backend | merged async completion PR + updated examples/tests |
+| PyPTO collectives | API issues exist, but implementation boundary is not settled | `design-intended` | follow PyPTO issue `#1189` and codegen/runtime changes | merged API + lowering tests + runtime example |
+| deferred completion | Multiple merged PRs support deferred completion context | `implemented` | keep examples and docs aligned with merged ABI | source/test/example that show changed behavior |
+| SDMA async completion | Open PR still represents unfinished async backend work | `emerging` | track [simpler PR #696](https://github.com/hw-native-sys/simpler/pull/696) or replacement completion backend | merged async completion PR + updated examples/tests |
 | complete distributed NN example | Current evidence has complete NN non-distributed examples and distributed partial examples, but not complete distributed NN | `TODO` | design a vertical slice from `llama_mini` plus simpler L3 FFN/collective path | runnable model-level distributed example and evidence ledger update |
 | CANN-side ownership | HCCL is partially inspected but HCOMM/SHMEM/HIXL are not | `open question` | run a CANN-side repository documentation pass | CANN repository profiles with source refs |
-
-## Definition Of Ready For New Wiki Claims
-
-Before adding a durable claim, capture:
-
-- exact repository path and commit SHA
-- material file and checksum when material-derived
-- GitHub issue/PR/commit URL when status-derived
-- whether the claim is implemented, emerging, design-intended, TODO, stale, inferred, not-run, or open question
-- which target-set behavior or open question the claim changes
