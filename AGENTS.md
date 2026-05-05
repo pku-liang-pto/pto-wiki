@@ -8,6 +8,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 
 - `.agents/workflows/agent-command-reference.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
+- `.agents/workflows/concept-evidence-lookup.md`
 - `.agents/workflows/document-material-ingestion.md`
 - `.agents/workflows/repo-documentation.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
@@ -37,6 +38,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Keep local target repository checkouts in `repositories/`.
 - Keep ad hoc user-supplied document materials in `materials/` or another clearly named local workspace; preserve raw originals and record checksums/conversion methods for used materials. Track raw material bundles under `wiki/materials/` only when the user explicitly wants them public, expose them through a `wiki/materials/` index, and cite them as audit/source-material evidence.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
+- Stabilize important concept explanations before writing answers or wiki updates. For acronyms, protocols, platform components, APIs, runtime layers, hardware terms, or code identifiers that matter to the reader, look up existing wiki coverage, local repository source, GitHub history, or official internet documentation as needed; then define the concept locally with status and citations.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
 - Treat examples as first-class documentation evidence. Example pages should provide background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, and explicit TODO/design-intended entries for important missing examples.
 - Public pages should be concise but information-rich: prose first, small ASCII diagrams when useful, concrete examples before abstract status tables, and no table-only explanation of important ideas.

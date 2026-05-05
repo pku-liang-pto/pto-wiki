@@ -36,7 +36,8 @@ Write concise but information-rich prose.
 - A table of source paths is not a substitute for a code walkthrough. Use tables for lookup after the code shape has been explained.
 - For long pages, optimize for chapter-style learning first and quick lookup second. Use strong headings and opening reading guidance instead of shrinking the page into a map.
 - Repository pages are repository-centered learning chapters: teach purpose, architecture, important examples, source-verified implementation state, and material-derived design context while preserving status boundaries.
-- Materials under `wiki/materials/` may be used as writing-quality references for structure and depth, but Examples/Topics/Repositories should synthesize, compress, cross-link, and update the material shape when the wiki page has a different job.
+- Materials under `wiki/materials/` are public learning pages when exposed in the sidebar. They must define important terms where introduced, explain source paths locally instead of saying only "see source", and include diagrams or source-shaped pseudocode when the material depends on execution flow or code behavior.
+- Materials may be used as writing-quality references for structure and depth, but Examples/Topics/Repositories should synthesize, compress, cross-link, and update the material shape when the wiki page has a different job.
 
 ## Visual Intuition
 
@@ -60,6 +61,8 @@ Avoid:
 - code-free repository/topic/example pages for implemented features
 - source-path tables without embedded code explanation
 - sentences that only say "see this source"
+- sidebar labels that hide the actual page subject, such as `Stack` when the page is really about Hardware, CANN, HCCL, and RoCE
+- public material pages that introduce acronyms such as `RoCE`, `RDMA`, `URMA`, `HCCL`, `HCOMM`, `HCCS`, `GM`, `CQ`, or `QP` without local explanation
 - agent instructions in `wiki/`
 - broad claims without nearby source/evidence
 - mixing implemented behavior and design target in one unlabelled paragraph

@@ -55,17 +55,17 @@ export default defineConfig({
       {
         text: 'Materials',
         items: [
-          { text: 'Material index', link: '/materials/' },
-          { text: 'Bundle overview', link: '/materials/pto-runtime-distributed/' },
-          { text: '00 README', link: '/materials/pto-runtime-distributed/00_README' },
-          { text: 'Stack', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
-          { text: 'ISA and Runtime Basics', link: '/materials/pto-runtime-distributed/02_pto_isa_and_runtime_basics' },
-          { text: 'Distributed Blueprint', link: '/materials/pto-runtime-distributed/03_distributed_blueprint' },
-          { text: 'Feature Deep Dives', link: '/materials/pto-runtime-distributed/04_feature_deep_dives' },
-          { text: 'Progress and Timeline', link: '/materials/pto-runtime-distributed/05_progress_and_timeline' },
-          { text: 'Development Tasks', link: '/materials/pto-runtime-distributed/06_development_tasks' },
-          { text: 'Source Notes', link: '/materials/pto-runtime-distributed/07_source_notes' },
-          { text: 'Design Alignment', link: '/materials/pto-runtime-distributed/08_top_level_design_alignment' },
+          { text: 'Materials Home', link: '/materials/' },
+          { text: 'PTO Runtime Bundle Guide', link: '/materials/pto-runtime-distributed/' },
+          { text: '00 Overview and Reading Paths', link: '/materials/pto-runtime-distributed/00_README' },
+          { text: '01 Hardware, CANN, HCCL, RoCE', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
+          { text: '02 PTO-ISA and Runtime Basics', link: '/materials/pto-runtime-distributed/02_pto_isa_and_runtime_basics' },
+          { text: '03 Distributed Runtime Blueprint', link: '/materials/pto-runtime-distributed/03_distributed_blueprint' },
+          { text: '04 Feature Deep Dives', link: '/materials/pto-runtime-distributed/04_feature_deep_dives' },
+          { text: '05 Progress and Timeline', link: '/materials/pto-runtime-distributed/05_progress_and_timeline' },
+          { text: '06 Development Tasks', link: '/materials/pto-runtime-distributed/06_development_tasks' },
+          { text: '07 Source and Evidence Notes', link: '/materials/pto-runtime-distributed/07_source_notes' },
+          { text: '08 HostWorker / DistWorker Alignment', link: '/materials/pto-runtime-distributed/08_top_level_design_alignment' },
           { text: 'Document System Design', link: '/materials/pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计' }
         ]
       }
@@ -120,17 +120,17 @@ export default defineConfig({
       {
         text: 'Materials',
         items: [
-          { text: 'Material index', link: '/materials/' },
-          { text: 'Bundle overview', link: '/materials/pto-runtime-distributed/' },
-          { text: '00 README', link: '/materials/pto-runtime-distributed/00_README' },
-          { text: 'Stack', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
-          { text: 'ISA and Runtime Basics', link: '/materials/pto-runtime-distributed/02_pto_isa_and_runtime_basics' },
-          { text: 'Distributed Blueprint', link: '/materials/pto-runtime-distributed/03_distributed_blueprint' },
-          { text: 'Feature Deep Dives', link: '/materials/pto-runtime-distributed/04_feature_deep_dives' },
-          { text: 'Progress and Timeline', link: '/materials/pto-runtime-distributed/05_progress_and_timeline' },
-          { text: 'Development Tasks', link: '/materials/pto-runtime-distributed/06_development_tasks' },
-          { text: 'Source Notes', link: '/materials/pto-runtime-distributed/07_source_notes' },
-          { text: 'Design Alignment', link: '/materials/pto-runtime-distributed/08_top_level_design_alignment' },
+          { text: 'Materials Home', link: '/materials/' },
+          { text: 'PTO Runtime Bundle Guide', link: '/materials/pto-runtime-distributed/' },
+          { text: '00 Overview and Reading Paths', link: '/materials/pto-runtime-distributed/00_README' },
+          { text: '01 Hardware, CANN, HCCL, RoCE', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
+          { text: '02 PTO-ISA and Runtime Basics', link: '/materials/pto-runtime-distributed/02_pto_isa_and_runtime_basics' },
+          { text: '03 Distributed Runtime Blueprint', link: '/materials/pto-runtime-distributed/03_distributed_blueprint' },
+          { text: '04 Feature Deep Dives', link: '/materials/pto-runtime-distributed/04_feature_deep_dives' },
+          { text: '05 Progress and Timeline', link: '/materials/pto-runtime-distributed/05_progress_and_timeline' },
+          { text: '06 Development Tasks', link: '/materials/pto-runtime-distributed/06_development_tasks' },
+          { text: '07 Source and Evidence Notes', link: '/materials/pto-runtime-distributed/07_source_notes' },
+          { text: '08 HostWorker / DistWorker Alignment', link: '/materials/pto-runtime-distributed/08_top_level_design_alignment' },
           { text: 'Document System Design', link: '/materials/pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计' }
         ]
       }

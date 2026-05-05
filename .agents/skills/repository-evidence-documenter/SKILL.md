@@ -13,6 +13,7 @@ Read:
 
 - `AGENTS.md`
 - `.agents/workflows/repo-documentation.md`
+- `.agents/workflows/concept-evidence-lookup.md`
 - `.agents/workflows/dependency-and-code-analysis.md`
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
@@ -21,6 +22,7 @@ Read:
 - `config/target-set.yml`
 
 Read `.agents/workflows/github-reference-documentation.md` when the task names a branch, issue, PR, release, tag, or commit.
+Use `concept-evidence-lookup` when repository documentation depends on important APIs, runtime layers, hardware/platform terms, protocols, or code identifiers whose meaning should be verified from source, GitHub history, or official docs.
 
 ## Workspace Rules
 
@@ -42,6 +44,8 @@ Inspect enough of these to support each claim:
 - source layout, entry points, public APIs, core modules, extension points
 - tests, examples, scripts, generated-artifact configuration
 - cross-repository references and shared concepts
+
+For important concepts, capture both the code shape and the reader-facing definition. A source path table is not enough; explain what the identifier means in this repository and what implementation state it proves.
 
 ## Output
 

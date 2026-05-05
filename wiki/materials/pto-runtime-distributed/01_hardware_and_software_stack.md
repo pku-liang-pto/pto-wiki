@@ -232,7 +232,77 @@ condition:
 
 ### 3.4 RoCE
 
-RoCE 用于跨 host 的 RDMA 网络路径。`RUNTIME_OPEN_PROBLEMS.md` 和 2026-04-29 聊天记录都把“通过 RoCE 网络管理远端 L3”列为 top 问题。聊天记录中还提到可以在一个 16 卡节点上“假装两个 8 卡 host”验证 RoCE 自通信思路。这是讨论线索，不代表已经实现。
+RoCE 是 `RDMA over Converged Ethernet`，也就是把 RDMA 能力放到 Ethernet 网络上。`RDMA` 是 `Remote Direct Memory Access`：一端的网卡或通信引擎在建立连接、注册内存和权限后，可以读写另一端暴露出来的 memory region。和普通 TCP/RPC 相比，RDMA 的直觉差异是：
+
+```text
+Normal TCP / RPC intuition
+--------------------------
+sender app
+  -> kernel/socket stack
+  -> NIC
+  -> Ethernet
+  -> receiver NIC
+  -> kernel/socket stack
+  -> receiver app copies/parses bytes
+
+RDMA / RoCE intuition
+---------------------
+host B registers memory region MR_B
+host A obtains permission + remote address/key for MR_B
+host A NIC/RDMA engine
+  -> Ethernet fabric
+  -> host B NIC/RDMA engine writes or reads MR_B
+
+CPU 主要负责 setup、权限、queue pair、completion 处理；
+真正的数据搬运尽量由 NIC/RDMA engine 完成。
+```
+
+NVIDIA DOCA 文档把 RoCE 定义为在 lossless Ethernet 上承载 RDMA，用于高吞吐、低延迟的 server-to-server memory transfer，并说明 RoCEv1 使用专用 Ethernet EtherType，RoCEv2 把 RDMA 封装进 UDP/IP，UDP 端口为 `4791`，因此可以跨 IP Layer 3 routing。该文档也强调可靠部署通常需要 Ethernet flow control，例如 Priority Flow Control。Ascend/HCCL 文档则说明 HCCL 是基于 Ascend AI processors 的集合通信库，支持 single-server multi-device 和 multi-server multi-device 场景，并在 HCCS、RoCE、PCIe 等高速链路上实现 AllReduce、Broadcast、AllGather、ReduceScatter、AlltoAll 等 collective primitives。Ascend PyTorch 通信基础文档也把 RoCE 解释为承载在融合以太网上的 RDMA 技术，并在该语境中特指 RoCE v2。
+
+资料来源：
+
+- NVIDIA DOCA, [RDMA over Converged Ethernet](https://docs.nvidia.com/doca/sdk/rdma-over-converged-ethernet/index.html)
+- Huawei Ascend, [HCCL Overview](https://www.hiascend.com/document/detail/en/canncommercial/800/hcclug/hcclug/hcclug_000001.html)
+- Huawei Ascend, [通信基础概述](https://www.hiascend.com/document/detail/zh/Pytorch/700/ptmoddevg/trainingmigrguide/performance_tuning_0050.html)
+
+对 PTO-Runtime 来说，RoCE 的位置应该这样读：
+
+```text
+PTO Runtime remote-L3 problem
+-----------------------------
+control plane:
+  launch/discover remote Worker
+  register callable identity
+  submit task metadata
+  maintain heartbeat/failure/retry
+  report completion/error
+
+possible data/transport substrate:
+  TCP socket      -> easiest control path, more CPU/kernel involvement
+  RoCE/RDMA      -> low-latency registered-memory data path
+  HCCL/HCOMM     -> collective/window-oriented NPU communication
+  URMA           -> Ascend/UB-oriented remote memory access path
+```
+
+因此，RoCE 不是 “remote L3”。它只回答“跨 host 低延迟搬数据可以走什么链路”这一层问题。Remote L3 还需要回答“谁启动远端进程、远端如何知道 callable 是什么、参数怎么序列化、Tensor identity 如何跨 host 表达、失败时如何回收资源”等 control-plane 问题。
+
+一个容易误读的点是：HCCL 已经可以在 RoCE 上做 multi-server collective communication，不等于 PTO-Runtime 已经拥有远端 L3 worker 管理。HCCL/HCOMM 更像 data plane 和 communication domain：它知道 rank、window、collective operation 和 device-side task orchestration。PTO-Runtime 的 remote L3 则需要 host-side worker ownership 和 task lifecycle：
+
+```text
+HCCL over RoCE can help with:
+  rank-based collective communication
+  comm window / memory information exchange
+  device-side wait/notify and transfer tasks
+
+PTO Runtime still needs:
+  remote Worker process lifecycle
+  callable registry across hosts
+  TaskArgs / TensorMap serialization boundary
+  async completion and error propagation into scheduler
+  cleanup when a remote host or communication endpoint fails
+```
+
+`RUNTIME_OPEN_PROBLEMS.md` 和 2026-04-29 聊天记录把“通过 RoCE 网络管理远端 L3”列为 top problem，应该按这个拆解理解：RoCE 是候选 transport/data path；remote L3 management 是尚未完成的 runtime control-plane 设计。聊天记录中提到可以在一个 16 卡节点上“假装两个 8 卡 host”验证 RoCE 自通信思路，这只能证明某些网络路径或通信配置可实验，不代表 remote L3 已经实现。
 
 ## 4. PTO-Runtime 中 control plane 和 data plane 的区别
 
