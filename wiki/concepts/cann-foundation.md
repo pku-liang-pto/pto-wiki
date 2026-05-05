@@ -6,12 +6,16 @@ sources:
   - config/target-set.yml
   - repositories/hccl/
   - wiki/evidence/distributed-execution.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # CANN Foundation
 
 本页解释 CANN-side repositories 在本 wiki 中的定位。当前 PTO pass 深入覆盖的是 `simpler`、`pto-isa` 和 `pypto`；CANN-side 项目主要作为 communication / memory / interconnect / recipe supporting layer 出现，除 `hccl` 有少量 source inspection 外，其余项目还不能当作已完整审计。
+
+## How To Read This Page
+
+先把 CANN 当作 Ascend execution substrate，而不是 PTO 的控制层。PTO pages 里提到 CANN/HCCL 时，通常是在解释 compiler/runtime environment、device runtime、communication window 或 collective data-plane；除非未来有 dedicated source pass，否则不要从这些词推断 HCOMM、SHMEM、HIXL 或 recipes 的具体 ownership。
 
 ## Current Mental Model
 
@@ -69,4 +73,4 @@ Concrete examples:
 
 HCCL/HCOMM/SHMEM/HIXL evidence can support data movement, collective communication, memory sharing, or interconnect claims. It does not by itself prove PTO Runtime worker lifecycle, PyPTO syntax/API, simpler scheduler behavior, remote callable registry, or remote L3 control plane.
 
-When a future wiki pass makes a durable claim about a CANN-side project, add a repository profile or evidence ledger first rather than letting distributed-runtime pages imply ownership.
+因此，当前没有 dedicated source pass 的 CANN-side project 只表示 target-set coverage gap，不表示本 wiki 已能解释其实现 ownership。分布式页面中的 HCCL/HCOMM/SHMEM/HIXL 相关句子，都应按 data-plane support 或 `open question` 阅读。

@@ -14,7 +14,7 @@ Evaluate whether the wiki's factual claims are auditable and whether status labe
 - Do evidence ledgers include source sets, refs, material routing, claim maps, negative findings, and open questions?
 - Are GitHub PRs/issues, commits, materials, and local checkouts cited precisely enough?
 - Are implemented/design-intended/emerging/stale/open-question labels used consistently?
-- Are raw materials summarized rather than copied into wiki pages?
+- Are source materials summarized or synthesized in learning pages rather than copied wholesale?
 
 ## Output
 

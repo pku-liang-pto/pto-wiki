@@ -6,15 +6,19 @@ sources:
   - repositories/simpler/
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
-  - materials/pto-runtime-distributed/
-last_updated: 2026-05-04
+  - wiki/materials/pto-runtime-distributed/
+last_updated: 2026-05-05
 ---
 
 # simpler
 
 `simpler` 是 PTO runtime 的主要实现仓库。先把它理解成“在 Ascend device 上启动和调度 task graph 的 runtime”，再看它的分布式扩展。它的基础能力是 L0-L2：host program 构造 callable/args/config，L2 `ChipWorker` 加载 host runtime、AICPU binary、AICore binary，AICPU scheduler 调度 AICore/AIV kernel。L3/L4 是在这个 L2 chip execution unit 上继续组合出来的层级 worker。
 
-本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `materials/pto-runtime-distributed/`。
+本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `wiki/materials/pto-runtime-distributed/`。
+
+## How To Read This Page
+
+先按 runtime foundation 阅读，不要直接跳到 distributed PR 表。`Repo 直觉` 和 `L0-L2 Ascend 启动路径` 解释最小可运行单元；`Runtime Variants` 和 `Host-side DAG 层` 解释 TensorMap/ring/scheduler 为什么存在；`L3 Worker 模型` 和 `Comm Window 与 HCCL` 才进入 distributed-adjacent 能力。想看更完整的上游 docs synthesis，继续读 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)。
 
 ## Repo 直觉
 
@@ -24,11 +28,11 @@ L3 之后不要先理解成“分布式系统”，而要先理解成“把多�
 
 上游 `simpler/docs/` 本身是本 wiki 的重要学习材料。更完整的 runtime mechanics synthesis 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；本 repo profile 只保留仓库级定位和主要入口。
 
-## Upstream Docs To Preserve In The Wiki
+## 上游文档学习主线
 
-`simpler` 的 docs 质量比普通 README 索引更高：它们分层解释了 L2 chip launch、L3+ hierarchy、task data flow、DAG construction、scheduler dispatch 和 worker process model。wiki 后续维护时不应只摘路径表，而要保留这些文档里的 mental model。
+`simpler` 的 docs 质量比普通 README 索引更高：它们分层解释了 L2 chip launch、L3+ hierarchy、task data flow、DAG construction、scheduler dispatch 和 worker process model。读者可以把这组文档当成 runtime 教材：先从 L2 三程序模型理解一个 chip 如何跑起来，再从 Orchestrator/Scheduler/WorkerManager 理解 L3+ 如何把多个 child worker 组合成 host-side DAG。
 
-| Upstream doc | What it teaches | Wiki destination |
+| Upstream doc | 它教什么 | Wiki destination |
 | --- | --- | --- |
 | `docs/chip-level-arch.md` | L2 三程序模型：host runtime、AICPU scheduler、AICore/AIV kernels；以及 Python/C/C++ API layers | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l2-three-program-model), [Non-Distributed Execution](../topics/non-distributed-execution.md) |
 | `docs/hierarchical_level_runtime.md` | L0-L6 level model；L3+ 的 Orchestrator/Scheduler/Worker component composition | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components), [Lingqu Level Map](../topics/lingqu-level-map.md) |
@@ -36,7 +40,7 @@ L3 之后不要先理解成“分布式系统”，而要先理解成“把多�
 | `docs/orchestrator.md` | TensorMap、Ring、Scope 和 `submit_*` 的 7-step flow | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#tensormap-ring-and-scope) |
 | `docs/scheduler.md` | wiring queue、ready queue、completion queue 和 fanout release | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components) |
 | `docs/worker-manager.md` | THREAD/PROCESS mode、fork ordering、shared-memory mailbox、nested Worker children | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#thread-and-process-modes) |
-| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [Examples Feature Map](../topics/examples-feature-map.md), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
+| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [PTO Examples](../examples/pto/), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
 
 ## L0-L2 Ascend 启动路径
 

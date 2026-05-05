@@ -6,12 +6,14 @@ sources:
   - repositories/pypto/
   - repositories/pto-isa/
   - repositories/simpler/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Non-Distributed Execution Evidence
 
 This ledger supports [Non-Distributed Execution](../topics/non-distributed-execution.md). It exists because the topic combines three repositories into one normal execution path.
+
+读者不需要从本页学习普通执行路径；普通执行的解释在 topic page。这里保留 source anchors、claim map 和 negative findings，用来证明 wiki 没有把 distributed material 盖过 foundation layer。
 
 ## Source Set
 

@@ -5,14 +5,16 @@ status: draft
 sources:
   - repositories/pypto_top_level_documents/linqu_runtime_design.md
   - repositories/pypto/include/pypto/ir/function.h
-  - materials/pto-runtime-distributed/08_top_level_design_alignment.md
-  - materials/pto-runtime-distributed/03_distributed_blueprint.md
-last_updated: 2026-05-04
+  - wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md
+  - wiki/materials/pto-runtime-distributed/03_distributed_blueprint.md
+last_updated: 2026-05-05
 ---
 
 # Lingqu Level Map Evidence
 
 This ledger supports [Lingqu Level Map](../topics/lingqu-level-map.md). It exists because the topic combines a top-level design document, PyPTO enum evidence, simpler runtime behavior, and material-derived distributed targets.
+
+读层级概念时先看 topic page；本页只用于核对每个 level 的证据强度。它特别保护一个边界：PyPTO enum 或 Lingqu design 名称存在，不等于对应 runtime level 已经可运行。
 
 ## Source Set
 
@@ -20,8 +22,8 @@ This ledger supports [Lingqu Level Map](../topics/lingqu-level-map.md). It exist
 | --- | --- | --- |
 | `repositories/pypto_top_level_documents/linqu_runtime_design.md` | `main` commit `7faac0b910e40989a6bbd381a80595b65ab29708` | top-level Lingqu runtime design |
 | `repositories/pypto/include/pypto/ir/function.h` | `pypto` commit `f21c2dd48cfe1e5c4add78b0e391a31196420862` | `Level`, `Role`, and `LevelToLinquLevel()` code evidence |
-| `materials/pto-runtime-distributed/08_top_level_design_alignment.md` | extracted from bundle SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0` | HostWorker/DistWorker and L0-L6 alignment |
-| `materials/pto-runtime-distributed/03_distributed_blueprint.md` | same bundle | L4-L6 remote/distributed target context |
+| `wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md` | extracted from bundle SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0` | HostWorker/DistWorker and L0-L6 alignment |
+| `wiki/materials/pto-runtime-distributed/03_distributed_blueprint.md` | same bundle | L4-L6 remote/distributed target context |
 | `repositories/simpler/docs/chip-level-arch.md` and `examples/workers/l3/README.md` | `simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` | L2/L3 runtime execution evidence |
 
 ## Claim Map

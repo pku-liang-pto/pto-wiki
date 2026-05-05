@@ -17,6 +17,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
+- `.agents/policies/wiki-writing-style-policy.md`
 - `.agents/policies/document-material-policy.md`
 - `.agents/policies/source-and-citation-policy.md`
 - `.agents/policies/repository-workspace-policy.md`
@@ -26,6 +27,7 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 
 - Keep `wiki/` human-readable.
 - Keep `wiki/` self-contained enough to learn from directly. Source links, PRs, issues, materials, and evidence ledgers are audit support, not substitutes for explanation.
+- Write public wiki narrative mostly in Chinese. Preserve English for code identifiers, repository names, APIs, classes, functions, file paths, PR titles, and source-native technical terms.
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
 - Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.
@@ -33,10 +35,11 @@ Before answering lookup requests, updating the wiki, or documenting repositories
 - Put target-specific repository data in `config/target-set.yml`.
 - Put target-specific human knowledge in `wiki/`.
 - Keep local target repository checkouts in `repositories/`.
-- Keep user-supplied document materials in `materials/` or another clearly named workspace. Prefer summarizing durable evidence in `wiki/`, but tracked material bundles are allowed when the user explicitly asks for them or when a pass defines them as source evidence.
+- Keep ad hoc user-supplied document materials in `materials/` or another clearly named local workspace; preserve raw originals and record checksums/conversion methods for used materials. Track raw material bundles under `wiki/materials/` only when the user explicitly wants them public, expose them through a `wiki/materials/` index, and cite them as audit/source-material evidence.
 - Cite source files, upstream documentation, repository URLs, commits, tags, or releases for factual claims.
 - When users provide materials for a topic, trace related issues, PRs, commits, branches, and files before writing a systematic wiki synthesis.
 - Treat examples as first-class documentation evidence. Example pages should provide background concepts, beginner-to-expert progression, cross-repository comparison, optimization notes, and explicit TODO/design-intended entries for important missing examples.
+- Public pages should be concise but information-rich: prose first, small ASCII diagrams when useful, concrete examples before abstract status tables, and no table-only explanation of important ideas.
 - Distinguish verified facts from inferred architecture.
 - Do not copy whole upstream documents into this repository.
 - Prefer incremental wiki updates over broad rewrites unless restructuring clearly improves correctness or navigation.

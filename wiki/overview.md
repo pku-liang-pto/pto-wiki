@@ -6,14 +6,18 @@ sources:
   - config/target-set.yml
   - wiki/evidence/non-distributed-execution.md
   - wiki/evidence/distributed-execution.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Overview
 
-This page is the living synthesis for the configured target set. It summarizes durable knowledge that cuts across individual pages and teaches the project shape.
+本页是 PTO-CANN target set 的总览。它不替代各个 repository、example、topic 章节，而是先给读者一个完整心智模型：PTO 为什么分成 PyPTO、PTO-ISA 和 `simpler`，普通程序怎样跑起来，distributed execution 又在哪些基础上继续扩展。
 
 The current target set is defined in `config/target-set.yml`.
+
+## How To Read This Page
+
+第一次阅读时，把本页当成地图和压缩版教材：先读 `Current PTO Runtime Synthesis`，确认从 Python DSL 到 Ascend device execution 的主链路；再读 `Standalone Learning Spine`，决定下一页从 concepts、examples、repositories 还是 topics 进入。已经熟悉系统的读者可以直接用本页检查某个 claim 的状态边界，例如 single-host L3 已实现、remote L3 仍是设计目标。
 
 ## Current PTO Runtime Synthesis
 
@@ -34,12 +38,16 @@ Remote L3、DistWorker、cross-host callable registration、RoCE/URMA-backed rem
 
 ## Standalone Learning Spine
 
-The wiki teaches the target set in four layers.
+这个 wiki 的阅读主线不是“先找外部资料”，而是从 wiki 内部直接建立系统知识，再通过 source links 做审计。当前公开内容分成四层。
 
 First, [Basic Terms](./concepts/basic-terms.md) and [Non-Distributed Execution](./topics/non-distributed-execution.md) define the vocabulary: tensor, tile, GM/on-chip memory, AICPU/AICore/AIV, `InCore`, `Orchestration`, `ChipWorker`, TensorMap, ring buffer, and runtime levels.
 
 Second, the repository profiles explain each subsystem as a component, not just a directory listing. [pypto](./repositories/pypto.md) is the language/compiler/runtime-facing entry; [pto-isa](./repositories/pto-isa.md) is the tile/kernel instruction layer; [simpler](./repositories/simpler.md) is the runtime that launches and schedules chip work. `simpler` also has unusually strong upstream architecture docs, now synthesized in [simpler Runtime Architecture](./topics/simpler-runtime-architecture.md): L2 three-program launch, L3+ Orchestrator/Scheduler/Worker composition, `TaskArgs` flow, TensorMap/ring behavior, THREAD/PROCESS mode, and worker examples.
 
-Third, [Examples Feature Map](./topics/examples-feature-map.md) teaches the system through examples from kernel to complete NN: hello world, elementwise, GEMM, softmax, attention, LLaMA mini, L2 runtime launch, TensorMap/ring-buffer runtime, allreduce, and tensor-parallel FFN.
+Third, [PTO Examples](./examples/pto/) teaches the system through examples from kernel to complete NN: hello world, elementwise, GEMM, softmax, attention, LLaMA mini, L2 runtime launch, TensorMap/ring-buffer runtime, allreduce, and tensor-parallel FFN.
 
 Fourth, [Distributed Execution](./topics/distributed-execution.md) adds hierarchy, rank/window communication, HCCL data-plane support, and the boundary between implemented single-host L3 and design-intended remote L3.
+
+## What To Remember
+
+PTO-CANN wiki 当前最重要的判断有三条。第一，非分布式基础不是附录：PyPTO 普通编译、PTO-ISA tile kernel、`simpler` L2 launch 是理解 distributed runtime 的必要前提。第二，examples 是最好的学习入口：hello/add 解释最小闭环，GEMM/attention 解释 kernel 和 performance，FFN TP/allreduce 解释当前 single-host distributed runtime。第三，HCCL 和 PTO-ISA communication primitives 支撑 data plane，但 remote worker lifecycle、remote callable registry 和 cross-host control plane 仍需要后续源码或可运行示例证明。

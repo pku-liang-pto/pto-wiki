@@ -4,6 +4,8 @@ The wiki should be easy to query, browse, and update incrementally.
 
 Follow `.agents/policies/wiki-content-boundary-policy.md` when deciding whether a sentence belongs in `wiki/` or `.agents/`.
 
+Follow `.agents/policies/wiki-writing-style-policy.md` for public learning pages.
+
 ## System Positioning
 
 This wiki is not a distributed-only documentation space. Distributed topics must be grounded in the non-distributed foundations that make them possible: basic terms, normal execution flow, repository roles, kernels, runtime launch paths, and representative examples.
@@ -36,9 +38,11 @@ Update `wiki/index.md` whenever adding, renaming, or deleting a durable wiki pag
 Use stable directories for recurring page types:
 
 - `wiki/repositories/`: repository profiles.
+- `wiki/examples/`: public example domains. Put current PTO examples under `wiki/examples/pto/`; keep run surface and cross-repository source comparison inside each concrete example chapter.
 - `wiki/topics/`: feature, design, workflow, issue family, or behavior syntheses.
 - `wiki/evidence/`: topic-scoped evidence ledgers for user materials, GitHub references, external documents, repository anchors, claim maps, negative findings, and open questions.
 - `wiki/concepts/`: reusable technical concepts, APIs, protocols, acronyms, and architecture ideas.
+- `wiki/materials/`: public source-material library used for direct reading, writing-style reference, and audit.
 
 Add new top-level wiki directories only when repeated pages justify the area. Prefer extending these areas before introducing a new taxonomy.
 
@@ -66,7 +70,7 @@ Each durable page should link to:
 - related repository, topic, or concept pages
 - source evidence near the claims it supports
 
-Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis should cite a paired `wiki/evidence/<topic>.md` page where the evidence is needed. Small topic pages based only on nearby direct repository citations do not need a paired evidence page.
+Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis must have and cite a paired `wiki/evidence/<topic>.md` ledger near the claims it supports. Small topic pages based only on nearby direct repository citations do not need a paired evidence page.
 
 Use normal Markdown links for file paths and URLs. Do not require graph data or graph-specific wikilink syntax.
 
@@ -75,6 +79,7 @@ Use normal Markdown links for file paths and URLs. Do not require graph data or 
 Before claiming a wiki update is complete, check:
 
 - no new page is orphaned from `wiki/index.md` or an area index
+- top navigation and left sidebar expose the same public hierarchy: Home, Repositories, Examples, Topics, Concepts, Materials
 - links added by the change resolve
 - pages are not empty stubs
 - major topic and repository pages are understandable as standalone learning material before source links are followed

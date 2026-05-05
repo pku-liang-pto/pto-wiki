@@ -1,6 +1,15 @@
+---
+title: "Projects"
+type: index
+status: draft
+sources:
+  - config/target-set.yml
+last_updated: 2026-05-05
+---
+
 # Projects
 
-This page lists the current PTO-CANN target repositories. Roles are intentionally brief until each repository receives a documentation pass.
+本页列出当前 PTO-CANN target repositories，并标明哪些仓库已经被系统写成 repository profile。它是 coverage ledger，不是完整架构说明：没有完成 source-backed pass 的仓库只能按 target-set role 暂存，不能用来推断实现细节。
 
 ## PTO
 
@@ -27,7 +36,7 @@ This page lists the current PTO-CANN target repositories. Roles are intentionall
 
 ## Documentation Status
 
-Profile status below indicates how much source-backed wiki coverage exists for each configured repository.
+下面的 status 表用于避免过度推断。`profiled` 表示已有可直接阅读的 wiki profile；`evidence-only` 表示只在某个 topic/evidence 中被引用；`partial evidence` 表示只检查了有限源；`not profiled` 表示还不能作为本 wiki 的权威解释来源。
 
 | Repository | Profile status | Inspected ref / confidence | Next documentation need |
 | --- | --- | --- | --- |
@@ -38,4 +47,4 @@ Profile status below indicates how much source-backed wiki coverage exists for e
 | `distributed-runtime` | not profiled | material mentions only; low | inspect repo before assigning remote L3 ownership |
 | `serving-lib`, `pto-li`, `ptoas` | not profiled | target-set config only; low | document only when serving/library/toolchain questions require them |
 | `hccl` | partial evidence | `master` commit `e8c897660d2afd02b1428b1daa2ce9576f00a5cd`; partial for communication support | create CANN communication profile if data-plane claims expand |
-| `hcomm`, `shmem`, `hixl`, `cann-recipes-infer` | not profiled | target-set config/material mentions only; low | do not infer ownership or behavior without a dedicated pass |
+| `hcomm`, `shmem`, `hixl`, `cann-recipes-infer` | not profiled | target-set config/material mentions only; low | 只能读作待检查线索；不能据此推断 ownership 或 behavior |

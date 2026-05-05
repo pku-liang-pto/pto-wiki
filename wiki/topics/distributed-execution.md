@@ -3,18 +3,22 @@ title: "Distributed Execution"
 type: topic
 status: draft
 sources:
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/
   - repositories/hccl/
   - wiki/evidence/distributed-execution.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Distributed Execution
 
 本页综合 PTO Runtime、PTO-ISA、PyPTO 和 HCCL 的分布式执行证据。当前实现的重心是 single-host L3、多 chip、HCCL/sim comm backend 和 PyPTO L3 runner；remote L3、跨 host DistWorker、RoCE/URMA control plane 属于目标设计。状态标签和 material/GitHub/source-file routing 记录在 [Distributed Execution Evidence](../evidence/distributed-execution.md)。
+
+## How To Read This Page
+
+先读 [Non-Distributed Execution](./non-distributed-execution.md) 和 [simpler Runtime Architecture](./simpler-runtime-architecture.md)，再读本页。分布式执行不是从 HCCL 或 allreduce 开始，而是从 ordinary PyPTO program、PTO-ISA tile kernel、`simpler` L2 launch 和 L3 host DAG 扩展出来。读本页时要一直区分三件事：当前可运行的 single-host L3、kernel/data-plane communication primitive、以及材料中描述但尚未源码闭合的 remote L3 目标。
 
 ## 总体分工
 
@@ -37,6 +41,8 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 
 ## Control Plane vs Data Plane
 
+Control plane 决定 worker 如何发现、注册 callable、提交 task、等待 completion；data plane 决定 tensor/rank/window 中的数据如何移动。当前代码已经有 local L3 control plane 和 HCCL/sim data-plane support，但 remote control plane 还不能从 data-plane evidence 推出来。
+
 | 面 | 当前证据 | 状态 |
 | --- | --- | --- |
 | Local control plane | `simpler.Worker(level=3)`、fork child、mailbox、`submit_next_level`、`submit_sub` | `implemented` |
@@ -56,7 +62,7 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 
 这个路径的状态是 `implemented`，证据包括 `simpler` L3 examples、`pypto` L3 ST、PTO-ISA comm tests 和 HCCL-backed comm API。
 
-`implemented` 在本页表示 source/test/example/merged PR 证据存在，不表示本 wiki pass 已本地运行对应命令。运行状态和 caveats 见 [Examples Feature Map](./examples-feature-map.md#run-surface-and-caveats)；status label definition 见 [Evidence](../evidence/#status-labels)。
+`implemented` 在本页表示 source/test/example/merged PR 证据存在，不表示本 wiki pass 已本地运行对应命令。运行状态和 caveats 跟随每个具体示例，见 [PTO Distributed Runtime Examples](../examples/pto/distributed-runtime.md)；status label definition 见 [Evidence](../evidence/#status-labels)。
 
 ## Current Single-Host L3 Sequence
 
@@ -135,7 +141,7 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 ## 阅读建议
 
 - 想理解 repo 责任边界：先读 [simpler](../repositories/simpler.md)、[pto-isa](../repositories/pto-isa.md)、[pypto](../repositories/pypto.md)。
-- 想看具体例子：读 [Examples Feature Map](./examples-feature-map.md)。
+- 想看具体例子：读 [PTO Examples](../examples/pto/)。
 - 想对齐层级术语：读 [Lingqu Level Map](./lingqu-level-map.md) 和 [Distributed Execution Terms](../concepts/distributed-execution-terms.md)。
 
 ## 未决问题

@@ -12,7 +12,8 @@ Use these locations consistently:
 - `wiki/`: standalone learning material and durable synthesized knowledge about the configured target set.
 - `wiki/evidence/`: audit ledgers that support topic claims; not process policy and not raw document mirrors.
 - `repositories/`: local checkout cache used for source inspection.
-- `materials/`: user-supplied evidence workspace.
+- `materials/`: optional local user-supplied evidence workspace.
+- `wiki/materials/`: public source-material library that the user explicitly wants exposed for learning and audit.
 
 ## What Belongs In Agent Rules
 

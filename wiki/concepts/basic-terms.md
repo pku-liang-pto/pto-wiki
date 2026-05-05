@@ -9,12 +9,16 @@ sources:
   - repositories/pto-isa/include/pto/README.md
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Basic Terms
 
 本页记录 PTO Runtime / PTO-ISA / PyPTO wiki 中反复出现的基础术语。它先用 prose 解释概念，再用表格做速查；source paths 是审计线索，不是主要学习入口。分布式术语另见 [Distributed Execution Terms](./distributed-execution-terms.md)。
+
+## How To Read This Page
+
+第一次阅读时不要从表格开始。先读 `PTO In One Page`，建立三层模型；再读 `Programming Model`，理解 PyPTO 的 `InCore` / `Orchestration` 分工；接着读 `Tensor And Tile`，把 tensor、tile、GM/L1/L0 和 load/compute/store 连起来；最后读 `Runtime Basics`，理解 `simpler` 为什么需要 `ChipWorker`、AICPU scheduler、TensorMap 和 ring buffer。
 
 ## PTO In One Page
 
@@ -40,7 +44,7 @@ PTO-ISA 负责“kernel 内如何贴近硬件表达”。它关心 tile、memory
 | --- | --- | --- |
 | PyPTO | Python DSL、IR、pass、codegen 和 runtime-facing API。 | [pypto](../repositories/pypto.md) | `repositories/pypto/README.md` |
 | PTO-ISA | tile-oriented virtual ISA / C++ tile library；表达 kernel 内的 tile load/store/compute/comm。 | [pto-isa](../repositories/pto-isa.md) | `repositories/pto-isa/README.md` |
-| `@pl.program` | PyPTO program container；把 InCore kernel 和 Orchestration function 放在一个可编译单元内。 | [Examples Feature Map](../topics/examples-feature-map.md) | `repositories/pypto/examples/hello_world.py` |
+| `@pl.program` | PyPTO program container；把 InCore kernel 和 Orchestration function 放在一个可编译单元内。 | [PTO Examples](../examples/pto/) | `repositories/pypto/examples/hello_world.py` |
 | `InCore` | kernel/tile 层 compute function；通常执行 `pl.load`、tile op、`pl.store`。 | [Non-Distributed Execution](../topics/non-distributed-execution.md) | `repositories/pypto/examples/hello_world.py` |
 | `Orchestration` | PyPTO 中组织 InCore calls、tensor creation、control/data flow 的 function。 | [Non-Distributed Execution](../topics/non-distributed-execution.md) | `repositories/pypto/examples/hello_world.py` |
 | `CompiledProgram` | 普通 compile path 的产物；Lingqu level >= 3 才进入 distributed compiled program path。 | [Lingqu Level Map](../topics/lingqu-level-map.md) | `repositories/pypto/python/pypto/ir/compile.py` |
@@ -64,9 +68,9 @@ GEMM 只是这件事的高压版本：矩阵被拆成 tile，K 维可能继续�
 | --- | --- | --- |
 | Tensor | 用户侧或 orchestration 侧的数据对象，通常对应 global memory buffer。 | [Non-Distributed Execution](../topics/non-distributed-execution.md) | `repositories/pypto/examples/hello_world.py` |
 | Tile | PTO-ISA 的基本计算单位；kernel 把 tensor 片段搬进 tile memory 后执行 tile op。 | [pto-isa](../repositories/pto-isa.md) | `repositories/pto-isa/include/pto/README.md` |
-| GM | Global Memory，host/device tensor buffer 的主要存放位置。 | [Examples Feature Map](../topics/examples-feature-map.md) | `repositories/pto-isa/include/pto/common/pto_tile.hpp` |
-| L1 / L0 | Ascend kernel 内更近计算单元的 memory levels；GEMM 等例子会把数据搬到 Mat/Left/Right/Vec memory。 | [Examples Feature Map](../topics/examples-feature-map.md) | `repositories/pto-isa/demos/baseline/gemm_basic/README.md` |
-| Pipeline | kernel 内通过 staged load/compute/store 或 double buffering 提高吞吐的组织方式。 | [Examples Feature Map](../topics/examples-feature-map.md) | `repositories/pto-isa/demos/baseline/gemm_basic/README.md` |
+| GM | Global Memory，host/device tensor buffer 的主要存放位置。 | [PTO Examples](../examples/pto/) | `repositories/pto-isa/include/pto/common/pto_tile.hpp` |
+| L1 / L0 | Ascend kernel 内更近计算单元的 memory levels；GEMM 等例子会把数据搬到 Mat/Left/Right/Vec memory。 | [PTO Examples](../examples/pto/) | `repositories/pto-isa/demos/baseline/gemm_basic/README.md` |
+| Pipeline | kernel 内通过 staged load/compute/store 或 double buffering 提高吞吐的组织方式。 | [PTO Examples](../examples/pto/) | `repositories/pto-isa/demos/baseline/gemm_basic/README.md` |
 
 ## Runtime Basics
 

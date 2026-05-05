@@ -5,21 +5,36 @@ status: draft
 sources:
   - repositories/pypto_top_level_documents/linqu_runtime_design.md
   - repositories/pypto/include/pypto/ir/function.h
-  - materials/pto-runtime-distributed/08_top_level_design_alignment.md
+  - wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md
   - wiki/evidence/lingqu-level-map.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Lingqu Level Map
 
 本页把 top-level Lingqu runtime design、PyPTO `Level` enum 和 simpler worker 层级放在一张表里，避免把“代码里能表达的层级”和“runtime 已经可运行的层级”混为一谈。
 
+## How To Read This Page
+
+先把 level 当成三个不同来源的对齐问题：design 文档给出理想 hierarchy，PyPTO enum 给出语言/IR 可表达层级，`simpler` examples 和 runtime source 给出当前可运行层级。三者名字相似，但证据强度不同。本页的表格只在这段 prose 之后才有意义。
+
+```text
+Lingqu design level
+  -> PyPTO Level enum / Role enum
+  -> simpler Worker(level=N) execution evidence
+  -> status label per level
+```
+
 ## 层级映射
+
+这张表只在“证据强度”明确时才有意义。L0-L3 有较强的 source/example 支撑：PyPTO enum 能表达这些 level，PTO-ISA 和 PyPTO kernel path 支撑 L0/L1-ish kernel side，`simpler` L2/L3 examples 支撑 chip/host execution。L4-L6 主要来自 Lingqu/top-level design 和 distributed material blueprint，本轮没有看到 stable remote runtime example，所以必须保持 `design-intended`。
+
+L1 / `CHIP_DIE` 是最容易误读的一行。PyPTO `Level` enum 和 Lingqu mapping 中有这个层级，但本轮 wiki 没有把它单独核验成稳定 runtime surface；它不能和 `simpler` L2 `CHIP` 或 L3 `HOST` 一样写成完整 implemented path。因此本页把它标成 `open question` with enum/design evidence，而不是把 partial runtime semantics 写死。证据边界见 [Lingqu Level Map Evidence](../evidence/lingqu-level-map.md#claim-map)。
 
 | Lingqu level | PyPTO level | runtime 读法 | 当前状态 |
 | --- | --- | --- | --- |
 | L0 | `AIV` / `AIC` / `CORE_GROUP` | InCore / tile-level kernel | `implemented` through PTO-ISA and PyPTO kernel path |
-| L1 | `CHIP_DIE` | chip 内更高一级 scope | `implemented`/partial，具体边界依赖 runtime |
+| L1 | `CHIP_DIE` | chip 内更高一级 scope；本轮未独立核验稳定 runtime surface | `open question`; enum/design evidence exists |
 | L2 | `CHIP` | chip orchestration / next-level worker | `implemented` in simpler local hierarchy |
 | L3 | `HOST` | host orchestrator + chip workers + SubWorkers | `implemented` for single-host path |
 | L4 | `CLUSTER_0` | 多 host / first cluster layer | `design-intended` |

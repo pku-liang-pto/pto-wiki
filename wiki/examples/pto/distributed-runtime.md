@@ -1,0 +1,97 @@
+---
+title: "PTO Distributed Runtime Examples"
+type: topic
+status: draft
+sources:
+  - repositories/simpler/examples/workers/l3/
+  - repositories/pto-isa/demos/baseline/allgather_async
+  - repositories/pypto/tests/st/distributed/
+  - wiki/evidence/examples-feature-map.md
+  - wiki/evidence/distributed-execution.md
+last_updated: 2026-05-05
+---
+
+# PTO Distributed Runtime Examples
+
+这一章只讨论当前可验证的 distributed examples。结论必须保守：single-host L3 multi-chip examples 和 kernel communication demos 是 `implemented`；remote L3、DistWorker、cross-host callable registry 仍是 `design-intended`。
+
+## How To Read This Page
+
+先把 distributed runtime 拆成三类证据：simpler 证明 runtime data-plane 和 L3 scheduling，PTO-ISA 证明 kernel communication primitive，PyPTO 证明 hierarchy-aware expression/codegen/runner integration。三类证据合起来指向 distributed direction，但不能互相替代。
+
+```text
+simpler L3 runtime
+  + PTO-ISA communication primitive
+  + PyPTO hierarchy lowering
+  != remote multi-host runtime
+```
+
+## simpler L3 Allreduce
+
+`repositories/simpler/examples/workers/l3/allreduce_distributed` 是当前 multi-chip data-plane 示例。它通过 `Worker(level=3)` 管理 chip children，rank/window setup 暴露 communication memory，kernel 内完成 cross-rank sum。
+
+读 allreduce 时要把 control 和 data 分开。`Worker(level=3)`、pre-fork child、Scheduler、WorkerThread 和 mailbox 是 local control plane；rank/window 和 kernel 内通信是 data plane。这个例子强力证明 single-host multi-chip path，但它没有 remote discovery、remote callable registration 或 persistent cross-host run loop。
+
+本例的本机 L3 流程可以压缩成：
+
+```text
+parent Python process
+  -> Worker(level=3, device_ids=[d0,d1])
+  -> init() forks chip children and bootstraps HCCL
+  -> Orchestrator submits allreduce ChipCallable per rank
+  -> AIV kernel uses rank/window data plane
+  -> host compares every rank with golden sum
+```
+
+Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source inspection）：
+
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/simpler/` | `python examples/workers/l3/allreduce_distributed/main.py -d 0-1` | two A2/A3 devices | logs show kernel compile, HCCL bootstrap, `running 2-chip allreduce DAG`, per-chip max diff, and `all ranks matched golden` | `not-run`; source-inspected | 证明 single-host multi-chip data-plane，不证明 remote control plane |
+| `repositories/simpler/` | `pytest examples/workers/l3/allreduce_distributed/test_allreduce.py --platform a2a3 --device 0-1` | two A2/A3 devices | pytest hardware ST calls `run()` and asserts return code `0` | `not-run`; source-inspected | exact device option follows simpler pytest config; requires hardware marker support |
+
+## simpler FFN Tensor Parallel
+
+`repositories/simpler/examples/workers/l3/ffn_tp_parallel` 同时属于 [GEMM / FFN](./gemm-ffn.md) 和 distributed runtime。它把 FFN stage 放到 L3 runtime 中，展示 TensorMap 如何用 tensor address 建 producer/consumer dependency。
+
+这里的关键概念是“同一 host 上的 distributed partial graph”。Stage 1 和 Stage 2 不是 remote service call，而是同一个 L3 worker 下的 chip tasks；TensorMap 负责把相同 tensor address 上的 producer/consumer 连起来，rank/window 负责 cross-rank data movement。
+
+Run surface：
+
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/simpler/` | `python examples/workers/l3/ffn_tp_parallel/main.py -d 0-1` | two A2/A3 devices | logs show 2-chip 2-stage DAG, per-chip max error, and `all ranks matched golden` | `not-run`; source-inspected | 没有证明 complete model graph 或 remote workers |
+| `repositories/simpler/` | `pytest examples/workers/l3/ffn_tp_parallel/test_ffn_tp_parallel.py --platform a2a3 --device 0-1` | two A2/A3 devices | pytest hardware ST calls `run()` and asserts return code `0` | `not-run`; source-inspected | exact device option follows simpler pytest config |
+
+## PTO-ISA Allgather Async
+
+`repositories/pto-isa/demos/baseline/allgather_async` 证明 kernel/data movement primitive 方向。它可以与 simpler allreduce 对照：PTO-ISA 负责 primitive，simpler 负责 runtime bootstrap、rank/window 和 task scheduling。
+
+Allgather async 的价值是展示 PTO-ISA communication primitive 可以表达跨 rank data movement 和 async session/event 语义。它处在 kernel/ISA 层：即使 demo 通过多 rank 运行，也只能证明 primitive 和 operator path，不证明 PyPTO 已经有 `pl.all_gather` high-level API。
+
+Run surface：
+
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/pto-isa/demos/baseline/allgather_async/` | `source /path/to/set_env.sh && ./run.sh` | 8-rank A2/A3 default SoC | SDMA demos report `[TPUT_ASYNC_MC PASS]`, `[TGET_ASYNC_MC PASS]`, `[RING_TPUT_ASYNC PASS]`, then `All demos PASSED` | `not-run`; README-inspected | needs CANN Toolkit/Ops >= 9.0.0, MPICH, enough devices |
+| `repositories/pto-isa/demos/baseline/allgather_async/` | `source /path/to/set_env.sh && ./run.sh 2 Ascend950PR_9599` | 2-rank A5 | URMA demos report `[URMA_TPUT_MC PASS]`, `[URMA_TGET_MC PASS]`, `[URMA_RING_TPUT PASS]` | `not-run`; README-inspected | 不证明 PyPTO orchestration-level collective API |
+
+## PyPTO Hierarchy Tests
+
+`repositories/pypto/tests/st/distributed/test_l3_distributed.py` 证明 PyPTO 可以表达 hierarchy program，并通过 distributed runner/codegen 接到 `simpler.Worker(level=3)`。Skipped 或 partial tests 只能作为 `emerging` / `design-intended` evidence。
+
+PyPTO hierarchy tests 是 compiler/runtime bridge evidence。它们证明 DSL/IR/codegen 可以产生 host orchestrator、`submit_next_level` / `submit_sub`、`TaskArgs` 和 runner integration。它们不替代 PTO-ISA kernel communication demo，也不替代 `simpler` 的 worker lifecycle evidence。
+
+Run surface：
+
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/pypto/` | `python -m pytest tests/st/distributed/test_l3_distributed.py -v` | depends on selected `test_config.platform` | HOST Orchestrator -> CHIP worker -> SubWorker path compiles and executes through `Worker(level=3)` | `not-run`; source-inspected | environment fixtures decide platform/device |
+| `repositories/pypto/` | `python -m pytest tests/st/distributed/test_l3_parallel_reduce.py -v` | depends on platform | source marks test skipped because runtime support pending | `not-run`; source-inspected | skipped tests stay `emerging`, not `implemented` |
+
+## What Not To Infer
+
+- HCCL/window data plane is not PTO Runtime control plane.
+- PTO-ISA allgather primitive is not PyPTO `pl.all_reduce`.
+- `Worker(level=3)` on one host is not remote DistWorker.
+- FFN TP is not complete distributed NN.

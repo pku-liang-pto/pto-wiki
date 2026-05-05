@@ -3,17 +3,19 @@ title: "Distributed Execution Evidence"
 type: evidence
 status: draft
 sources:
-  - materials/pto-runtime-distributed/
+  - wiki/materials/pto-runtime-distributed/
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/
   - repositories/hccl/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Distributed Execution Evidence
 
 This ledger supports [Distributed Execution](../topics/distributed-execution.md). It records why current distributed claims use the shared [status labels](./index.md#status-labels), especially `implemented`, `emerging`, `design-intended`, `stale`, and `open question`.
+
+学习 distributed execution 时先读 topic page；本页回答“这句话凭什么这么标状态”。Material files、repository commits、PR/issue rows 和 negative findings 都服务于一个目的：防止把 single-host L3、kernel data-plane primitive 和 remote L3 design target 混成同一件事。
 
 ## Status Labels
 
@@ -27,8 +29,8 @@ This ledger supports [Distributed Execution](../topics/distributed-execution.md)
 
 | Source | Ref / checksum | Role |
 | --- | --- | --- |
-| `materials/pto-runtime-distributed.zip` | SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0`; extracted 2026-05-04 | material bundle and design blueprint |
-| `materials/pto-runtime-distributed/` | 10 real files, 3843 lines; `__MACOSX` and `._*` excluded | extracted material evidence |
+| `materials/pto-runtime-distributed.zip` | SHA256 `aa8d92ae9892a6fbda4f9dbfb49111724ad61b286ca081f2a4f02d426a4634a0`; extracted 2026-05-04 | original archive; extracted public material lives under `wiki/materials/pto-runtime-distributed/` |
+| `wiki/materials/pto-runtime-distributed/` | 10 real files, 3843 lines; `__MACOSX` and `._*` excluded | extracted material evidence |
 | `repositories/simpler` | `main` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` | runtime implementation, L2/L3 examples, comm/window APIs |
 | `repositories/pto-isa` | `main` commit `a977dd1161222a8b779fb5ff5d1c8b7f4518c3a2` | tile and communication ISA evidence |
 | `repositories/pypto` | `main` commit `f21c2dd48cfe1e5c4add78b0e391a31196420862` | DSL/codegen/distributed runner evidence |
@@ -36,7 +38,7 @@ This ledger supports [Distributed Execution](../topics/distributed-execution.md)
 
 ## Material Manifest
 
-All material files are UTF-8 Markdown extracted from `materials/pto-runtime-distributed.zip` on 2026-05-04. No converter was needed. Archive metadata paths `__MACOSX` and `._*` were excluded.
+All material files are UTF-8 Markdown extracted from `materials/pto-runtime-distributed.zip` on 2026-05-04 and moved under `wiki/materials/pto-runtime-distributed/` for public audit access. No converter was needed. Archive metadata paths `__MACOSX` and `._*` were excluded.
 
 | Material file | SHA256 | Routed to |
 | --- | --- | --- |

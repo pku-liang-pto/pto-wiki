@@ -12,12 +12,16 @@ sources:
   - repositories/simpler/docs/worker-manager.md
   - repositories/simpler/docs/testing.md
   - repositories/simpler/examples/workers/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # simpler Runtime Architecture
 
 `simpler` 的上游文档已经形成了一套很完整的 runtime 教材。本页把这些文档的主线合成到 wiki 中：先理解 L2 单 chip 的 host/AICPU/AICore 三程序模型，再理解 L3+ 如何用 Orchestrator、Scheduler 和 WorkerManager 递归组合多个 child worker。源证据来自 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 的 `README.md`、`docs/*.md` 和 `examples/workers/`。
+
+## How To Read This Page
+
+如果你只记一件事：`simpler` 是 runtime，不是 compiler，也不是 kernel ISA。阅读时按层级向上走：L2 先解释 host、AICPU scheduler、AICore/AIV kernel 如何协作；L3+ 再解释 Orchestrator 如何构图、Scheduler 如何派发、WorkerManager 如何管理 child workers。读完本页再读 distributed execution，才能看出 current L3 与 future remote L3 的差异。
 
 ## One Sentence Model
 
@@ -52,7 +56,7 @@ Python example / scene test
   -> host synchronizes and copies results back
 ```
 
-The important maintenance lesson is that L2 launch failures are boundary problems. A failure can come from Python binding setup, runtime binary lookup, C API symbol loading, device initialization, AICPU scheduling, kernel execution, or host/device copy-back. The wiki should not collapse all of these into “runtime failed.”
+读 L2 failure 时，关键不是把它统一称为 “runtime failed”，而是先定位失败发生在哪个边界。问题可能来自 Python binding setup、runtime binary lookup、C API symbol loading、device initialization、AICPU scheduling、kernel execution，也可能来自 host/device copy-back。只有把这些边界拆开，后续维护者才知道该看 Python wrapper、runtime `.so`、AICPU scheduler、AICore object，还是数据回拷路径。
 
 ## L3+ Engine Components
 
