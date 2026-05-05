@@ -8,7 +8,7 @@ sources:
   - repositories/pto-isa/include/pto/README.md
   - repositories/pto-isa/demos/README.md
   - wiki/materials/pto-runtime-distributed/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # pto-isa
@@ -16,6 +16,10 @@ last_updated: 2026-05-04
 `pto-isa` 是 PTO Tile Library 和 virtual ISA 仓库。先把它理解成 tile-oriented operator/kernel library：它提供 public headers、tile type system、compute/data-movement instructions、CPU simulation、NPU implementations、tests、demos 和性能样例。Communication ISA 是后续扩展层，不是这个仓库的唯一入口。
 
 本页基于 `repositories/pto-isa` commit `a977dd1161222a8b779fb5ff5d1c8b7f4518c3a2`。
+
+## How To Read This Page
+
+先把 `pto-isa` 当成 kernel/tile instruction layer，而不是 distributed runtime。阅读顺序是 tile programming basics、non-distributed demos、communication ISA、再读与 `simpler` / PyPTO 的边界。这样可以避免把一个 communication primitive 误读成 PyPTO high-level collective 或 remote worker control plane。
 
 ## Repo 直觉
 

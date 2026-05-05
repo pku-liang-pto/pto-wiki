@@ -40,6 +40,8 @@ hidden [S,D]
   -> logits [S,V]
 ```
 
+这个例子的重要性不在于模型规模，而在于它第一次把前面章节的多个概念放进一个完整 decoder flow。RMSNorm 对应 normalization pattern；Q/K/V projection 和 MLP 对应 GEMM/FFN；attention 对应 softmax、mask、RoPE 和 PV matmul；residual 把多个阶段连成 model graph。未来 distributed NN 示例必须解释这些阶段如何被切分、哪些 tensor 留在 rank-local、哪些 tensor 需要跨 rank communication。
+
 Run surface:
 
 | Entry | Hardware | Expected signal | Caveat |
@@ -64,3 +66,5 @@ Complete distributed NN is not implemented in the inspected evidence. The missin
 - rank-local and cross-rank validation
 
 Detailed acceptance criteria live in [Missing Roadmap](./missing-roadmap.md).
+
+因此，`llama_mini` 当前应该被当作 complete non-distributed reference。它给未来 distributed model 提供 shape、stage 和 validation 目标，但不能单独证明 tensor parallel execution、collective lowering 或 remote worker behavior。

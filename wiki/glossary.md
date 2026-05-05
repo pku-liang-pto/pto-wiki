@@ -1,6 +1,17 @@
+---
+title: "Glossary"
+type: concept
+status: draft
+sources:
+  - wiki/concepts/basic-terms.md
+  - wiki/concepts/distributed-execution-terms.md
+  - wiki/concepts/cann-foundation.md
+last_updated: 2026-05-05
+---
+
 # Glossary
 
-This glossary grows as terms are encountered during lookup and repository documentation.
+本页是快速查词入口。较长解释请读 [Basic Terms](./concepts/basic-terms.md)、[Distributed Execution Terms](./concepts/distributed-execution-terms.md) 和 [CANN Foundation](./concepts/cann-foundation.md)；这里保留短定义和 canonical link，帮助读者在长章节中快速回到正确概念层。
 
 | Term | Meaning | Source |
 | --- | --- | --- |

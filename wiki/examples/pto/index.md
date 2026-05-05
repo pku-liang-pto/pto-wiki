@@ -13,7 +13,7 @@ last_updated: 2026-05-05
 
 # PTO Examples
 
-本书把 PTO stack 的具体示例按学习颗粒度拆开。每一章都把 run surface 放在对应示例旁边，并在正文中说明 PyPTO、PTO-ISA、simpler 各自证明什么。
+本书把 PTO stack 的具体示例按学习颗粒度拆开。每一章都把 run surface 放在对应示例旁边，并在正文中说明 PyPTO、PTO-ISA、simpler 各自证明什么。这里的目标不是做 examples checklist，而是让读者能通过示例掌握系统：一个 program 如何表达、kernel 如何贴近 hardware、runtime 如何启动和调度、distributed claim 到底证明到哪一层。
 
 ## How To Read This Page
 
@@ -36,3 +36,7 @@ operator basics
 - [Complete Models](./complete-models.md): PyPTO `llama_mini` 和 complete distributed NN 的缺口。
 - [Distributed Runtime](./distributed-runtime.md): simpler L3 allreduce、FFN TP、PTO-ISA allgather、PyPTO hierarchy tests。
 - [Missing Roadmap](./missing-roadmap.md): missing examples 和升级为 `implemented` 前需要的 evidence。
+
+## Cross-Repository Reading Rule
+
+同一个数学概念会在不同仓库出现多次。例如 add 在 PyPTO 是 DSL/IR 示例，在 PTO-ISA 是 tile/operator 示例，在 `simpler` 是 L2 runtime launch 示例；FFN 在 PyPTO 是 model block，在 PTO-ISA 需要 GEMM kernel，在 `simpler` L3 中变成 tensor-parallel runtime 示例。读每一章时都要问：这个 source 证明的是 expression、kernel semantics、runtime scheduling，还是 distributed data movement？

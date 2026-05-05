@@ -8,12 +8,14 @@ sources:
   - repositories/pto-isa/
   - repositories/pypto/
   - repositories/hccl/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Distributed Execution Evidence
 
 This ledger supports [Distributed Execution](../topics/distributed-execution.md). It records why current distributed claims use the shared [status labels](./index.md#status-labels), especially `implemented`, `emerging`, `design-intended`, `stale`, and `open question`.
+
+学习 distributed execution 时先读 topic page；本页回答“这句话凭什么这么标状态”。Material files、repository commits、PR/issue rows 和 negative findings 都服务于一个目的：防止把 single-host L3、kernel data-plane primitive 和 remote L3 design target 混成同一件事。
 
 ## Status Labels
 

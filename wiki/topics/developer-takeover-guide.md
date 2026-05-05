@@ -8,12 +8,16 @@ sources:
   - repositories/pto-isa/
   - repositories/pypto/
   - wiki/evidence/developer-takeover-guide.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Developer Takeover Guide
 
 本页面面向准备接手 PTO Runtime / PTO-ISA / PyPTO 工作的开发者和维护者。它不是“第几天读什么”的计划，而是把接手所需的系统内容讲清楚：系统由哪些层组成、每层负责什么、哪些能力已经实现、哪些能力只是设计目标，以及维护者在修改代码前必须保护哪些边界。证据 ledger 见 [Developer Takeover Guide Evidence](../evidence/developer-takeover-guide.md)。
+
+## How To Read This Page
+
+如果你要真正接手代码，先读 `Maintainer Knowledge Model` 和 `Ownership Boundaries`，确认 bug 或 feature 属于 PyPTO、PTO-ISA、`simpler` 还是 CANN-side support。然后用 `First Maintainer Tasks` 找一个低风险练习面，最后读 `Current High-Risk Areas`，避免把 open issue、material blueprint 或 skipped test 写成已经实现。
 
 ## Maintainer Knowledge Model
 

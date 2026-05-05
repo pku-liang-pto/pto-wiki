@@ -8,12 +8,14 @@ sources:
   - repositories/pypto/examples/
   - repositories/pypto/tests/st/distributed/
   - wiki/materials/pto-runtime-distributed/05_progress_and_timeline.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Examples Feature Map Evidence
 
 This ledger supports the public [PTO Examples](../examples/pto/) area. It explains why examples are ordered from non-distributed foundations to distributed behavior, why each example chapter names PyPTO/PTO-ISA/simpler source roles locally, and why missing complete distributed NN coverage is marked TODO.
+
+读学习内容时优先看 [PTO Examples](../examples/pto/)；本页只用于核对 example ordering、run-surface caveats、missing-example status 和 source anchors。
 
 ## Source Set
 

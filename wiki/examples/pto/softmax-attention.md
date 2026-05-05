@@ -32,6 +32,8 @@ softmax / norm
 
 `repositories/pypto/examples/kernels/06_softmax.py` 和 `07_normalization.py` 是 attention 前置基础。它们让读者看到 row reduction、max/sum、normalization 这类 vector/reduction pattern 如何进入 PyPTO program。
 
+Softmax 不是只做 `exp` 和除法。稳定 softmax 通常先求 row max，再做 shifted exp，然后求 row sum，最后 normalize；normalization 也包含 reduction、scale 和 elementwise transform。这些 pattern 会在 attention 和 decoder block 中反复出现，所以先读它们能降低后面 Flash Attention 的理解成本。
+
 Run surface:
 
 | Entry | Hardware | Expected signal | Caveat |
@@ -42,6 +44,8 @@ Run surface:
 ## PyPTO Flash Attention And Paged Attention
 
 `repositories/pypto/examples/models/03_flash_attention.py` 展示 online softmax 和 block-wise attention state。`04_paged_attention.py` 把 attention 接到 KV cache / block table / dynamic valid shape。它们主要证明 model-level DSL/control-flow 表达能力。
+
+Flash Attention 的直觉是“不把完整 attention matrix 当作巨大中间结果存下来”。它用 block-wise processing 和 online softmax state 在保持数值正确性的同时减少 memory pressure。Paged Attention 再加入 KV cache block 管理：query 仍要和 key/value 交互，但 key/value 的物理存放会通过 block table 间接访问。这就是为什么它同时考验 compiler expression、kernel memory behavior 和 runtime buffer dependency。
 
 Run surface:
 
@@ -63,6 +67,8 @@ Run surface:
 ## simpler Paged Attention Runtime
 
 `repositories/simpler/examples/a2a3/tensormap_and_ringbuffer/paged_attention` 展示 production-oriented runtime shape：task descriptors 进入 ring，TensorMap 根据 tensor address 建 producer/consumer dependency，output heap 和 scopes 管理中间结果生命周期。
+
+这个示例的阅读重点是 runtime 数据结构，而不是 attention 数学本身。Paged attention 会产生多个中间 tensor 和依赖关系；`tensormap_and_ringbuffer` runtime 让 task、dependency 和 output storage 被 bounded rings 管理，TensorMap 则把同一 tensor address 的 producer/consumer 自动连起来。读它可以理解为什么 `simpler` 的 docs 反复强调 Scope、Ring 和 TensorMap。
 
 Run surface:
 

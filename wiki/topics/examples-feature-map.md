@@ -12,6 +12,8 @@ last_updated: 2026-05-05
 
 示例学习内容已经移到公开的 [PTO Examples](../examples/pto/) 区域。
 
+本页只保留旧链接兼容。新的 example system 不再用一张 feature map 承担学习任务，而是按 concrete example granularity 拆成 chapter：每章直接解释背景、逻辑、run surface、source roles 和 caveats。
+
 - [PTO Examples](../examples/pto/)：example book overview。
 - [Hello / Elementwise](../examples/pto/hello-elementwise.md)：PyPTO hello、PTO-ISA add、simpler L2 vector add。
 - [GEMM / FFN](../examples/pto/gemm-ffn.md)：matmul/FFN、PTO-ISA GEMM、simpler FFN TP。
@@ -19,4 +21,4 @@ last_updated: 2026-05-05
 - [Distributed Runtime](../examples/pto/distributed-runtime.md)：allreduce、allgather、PyPTO hierarchy tests。
 - [Missing Roadmap](../examples/pto/missing-roadmap.md)：complete distributed NN 和 remote L3 等缺失示例的状态边界。
 
-本页保留为旧链接兼容入口。证据 ledger 仍是 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)。
+证据 ledger 仍是 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)。

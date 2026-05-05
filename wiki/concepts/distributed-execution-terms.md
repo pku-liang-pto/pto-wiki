@@ -7,12 +7,26 @@ sources:
   - repositories/simpler/
   - repositories/pypto/
   - repositories/pto-isa/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Distributed Execution Terms
 
 本页统一本轮 wiki 使用的分布式执行术语。英文 code identifier 保持原样；中文解释只用于帮助阅读。
+
+## How To Read This Page
+
+先读下面的 mental model，再查表。分布式术语最容易出错的地方不是拼写，而是把不同层的“通信”混成一个概念：PTO-ISA 的 `TPUT/TGET/TWAIT/TNOTIFY` 是 kernel primitive；`simpler` 的 `Worker(level=3)` 是 host-side runtime/scheduler；HCCL 是 data-plane backend；remote L3/DistWorker 是尚未实现的 control-plane 目标。只要这四层分清，后面的 status 表就不会误导。
+
+```text
+PyPTO hierarchy expression
+  -> simpler L3 control plane
+  -> PTO-ISA kernel communication primitive
+  -> HCCL/sim/SDMA/URMA data-plane support
+  -> remote L3 only when future control-plane evidence exists
+```
+
+## Canonical Terms
 
 | 术语 | 标准含义 | 状态 |
 | --- | --- | --- |
@@ -40,6 +54,8 @@ last_updated: 2026-05-04
 | URMA/RoCE | remote memory/network data movement 相关目标能力；PTO-ISA 有 URMA async demo，remote runtime control plane 未完成 | `implemented` at primitive/demo level, `design-intended` at runtime level |
 
 Status evidence for these rows is summarized from [Distributed Execution Evidence](../evidence/distributed-execution.md#claim-map), [Lingqu Level Map Evidence](../evidence/lingqu-level-map.md), and [Non-Distributed Execution Evidence](../evidence/non-distributed-execution.md).
+
+表里的状态标签要按“最窄行为”理解。例如 `CommContext` 的 `implemented` 说明当前源码/示例中有 rank/window metadata ABI；它不说明 remote worker lifecycle 已经存在。`URMA/RoCE` 同时出现两个状态，是因为 primitive/demo 层和 runtime control-plane 层不是同一件事。
 
 ## 使用规则
 

@@ -9,12 +9,16 @@ sources:
   - repositories/pto-isa/include/pto/README.md
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Basic Terms
 
 本页记录 PTO Runtime / PTO-ISA / PyPTO wiki 中反复出现的基础术语。它先用 prose 解释概念，再用表格做速查；source paths 是审计线索，不是主要学习入口。分布式术语另见 [Distributed Execution Terms](./distributed-execution-terms.md)。
+
+## How To Read This Page
+
+第一次阅读时不要从表格开始。先读 `PTO In One Page`，建立三层模型；再读 `Programming Model`，理解 PyPTO 的 `InCore` / `Orchestration` 分工；接着读 `Tensor And Tile`，把 tensor、tile、GM/L1/L0 和 load/compute/store 连起来；最后读 `Runtime Basics`，理解 `simpler` 为什么需要 `ChipWorker`、AICPU scheduler、TensorMap 和 ring buffer。
 
 ## PTO In One Page
 

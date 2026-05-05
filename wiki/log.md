@@ -68,6 +68,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 将 public top nav 和 sidebar 对齐为 Home、Repositories、Examples、Topics、Concepts、Materials。新增 [Examples](./examples/) / [PTO Examples](./examples/pto/) 区域，并按 example granularity 拆成 hello/elementwise、GEMM/FFN、softmax/attention、complete models、distributed runtime 和 missing roadmap；run surface 与 source comparison 跟随每个具体 example chapter。将 source materials 移动到 [Materials](./materials/) 作为 public source-material library；新增 wiki writing style policy，要求 public narrative 以中文为主、保留 English technical identifiers、chapter-style、prose-first、self-contained、concise but information-rich。
 
+## [2026-05-05] review-update | Comprehensive standalone writing pass
+
+根据 rendered wiki 内容 review，对 public learning pages 和 evidence/material framing 做系统写作增强：为 overview、repository profiles、major topics、concept pages、example chapters 添加或强化 `How To Read This Page`、mental model、background explanation、cross-repository role boundaries、run-surface caveats 和 status-boundary prose。保留 `wiki/materials/pto-runtime-distributed/*.md` 原文作为 public source-material library，不在 source evidence 中 silent rewrite material contents。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.

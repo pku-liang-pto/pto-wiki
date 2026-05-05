@@ -3,12 +3,12 @@ title: "Evidence"
 type: index
 status: draft
 sources: []
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Evidence
 
-This area holds topic-scoped evidence ledgers. Evidence pages are not source-material libraries and do not copy whole materials. They record source sets, material routing, repository anchors, GitHub references, claim maps, negative findings, and open questions that support synthesized topic pages.
+Evidence pages 是 topic-scoped audit ledger。它们不是主要学习章节，也不是 source-material library；读者应该先读 Examples、Topics、Repositories，再在需要核对 claim 时进入这里。Evidence pages 记录 source sets、material routing、repository anchors、GitHub references、claim maps、negative findings 和 open questions，帮助维护者判断 wiki 里的状态标签是否有依据。
 
 ## Status Labels
 

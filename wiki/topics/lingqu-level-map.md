@@ -7,12 +7,23 @@ sources:
   - repositories/pypto/include/pypto/ir/function.h
   - wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md
   - wiki/evidence/lingqu-level-map.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Lingqu Level Map
 
 本页把 top-level Lingqu runtime design、PyPTO `Level` enum 和 simpler worker 层级放在一张表里，避免把“代码里能表达的层级”和“runtime 已经可运行的层级”混为一谈。
+
+## How To Read This Page
+
+先把 level 当成三个不同来源的对齐问题：design 文档给出理想 hierarchy，PyPTO enum 给出语言/IR 可表达层级，`simpler` examples 和 runtime source 给出当前可运行层级。三者名字相似，但证据强度不同。本页的表格只在这段 prose 之后才有意义。
+
+```text
+Lingqu design level
+  -> PyPTO Level enum / Role enum
+  -> simpler Worker(level=N) execution evidence
+  -> status label per level
+```
 
 ## 层级映射
 

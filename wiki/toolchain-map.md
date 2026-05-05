@@ -1,6 +1,18 @@
+---
+title: "Toolchain Map"
+type: overview
+status: draft
+sources:
+  - config/target-set.yml
+  - wiki/repositories/simpler.md
+  - wiki/repositories/pto-isa.md
+  - wiki/repositories/pypto.md
+last_updated: 2026-05-05
+---
+
 # Toolchain Map
 
-The PTO-CANN target set combines PTO projects, CANN projects, runtime components, communication libraries, serving components, and recipes.
+本页给出 target set 的粗粒度 toolchain 视图。它回答“这些项目大概落在哪些区域”，但不把未审计仓库写成确定架构。确定的学习主线仍以 [Overview](./overview.md)、[Repositories](./repositories/) 和 [PTO Examples](./examples/pto/) 为准。
 
 ## Current View
 
@@ -12,9 +24,9 @@ The PTO-CANN target set combines PTO projects, CANN projects, runtime components
 | CANN communication and memory | `hcomm`, `hccl`, `shmem`, `hixl` | Dependency and interface relationships should be verified from upstream repos. |
 | CANN recipes | `cann-recipes-infer` | Recipe pages should link concrete examples to the libraries and runtime behavior they exercise. |
 
-## Documentation Rule
+## Reading Rule
 
-This map is a starting orientation. Do not treat it as a complete architecture description until the relevant repositories have been inspected and cited.
+把本页当作起始方向，不要当作完整架构证明。一个 repository 只有在完成 source-backed profile 或 topic evidence pass 后，才可以在 wiki 中承担具体 ownership claim。
 
 ## PTO Runtime / ISA / PyPTO Pass
 

@@ -9,7 +9,7 @@ sources:
   - repositories/pypto/python/pypto/ir/compile.py
   - repositories/simpler/
   - wiki/materials/pto-runtime-distributed/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # pypto
@@ -17,6 +17,10 @@ last_updated: 2026-05-04
 `pypto` 是 PTO 的 Python DSL、IR、pass、codegen 和 runtime-facing 入口。先把它理解成非分布式 operator/programming framework：用户用 Python 写 `@pl.program` / `@pl.function`，parser 生成 IR，pass pipeline 把 tensor-level program 降到 tile/PTO-level code，runtime runner 编译并执行。Distributed codegen 是建立在这条普通编译执行链路之上的扩展。
 
 本页基于 `repositories/pypto` commit `f21c2dd48cfe1e5c4add78b0e391a31196420862`。
+
+## How To Read This Page
+
+先读普通 PyPTO：`@pl.program`、`InCore`、`Orchestration`、parser、passes、`CompiledProgram` 和 `runtime.run()`。确认这条普通链路后，再读 `Distributed Extension`、`Distributed Codegen` 和 `Distributed Runner`。这能防止把所有 PyPTO API 都误读成 distributed API，也能看清当前 L3 runner 与未来 remote L3/collective API 的差距。
 
 ## Repo 直觉
 

@@ -7,12 +7,14 @@ sources:
   - repositories/simpler/
   - repositories/pto-isa/
   - repositories/pypto/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Developer Takeover Guide Evidence
 
 This ledger supports [Developer Takeover Guide](../topics/developer-takeover-guide.md).
+
+Maintainer-facing knowledge should live in the guide itself. This ledger only records why the guide emphasizes layer ownership, examples-first learning, high-risk status labels, and unprofiled-repository caution.
 
 ## Source Set
 

@@ -29,6 +29,8 @@ PyPTO model graph
 
 ## 缺失项
 
+下面的表不是愿望清单，而是防止 wiki 过早升级状态的边界。每个 missing example 都需要自己的 source/test/example/PR evidence；不能因为相邻层已有实现，就把整条 vertical slice 写成 `implemented`。
+
 | Missing example | Intended coverage | Status |
 | --- | --- | --- |
 | Complete distributed NN | PyPTO complete model graph + simpler L3/L4 execution + PTO-ISA optimized kernels + cross-rank collectives | `TODO` |

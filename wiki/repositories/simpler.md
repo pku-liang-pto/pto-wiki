@@ -7,7 +7,7 @@ sources:
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
   - wiki/materials/pto-runtime-distributed/
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # simpler
@@ -15,6 +15,10 @@ last_updated: 2026-05-04
 `simpler` 是 PTO runtime 的主要实现仓库。先把它理解成“在 Ascend device 上启动和调度 task graph 的 runtime”，再看它的分布式扩展。它的基础能力是 L0-L2：host program 构造 callable/args/config，L2 `ChipWorker` 加载 host runtime、AICPU binary、AICore binary，AICPU scheduler 调度 AICore/AIV kernel。L3/L4 是在这个 L2 chip execution unit 上继续组合出来的层级 worker。
 
 本页基于 `repositories/simpler` commit `5029466197ab26cdef80c34b5d2cdcfca86b71d7` 和材料包 `wiki/materials/pto-runtime-distributed/`。
+
+## How To Read This Page
+
+先按 runtime foundation 阅读，不要直接跳到 distributed PR 表。`Repo 直觉` 和 `L0-L2 Ascend 启动路径` 解释最小可运行单元；`Runtime Variants` 和 `Host-side DAG 层` 解释 TensorMap/ring/scheduler 为什么存在；`L3 Worker 模型` 和 `Comm Window 与 HCCL` 才进入 distributed-adjacent 能力。想看更完整的上游 docs synthesis，继续读 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)。
 
 ## Repo 直觉
 

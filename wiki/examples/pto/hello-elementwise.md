@@ -30,6 +30,8 @@ PyPTO hello
 
 `repositories/pypto/examples/hello_world.py` 是最小语言示例。它定义一个 `@pl.program`，里面有 `InCore` tile function 和 `Orchestration` function。`InCore` 用 `pl.load` 把 global tensor 读成 tile，用 `pl.add` 做 elementwise compute，再用 `pl.store` 写回 output。`Orchestration` 负责调用这个 kernel。
 
+这个例子的价值在于它把 PyPTO 的两层函数边界暴露得最清楚。`InCore` 不是普通 Python helper，而是将来会进入 tile/kernel lowering 的 compute body；`Orchestration` 不是 kernel，而是描述 kernel call 和 tensor flow 的外层 program logic。后续 matmul、attention、LLaMA mini 都保留这个分工，只是 body 更复杂。
+
 Run surface:
 
 | Entry | Hardware | Expected signal | Caveat |
@@ -39,6 +41,8 @@ Run surface:
 ## PTO-ISA Add
 
 `repositories/pto-isa/demos/baseline/add` 把 add 降到 tile/kernel/operator packaging 层。这里要看的不是 Python DSL，而是 kernel source、host-side operator registration、wheel build/install 和 Python test。它证明 PTO-ISA 可以把一个简单 tile operation 包成 NPU/PyTorch custom operator。
+
+读 PTO-ISA add 时，可以把它和 PyPTO hello 的 `pl.load/add/store` 对齐：PyPTO 让用户用 DSL 表达同样的 load/compute/store 意图；PTO-ISA 展示这些意图在 C++ tile library、operator wrapper 和 `torch_npu` integration 中怎样出现。它不负责解释 `Worker(level=2)` 如何启动。
 
 Run surface:
 
@@ -51,6 +55,8 @@ Run surface:
 `repositories/simpler/examples/workers/l2/hello_worker` 是 runtime lifecycle smoke test：construct `Worker(level=2)`，`init()`，`malloc/free`，然后 close。它不验证 kernel logic，只验证 runtime plumbing。
 
 `repositories/simpler/examples/workers/l2/vector_add` 是最小完整 L2 run：host 编译或加载 AIV kernel，创建 `ChipCallable`，构造 `TaskArgs`，拷贝 input buffers 到 device，运行 worker，copy-back output，再和 numpy golden 比较。
+
+这两个例子合起来回答 runtime 层的基础问题。`hello_worker` 先证明 worker lifecycle 不是概念名，而是有 init/memory/close contract；`vector_add` 再把 callable、tensor buffers、device copy、kernel execution 和 golden validation 接起来。它们比 L3 allreduce 更适合做第一条 runtime 学习路径，因为没有 rank/window 和 communication 干扰。
 
 Run surface:
 

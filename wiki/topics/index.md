@@ -3,12 +3,14 @@ title: "Topics"
 type: index
 status: draft
 sources: []
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Topics
 
-This area holds feature, design, workflow, behavior, issue-family, and material-driven syntheses.
+Topics 是跨仓库学习章节。它们回答 repository profile 不能单独回答的问题：一个普通 PyPTO program 怎样跑完，`simpler` runtime 的 L2/L3 机制如何组合，distributed execution 的当前实现边界在哪里，Lingqu level 与代码 enum 如何对齐，以及维护者接手时该保护哪些边界。
+
+本区页面应当直接讲知识，而不是把读者转去 evidence ledger。Evidence pages 只用于审计 source/material/PR/issue 依据。
 
 ## Pages
 

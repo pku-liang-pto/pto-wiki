@@ -7,12 +7,14 @@ sources:
   - repositories/pypto/include/pypto/ir/function.h
   - wiki/materials/pto-runtime-distributed/08_top_level_design_alignment.md
   - wiki/materials/pto-runtime-distributed/03_distributed_blueprint.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Lingqu Level Map Evidence
 
 This ledger supports [Lingqu Level Map](../topics/lingqu-level-map.md). It exists because the topic combines a top-level design document, PyPTO enum evidence, simpler runtime behavior, and material-derived distributed targets.
+
+读层级概念时先看 topic page；本页只用于核对每个 level 的证据强度。它特别保护一个边界：PyPTO enum 或 Lingqu design 名称存在，不等于对应 runtime level 已经可运行。
 
 ## Source Set
 

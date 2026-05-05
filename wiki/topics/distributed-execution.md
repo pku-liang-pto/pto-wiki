@@ -9,12 +9,16 @@ sources:
   - repositories/pypto/
   - repositories/hccl/
   - wiki/evidence/distributed-execution.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Distributed Execution
 
 本页综合 PTO Runtime、PTO-ISA、PyPTO 和 HCCL 的分布式执行证据。当前实现的重心是 single-host L3、多 chip、HCCL/sim comm backend 和 PyPTO L3 runner；remote L3、跨 host DistWorker、RoCE/URMA control plane 属于目标设计。状态标签和 material/GitHub/source-file routing 记录在 [Distributed Execution Evidence](../evidence/distributed-execution.md)。
+
+## How To Read This Page
+
+先读 [Non-Distributed Execution](./non-distributed-execution.md) 和 [simpler Runtime Architecture](./simpler-runtime-architecture.md)，再读本页。分布式执行不是从 HCCL 或 allreduce 开始，而是从 ordinary PyPTO program、PTO-ISA tile kernel、`simpler` L2 launch 和 L3 host DAG 扩展出来。读本页时要一直区分三件事：当前可运行的 single-host L3、kernel/data-plane communication primitive、以及材料中描述但尚未源码闭合的 remote L3 目标。
 
 ## 总体分工
 
@@ -36,6 +40,8 @@ HCCL / sim comm backend for window, rank, barrier, remote pointer support
 ```
 
 ## Control Plane vs Data Plane
+
+Control plane 决定 worker 如何发现、注册 callable、提交 task、等待 completion；data plane 决定 tensor/rank/window 中的数据如何移动。当前代码已经有 local L3 control plane 和 HCCL/sim data-plane support，但 remote control plane 还不能从 data-plane evidence 推出来。
 
 | 面 | 当前证据 | 状态 |
 | --- | --- | --- |

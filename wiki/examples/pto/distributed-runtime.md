@@ -30,6 +30,8 @@ simpler L3 runtime
 
 `repositories/simpler/examples/workers/l3/allreduce_distributed` 是当前 multi-chip data-plane 示例。它通过 `Worker(level=3)` 管理 chip children，rank/window setup 暴露 communication memory，kernel 内完成 cross-rank sum。
 
+读 allreduce 时要把 control 和 data 分开。`Worker(level=3)`、pre-fork child、Scheduler、WorkerThread 和 mailbox 是 local control plane；rank/window 和 kernel 内通信是 data plane。这个例子强力证明 single-host multi-chip path，但它没有 remote discovery、remote callable registration 或 persistent cross-host run loop。
+
 Run surface:
 
 | Entry | Hardware | Expected signal | Caveat |
@@ -50,6 +52,8 @@ Run surface:
 
 `repositories/pto-isa/demos/baseline/allgather_async` 证明 kernel/data movement primitive 方向。它可以与 simpler allreduce 对照：PTO-ISA 负责 primitive，simpler 负责 runtime bootstrap、rank/window 和 task scheduling。
 
+Allgather async 的价值是展示 PTO-ISA communication primitive 可以表达跨 rank data movement 和 async session/event 语义。它处在 kernel/ISA 层：即使 demo 通过多 rank 运行，也只能证明 primitive 和 operator path，不证明 PyPTO 已经有 `pl.all_gather` high-level API。
+
 Run surface:
 
 | Entry | Hardware | Expected signal | Caveat |
@@ -59,6 +63,8 @@ Run surface:
 ## PyPTO Hierarchy Tests
 
 `repositories/pypto/tests/st/distributed/test_l3_distributed.py` 证明 PyPTO 可以表达 hierarchy program，并通过 distributed runner/codegen 接到 `simpler.Worker(level=3)`。Skipped 或 partial tests 只能作为 `emerging` / `design-intended` evidence。
+
+PyPTO hierarchy tests 是 compiler/runtime bridge evidence。它们证明 DSL/IR/codegen 可以产生 host orchestrator、`submit_next_level` / `submit_sub`、`TaskArgs` 和 runner integration。它们不替代 PTO-ISA kernel communication demo，也不替代 `simpler` 的 worker lifecycle evidence。
 
 Run surface:
 

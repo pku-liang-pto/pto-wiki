@@ -11,7 +11,7 @@ sources:
   - repositories/simpler/docs/chip-level-arch.md
   - repositories/simpler/src/a2a3/docs/runtimes.md
   - wiki/evidence/non-distributed-execution.md
-last_updated: 2026-05-04
+last_updated: 2026-05-05
 ---
 
 # Non-Distributed Execution
@@ -19,6 +19,10 @@ last_updated: 2026-05-04
 本页说明 PTO/PyPTO/simpler 的非分布式基础路径。它是阅读 distributed execution 的前置层：先理解一个 program 如何从 Python DSL 变成 tile kernel，再理解 runtime 如何在单个 Ascend chip 上启动和调度 task graph。证据 ledger 见 [Non-Distributed Execution Evidence](../evidence/non-distributed-execution.md)。
 
 这里的“非分布式”不是简单例子或次要能力。它是整个系统的地基：distributed execution 只是把普通 program、普通 kernel、普通 chip launch 和普通 task dependency 扩展到多 worker、多 rank、甚至未来 remote host。若不能解释单个 chip 上一次 add、GEMM 或 paged attention 如何启动，就无法可靠解释 L3/L4。
+
+## How To Read This Page
+
+本页按一次普通执行的顺序组织。先读 `One-Program Mental Model`，知道一条 program 从 PyPTO 到 device 的链路；再读 `Layer Responsibilities`，避免把 compiler、kernel 和 runtime 的职责混在一起；然后用 `Hello World End-To-End` 走一遍最小例子；最后读 PTO-ISA 和 `simpler` L2，理解 tile kernel 和 chip launch 如何接上。
 
 ## One-Program Mental Model
 
