@@ -43,6 +43,32 @@ parent Python process
   -> host compares every rank with golden sum
 ```
 
+源码中的 control-plane shape 来自 `repositories/simpler/examples/workers/l3/allreduce_distributed/main.py`：
+
+```python
+worker = Worker(
+    level=3,
+    platform="a2a3",
+    runtime="tensormap_and_ringbuffer",
+    device_ids=device_ids,
+    chip_bootstrap_configs=cfgs,
+)
+worker.init()
+
+def orch_fn(orch, _args, cfg):
+    chip_args = TaskArgs()
+    chip_args.add_tensor(make_tensor_arg(host_inputs[i]), TensorArgType.INPUT)
+    chip_args.add_tensor(make_tensor_arg(host_outputs[i]), TensorArgType.OUTPUT_EXISTING)
+    chip_args.add_tensor(window_scratch_tensor, TensorArgType.INOUT)
+    chip_args.add_scalar(ctx.nranks)
+    chip_args.add_scalar(ctx.device_ctx)
+    orch.submit_next_level(chip_callable, chip_args, cfg, worker=i)
+
+worker.run(orch_fn, args=None, config=CallConfig())
+```
+
+这段 code 已经暴露了边界：L3 parent process 创建 `Worker(level=3)` 并提交 chip tasks；HCCL window/scratch 通过 `chip_bootstrap_configs` 和 `ChipContext` 进入 rank-local kernel args；`submit_next_level` 派发给 local child worker。这里没有 remote host discovery，也没有跨 host callable registry。
+
 Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source inspection）：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -82,6 +108,8 @@ Run surface：
 
 PyPTO hierarchy tests 是 compiler/runtime bridge evidence。它们证明 DSL/IR/codegen 可以产生 host orchestrator、`submit_next_level` / `submit_sub`、`TaskArgs` 和 runner integration。它们不替代 PTO-ISA kernel communication demo，也不替代 `simpler` 的 worker lifecycle evidence。
 
+因此，本页的 code reading rule 是：看到 `submit_next_level` 时，它证明 hierarchy dispatch；看到 `child_memory=True` 或 comm window pointer 时，它证明 device-visible data-plane pointer；看到 skipped PyPTO distributed test 时，它只证明 intended path，不证明 implemented runtime。
+
 Run surface：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -95,3 +123,11 @@ Run surface：
 - PTO-ISA allgather primitive is not PyPTO `pl.all_reduce`.
 - `Worker(level=3)` on one host is not remote DistWorker.
 - FFN TP is not complete distributed NN.
+
+## What To Read Next
+
+如果你想理解 L3 local runtime mechanics，继续读 [simpler Runtime Architecture](../../topics/simpler-runtime-architecture.md)。如果你想知道 remote L3 / complete distributed NN 何时能升级状态，读 [Missing Roadmap](./missing-roadmap.md)。如果你需要 audit source status，读 [Distributed Execution Evidence](../../evidence/distributed-execution.md) 和 [Examples Feature Map Evidence](../../evidence/examples-feature-map.md)。
+
+## What To Remember
+
+当前 distributed examples 是一组 partial proofs：`simpler` 证明 single-host L3 scheduling and data-plane examples，PTO-ISA 证明 kernel communication primitive，PyPTO 证明 hierarchy-aware lowering/runner。它们共同支持 distributed direction，但还没有组成 remote multi-host runtime 或 complete distributed NN。

@@ -31,3 +31,7 @@ last_updated: 2026-05-05
 | Ring buffer | `tensormap_and_ringbuffer` 中管理 task/output/dependency queues 的 runtime storage pattern。 | [Basic Terms](./concepts/basic-terms.md) |
 | Target set | `config/target-set.yml` 配置的 repository 和 concept 集合，是本 wiki 的文档对象。 | `config/target-set.yml` |
 | Repository profile | 解释一个 repository 的 role、structure、dependencies、entry points 和 open questions 的 wiki page。 | [Repository Profiles](./repositories/) |
+
+## Reading Rule
+
+Glossary 只负责快速定位概念，不替代正文。读者遇到不熟悉的词时，先在这里确认 canonical page，再回到对应 chapter 学习完整背景、例子和状态边界。

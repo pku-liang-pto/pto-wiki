@@ -34,6 +34,10 @@ Summarize manifests, lockfiles, build files, package metadata, toolchain files, 
 
 Explain important directories, entry points, public APIs, modules, and extension points.
 
+## Source Code Walkthrough
+
+For implemented behavior, include short source excerpts or source-shaped pseudocode. Explain what the code proves, what layer owns it, and what it does not prove. Do not let path tables replace this walkthrough.
+
 ## Tests, Examples, And Scripts
 
 Summarize examples as learning material: background concept, beginner-to-expert position, what the example proves, and what it does not prove.

@@ -13,6 +13,7 @@ Read:
 
 - `AGENTS.md`
 - `.agents/workflows/topic-evidence-discovery.md`
+- `.agents/workflows/concept-evidence-lookup.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
 - `.agents/workflows/github-reference-documentation.md`
 - `.agents/policies/wiki-content-boundary-policy.md`
@@ -21,16 +22,18 @@ Read:
 - `config/target-set.yml`
 
 Use `document-material-ingester` first when the topic starts from files, folders, or archives.
+Use `concept-evidence-lookup` when the topic depends on important acronyms, platform concepts, protocols, APIs, or source identifiers that need stable definitions from repositories, GitHub, or official external docs.
 
 ## Discovery
 
 1. Search existing `wiki/` coverage.
 2. Extract anchors: repo names, issue/PR numbers, branches, commits, files, symbols, APIs, labels, errors, and domain terms.
-3. Identify the smallest relevant repository set.
-4. Search local source and history with `rg`, `git log --all --grep`, `git log --all -S`, and `git log --all -- <path>` when history matters.
-5. Search GitHub issues and PRs with `gh` by keyword, label, author, assignee, path, symbol, branch, commit, and cross-link.
-6. Expand from strong matches through linked issues, closing commits, review discussion, labels, milestones, release notes, and follow-up regressions.
-7. Classify candidates as primary, supporting, rejected, stale, or open question.
+3. Stabilize important concept definitions early so the synthesis does not inherit vague or source-only terminology.
+4. Identify the smallest relevant repository set.
+5. Search local source and history with `rg`, `git log --all --grep`, `git log --all -S`, and `git log --all -- <path>` when history matters.
+6. Search GitHub issues and PRs with `gh` by keyword, label, author, assignee, path, symbol, branch, commit, and cross-link.
+7. Expand from strong matches through linked issues, closing commits, review discussion, labels, milestones, release notes, and follow-up regressions.
+8. Classify candidates as primary, supporting, rejected, stale, or open question.
 
 ## Synthesis
 

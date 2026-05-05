@@ -133,6 +133,52 @@
 
 这对本地多进程层次化是合理的，但不能直接推广到远端 L3，因为远端进程不共享父进程地址空间，也不能继承 Python registry、HeapRing mmap 或裸指针 callable。
 
+把这句话展开成 runtime 形状，大致是下面这样：
+
+```text
+Local L3/L4 hierarchical start, implemented shape
+-------------------------------------------------
+parent Worker process
+  1. 建立 Python-side callable registry
+  2. mmap / allocate HeapRing, TensorMap, mailbox 等本机共享对象
+  3. os.fork()
+
+child process after fork
+  4. 继承 parent 当前进程的地址空间快照
+  5. 看到同一批 Python registry entries 和 mmap-backed objects
+  6. 进入 child worker loop，等待 parent 通过 mailbox 派发任务
+
+PROCESS mailbox payload, source-shaped
+--------------------------------------
+state       : IDLE | TASK_READY | TASK_DONE | SHUTDOWN | ERROR
+callable    : parent/child 本地都能解释的 callable pointer 或 callable id
+config      : serialized CallConfig / worker dispatch config
+args_blob   : serialized TaskArgs / argument bytes
+result_blob : child 写回的返回值或错误摘要
+```
+
+这里的关键不是 `fork` 这个系统调用本身，而是它给了 runtime 一个“本机继承”的便利条件：child 启动时已经拥有和 parent 对齐的地址解释、Python 对象身份、mmap 映射、文件描述符和部分 runtime registry。mailbox 只需要传很短的任务描述，因为大量上下文已经通过 fork 继承好了。
+
+远端 L3 的问题正好相反：
+
+```text
+Remote L3 target shape
+----------------------
+host A parent Worker
+  cannot fork host B
+  cannot assume host B has same Python object addresses
+  cannot send a raw callable pointer to host B
+  cannot rely on one mmap object being visible on both hosts
+
+host B remote L3 Worker
+  must be launched/discovered by another mechanism
+  must receive a stable callable name/id plus versioned registration data
+  must allocate or attach its own local HeapRing/TensorMap/mailbox resources
+  must report liveness, errors, and completion back over a host-to-host control plane
+```
+
+因此，“通过 RoCE 网络管理远端 L3”不能理解成把现在的 shared-memory mailbox 换成网络 socket 就结束。需要重新定义至少四层语义：远端进程生命周期、callable 注册协议、参数与 Tensor identity 的可序列化表达、失败与资源回收。RoCE/RDMA 只可能提供某些跨 host 数据通路或低延迟传输能力，不会自动提供这些 control-plane 语义。
+
 ### 4.5 HCCL/comm window 已是已合入基座，但它不是完整 remote L3 管理
 
 根据 PR #592 与主线 `src/a2a3/platform/onboard/host/comm_hccl.cpp`，项目已经有 `comm_init`、`comm_alloc_windows`、`comm_barrier`、`comm_destroy` 等 platform comm API，并通过 HCCL/private hcomm 能力生成 `CommContext`。这解决的是 L2/L1 侧通信窗口和通信域问题。

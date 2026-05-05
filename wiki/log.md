@@ -83,3 +83,23 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-05] review-update | Multi-agent writing and policy audit
 
 用 public learner、examples developer、evidence auditor 和 agent-rules maintainer 四类 reviewer 重新检查 public wiki。根据反馈补强 example run surfaces 的 exact cwd/commands/status，扩展 advanced example chapters，修正 Lingqu L1 status、developer takeover/process leakage、glossary 中文叙述和 materials framing；同步更新 `.agents/` policies/workflows/skills，明确 public `wiki/materials/` 只在用户显式要求时使用，topic page 一旦依赖 material/GitHub/external/cross-repo evidence 就必须引用 paired evidence ledger，并把 public navigation hierarchy 纳入 wiki health checks。
+
+## [2026-05-05] review-update | Implement standalone learning content rewrite spec
+
+根据 `docs/specs/2026-05-05-wiki-standalone-learning-content-upgrade.md`，系统升级 public wiki contents：Home/Overview/area indexes 更聚焦阅读路径；repository chapters 强化 ownership、architecture diagram、source anchors、examples/tests、proof boundaries 和 safe first change；PTO example chapters 补足背景、run surface、source comparison、what it proves / does not prove；topics/concepts/glossary 增加 mental model、status boundary、What To Remember；evidence ledgers 增加 status-change criteria；materials index 明确 source-material 与 synthesized wiki 的边界。
+
+## [2026-05-05] review-update | Add implementation code walkthroughs
+
+根据 PR review，进一步提升 standalone-learning 标准：repository/topic/example pages 不能只列 source paths 或 run tables，必须嵌入短 source excerpts 或 source-shaped pseudocode，并解释代码证明哪一层实现、不能证明什么。重点补强 [GEMM / FFN](./examples/pto/gemm-ffn.md)、[Distributed Runtime](./examples/pto/distributed-runtime.md)、repository profiles、[Non-Distributed Execution](./topics/non-distributed-execution.md)、[simpler Runtime Architecture](./topics/simpler-runtime-architecture.md) 和 [Distributed Execution](./topics/distributed-execution.md)。同步更新 `.agents` writing/health rules，避免后续页面退回 code-free summary。
+
+## [2026-05-05] review-update | Make public materials navigable and self-contained
+
+根据 PR review，修正 Materials 在 top nav/sidebar 中的 page labels，避免 `Stack`、`00 README` 等过短名称隐藏实际主题。将 [Materials](./materials/) 和 [PTO Runtime Bundle Guide](./materials/pto-runtime-distributed/index.md) 从“原始材料库”重新定位为 public source-material learning pages：允许为了自包含阅读补充定义、图示、source-shaped pseudocode、外部背景引用和状态边界。重点补强 [00 Overview and Reading Paths](./materials/pto-runtime-distributed/00_README.md) 中本地 `fork`/mailbox 与 remote L3 control-plane 差异，以及 [01 Hardware, CANN, HCCL, RoCE](./materials/pto-runtime-distributed/01_hardware_and_software_stack.md) 中 RoCE/RDMA、RoCEv1/v2、HCCL over RoCE 和 PTO Runtime remote L3 的边界解释。同步更新 `.agents` material、writing 和 health rules，要求 public material pages 首次引入专业缩写时必须就地解释。
+
+## [2026-05-05] policy-update | Add automatic concept evidence lookup skill
+
+新增 `.agents/skills/concept-evidence-lookup/` 和 `.agents/workflows/concept-evidence-lookup.md`，把重要概念 lookup 稳定成 reusable agent skill。后续回答问题或更新文档时，若涉及关键缩写、protocol、platform component、API、runtime layer、hardware term 或 repository-specific identifier，agent 应先查 existing wiki、local repositories、GitHub history 或 official internet docs，再在正文中给出本地定义、mental model、project-specific role、status boundary 和 citations。同步更新 AGENTS、wiki lookup、repo documentation、material ingestion、topic evidence、source citation 和 health lint rules，使该能力在文档更新和问答场景自动触发。
+
+## [2026-05-06] review-update | Replace module tables with architecture prose
+
+根据 PR review 中对 table-driven writing 的反馈，重新审查 public wiki table blocks，重点修正 repository profiles 中用 module/source-path table 承载架构解释的问题。将 [simpler](./repositories/simpler.md) 的关键模块表改写为 L2 chip launch、L3+ host DAG、communication data-plane 三条运行路径；将 [pto-isa](./repositories/pto-isa.md) 的主要结构表改写为 public instruction interface、runnable operator packaging、communication primitive layer 三层；将 [pypto](./repositories/pypto.md) 的核心模块表改写为 language-to-IR、normal codegen/runner、distributed extension 三条主线。同步强化 `.agents` writing/health rules，要求后续 table audit 检查每个表格是否只是 lookup support，而不是正文解释的替代品。

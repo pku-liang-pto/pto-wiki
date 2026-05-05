@@ -35,6 +35,19 @@ include/pto/pto-inst.hpp
   -> communication extension only after compute/data movement model is clear
 ```
 
+```text
+pto-isa owns kernel semantics
+
+GM tensor
+  -> TLOAD into on-chip Tile
+  -> tile compute: TADD / TMATMUL / activation / reduction
+  -> optional sync/comm primitive: TNOTIFY / TWAIT / TPUT / TGET
+  -> TSTORE back to GM
+
+not owned here:
+PyPTO high-level API, host DAG scheduling, remote worker lifecycle
+```
+
 ## Tile Programming 基础
 
 `include/pto/README.md` 说明 `include/pto/` 是 public header entry：`common/` 放 platform-independent Tile 和 instruction infrastructure，`cpu/` 放 CPU simulation/debug support，`npu/` 按 SoC 拆 A2/A3/A5 implementation，`comm/` 放 communication instruction library。
@@ -60,6 +73,19 @@ test script
 
 ## 非分布式示例路径
 
+非分布式 examples 应按“能运行的 operator story”来读。`add` 是最小 PyTorch custom op：证明 PTO kernel 可以被包装、build、install、由 `torch_npu` 调用并与 golden 比较。`gemm_basic` 开始出现 tiling、per-core split、K 分块、double buffering 和 pipeline sync。`flash_atten` 与 `kernels/manual/*` 更接近性能/算法复杂度；CPU demos 则用于在没有 NPU 时先检查 instruction semantics 和算法 shape。
+
+```text
+add
+  -> custom-op packaging and golden correctness
+gemm_basic
+  -> tile shape, split-K/per-core layout, double buffering
+flash attention / manual kernels
+  -> complex operator and performance-oriented implementation
+cpu demos
+  -> semantics/debug path before hardware
+```
+
 | 示例 | 说明 | 状态 |
 | --- | --- | --- |
 | `demos/baseline/add` | PTO kernel 封装为 `torch_npu` 自定义 PyTorch operator；host 侧用 `TORCH_LIBRARY`/`TORCH_LIBRARY_IMPL` 注册 schema 和实现 | `implemented` |
@@ -70,18 +96,98 @@ test script
 
 ## 主要结构
 
-| 区域 | 作用 | 状态 |
-| --- | --- | --- |
-| `include/pto/` | public PTO tile/ISA headers | `implemented` |
-| `include/pto/common/` | Tile、Shape、Stride、instruction infrastructure | `implemented` |
-| `include/pto/cpu/` | CPU simulation/debug support | `implemented` |
-| `include/pto/npu/` | SoC-specific NPU implementations for A2/A3/A5 | `implemented` |
-| `demos/baseline/` | PyTorch operator examples with CMake/wheel packaging | `implemented` |
-| `demos/cpu/` | cross-platform CPU simulation demos | `implemented` |
-| `kernels/manual/` | hand-optimized operator implementations | `implemented` |
-| `include/pto/comm/` | communication ISA public API and implementations | `implemented` |
-| `include/pto/comm/async_common/` | SDMA/URMA async session type abstraction | `implemented` |
-| `tests/npu/*/comm/st/testcase/` | NPU communication ST for A2/A3 and A5 | `implemented` |
+源码入口可以按 three-layer reading 分组：public headers teach the interface, demos teach runnable operator packaging, tests teach primitive semantics under CPU/NPU backends.
+
+第一层是 **public instruction interface**。`include/pto/pto-inst.hpp` 是用户和 examples 最常引用的 all-in-one header；`include/pto/common/` 定义 `Tile`、`Shape`、`Stride`、`GlobalTensor` 和 instruction infrastructure；`include/pto/cpu/` 提供 CPU simulation/debug path；`include/pto/npu/` 按 SoC 提供 A2/A3/A5 后端实现。读这一层时要问：一个 instruction 在 CPU simulation 和 NPU backend 中分别如何解释？
+
+```text
+public instruction interface
+----------------------------
+include/pto/pto-inst.hpp
+  -> common Tile / GlobalTensor / Shape / Stride
+  -> cpu simulation implementation
+  -> npu SoC-specific implementation
+```
+
+第二层是 **runnable operator packaging**。`demos/baseline/` 把 PTO kernel 包成 PyTorch custom op，通常包含 CMake/wheel build、kernel source、host wrapper 和 `test.py` golden check；`demos/cpu/` 让开发者在无 NPU 环境先验证 instruction semantics；`kernels/manual/` 放更接近性能调优的 hand-written kernels。读这一层时要问：kernel body 的 tile instruction 如何被 host/operator wrapper 暴露给测试？
+
+```text
+runnable operator packaging
+---------------------------
+kernel source
+  -> custom-op wrapper / CMake / wheel
+  -> Python test.py
+  -> compare with torch/numpy golden
+```
+
+第三层是 **communication primitive layer**。`include/pto/comm/` 定义 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、collective/async 等 communication ISA；`include/pto/comm/async_common/` 把 SDMA/URMA session、event 和 context 抽象到 engine-aware 类型；`tests/npu/*/comm/st/testcase/` 验证 A2/A3 与 A5 的 NPU communication behavior。读这一层时要问：这是 kernel/rank/data movement primitive，还是已经上升到 PyPTO orchestration API 或 simpler remote worker lifecycle？当前证据只能证明前者。
+
+```text
+communication primitive layer
+-----------------------------
+TPUT / TGET / TNOTIFY / TWAIT
+  -> SDMA or URMA async session
+  -> rank/device testcases
+  -> runtime-level collective still needs PyPTO + simpler evidence
+```
+
+Code anchors:
+
+- `include/pto/pto-inst.hpp`: public all-in-one instruction header for users and examples.
+- `include/pto/common/pto_tile.hpp`: `Shape`、`Stride`、`Tile`、`GlobalTensor` 等基础类型。
+- `include/pto/comm/README.md`: communication ISA narrative and API grouping.
+- `demos/baseline/add/test/test.py`: simplest custom op validation surface.
+- `demos/baseline/gemm_basic/README.md`: fixed GEMM shape、24-core split、K tiling、double buffering。
+- `demos/baseline/allgather_async/README.md`: rank/device mapping and SDMA/URMA async communication run scripts.
+
+## Source Code Walkthrough
+
+PTO-ISA 的核心类型可以直接从 `include/pto/common/pto_tile.hpp` 读出来。`GlobalTensor` 代表 GM 中的数据和 shape/stride metadata：
+
+```cpp
+template <typename Element_, typename Shape_, typename Stride_, Layout Layout_>
+struct GlobalTensor {
+    using DType = __gm__ Element_;
+    static constexpr Layout layout = Layout_;
+
+    PTO_INTERNAL GlobalTensor(DType *data,
+                              const Shape &shape = defaultShape,
+                              const Stride &stride = defaultStride) {
+        data_ = data;
+        // dynamic shape/stride fields are copied here
+    }
+};
+```
+
+`Tile` 则是 kernel 内的 on-chip work unit：
+
+```cpp
+template <TileType Loc_, typename Element_, const int Rows_, const int Cols_, ...>
+struct Tile {
+    static constexpr TileType Loc = Loc_;
+    static constexpr int Rows = Rows_;
+    static constexpr int Cols = Cols_;
+    static constexpr int Numel = Rows * Cols;
+    static_assert(Rows > 0 && Cols > 0, "Invalid Tile Layout.");
+};
+```
+
+这两个类型解释了为什么 PTO-ISA 页面一直强调 tensor/tile split：`GlobalTensor` 关心 GM address、shape、stride；`Tile` 关心 on-chip memory location、element type、rows/cols、layout 和 valid shape。kernel instruction 在这两个世界之间搬数据。
+
+GEMM demo 展示 instruction sequence，来自 `demos/baseline/gemm_basic/csrc/kernel/gemm_basic_custom.cpp`：
+
+```cpp
+GlobalDataSrcA gmA(currentSrc0 + kIter * baseK);
+GlobalDataSrcB gmB(currentSrc1 + kIter * baseK);
+TLOAD(aMatTile[cur], gmA);
+TLOAD(bMatTile[cur], gmB);
+TMOV(aTile[cur], aMatTile[cur]);
+TMOV(bTile[cur], bMatTile[cur]);
+TMATMUL_ACC(cTile, cTile, aTile[cur], bTile[cur]);
+TSTORE(dstGlobal, cTile);
+```
+
+这段代码是 PTO-ISA 的真实 reading target。`TLOAD` 和 `TSTORE` 是 data movement；`TMOV` 是 tile memory movement；`TMATMUL_ACC` 是 compute accumulator update。它证明 repository owns kernel instruction semantics。它不证明 host DAG scheduling，因为这里没有 `Worker`、`TaskArgs`、TensorMap 或 SubWorker。
 
 ## Communication ISA
 
@@ -112,6 +218,10 @@ Communication ISA 应读作“kernel 内可以表达跨 rank / remote memory / a
 | GEMM optimization reading | inspect `demos/baseline/gemm_basic/README.md` and `test/test.py` | can explain fixed shapes, per-core split, double buffering | hardware/software stack unavailable for run |
 | communication primitive demo | `./run.sh 2 Ascend950PR_9599` in `demos/baseline/allgather_async` | allgather demos pass for ranks | CANN Toolkit/Ops, MPICH, enough NPU devices |
 
+## Safe First Change
+
+第一次改 `pto-isa` 应选一个能被 operator demo 或 focused test 覆盖的点。比如 add demo 的 wrapper/test、GEMM tiling parameter 注释、CPU simulation demo 的 expected result，比直接改 communication async session 更安全。改动前先判断它影响的是 compute instruction、data movement、communication primitive、SoC-specific backend，还是 packaging/test harness。
+
 ## 与 simpler 的关系
 
 `simpler` 的 L3 hardware examples 会通过 `simpler_setup.pto_isa.ensure_pto_isa_root()` 获取 PTO-ISA root，再用 `KernelCompiler.compile_incore()` 编译 AIC/AIV kernel。也就是说，PTO-ISA 是 kernel-level target；simpler 是运行和调度这些 kernel 的 runtime。
@@ -126,8 +236,16 @@ PyPTO 负责 Python DSL、IR、pass 和 codegen。它生成或调用的低层 ke
 
 本页把 `pto-isa` 解释为 kernel/ISA foundation，而不是 runtime orchestrator。证据来自 README、`include/pto/README.md`、baseline add/GEMM/Flash Attention demos、CPU demos、`include/pto/comm/README.md` 和 allgather async demo。通信 primitive 是 distributed execution 的必要支撑，但它只证明 kernel/rank/data movement 能力；worker lifecycle、DAG scheduling、remote callable registry 仍属于 runtime/PyPTO/simpler 组合需要证明的层面。
 
+## What This Page Proves
+
+本页可以证明 `pto-isa` 提供 tile/kernel-level compute、data movement 和 communication primitive，并且这些 primitive 有 baseline demos、CPU demos 或 NPU tests 作为证据。它不能证明 PyPTO 已经暴露某个 high-level collective API，也不能证明 `simpler` 已经拥有 remote L3 control plane。读 distributed claims 时，PTO-ISA evidence 只应升级 kernel/data-plane status，不应升级 compiler/runtime ownership status。
+
 ## 未决问题
 
 - PyPTO `pl.all_reduce` 等 orchestration-level collective 会直接发 PTO-ISA collective，还是先走 simpler runtime/HCCL window？
 - A5 URMA path 与 remote L3/RoCE blueprint 的关系还需要后续实现证明。
 - PTO-ISA roadmap 中 system scheduling extension 与 simpler scheduler 的边界尚未从源码中确认。
+
+## What To Remember
+
+`pto-isa` 是“kernel 如何表达”的答案，不是“program 如何被调度”的答案。先用 add/GEMM/Flash Attention 学普通 tile programming，再用 allgather async、`TWAIT/TNOTIFY`、SDMA/URMA 学 communication primitive。只有当 PyPTO 和 `simpler` 同时提供对应 evidence 时，才能把 kernel primitive 升级成 end-to-end distributed capability。

@@ -30,12 +30,12 @@ operator basics
 
 ## Chapters
 
-- [Hello / Elementwise](./hello-elementwise.md): PyPTO hello、PTO-ISA add、simpler L2 vector add。
-- [GEMM / FFN](./gemm-ffn.md): PyPTO matmul/FFN、PTO-ISA GEMM、simpler FFN tensor parallel。
-- [Softmax / Attention](./softmax-attention.md): PyPTO softmax/norm/Flash Attention/Paged Attention、PTO-ISA attention baseline、simpler paged-attention runtime。
-- [Complete Models](./complete-models.md): PyPTO `llama_mini` 和 complete distributed NN 的缺口。
-- [Distributed Runtime](./distributed-runtime.md): simpler L3 allreduce、FFN TP、PTO-ISA allgather、PyPTO hierarchy tests。
-- [Missing Roadmap](./missing-roadmap.md): missing examples 和升级为 `implemented` 前需要的 evidence。
+- [Hello / Elementwise](./hello-elementwise.md): 从最小 PyPTO program、PTO-ISA add kernel 和 `simpler` L2 vector add 建立 expression/kernel/runtime 三层闭环。
+- [GEMM / FFN](./gemm-ffn.md): 从 matmul 和 FFN block 进入 tiling、double buffering、tensor-parallel runtime 的性能路径。
+- [Softmax / Attention](./softmax-attention.md): 解释 softmax、Flash Attention、Paged Attention、KV cache 和 runtime dependency 管理。
+- [Complete Models](./complete-models.md): 用 PyPTO `llama_mini` 串起 RMSNorm、QKV、RoPE、attention、SwiGLU、residual 和 LM head，并标出 complete distributed NN 缺口。
+- [Distributed Runtime](./distributed-runtime.md): 学习 `simpler` L3 allreduce、FFN TP、PTO-ISA allgather async、PyPTO hierarchy tests 分别证明哪一层。
+- [Missing Roadmap](./missing-roadmap.md): 把缺失的 examples 写成 learning gaps、implementation gaps 和升级为 `implemented` 所需 evidence。
 
 ## Cross-Repository Reading Rule
 

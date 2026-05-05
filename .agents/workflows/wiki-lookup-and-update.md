@@ -7,17 +7,18 @@ Use this workflow for questions about the target set, repository behavior, depen
 1. Read `config/target-set.yml` to understand the configured target set.
 2. Search `wiki/` for existing coverage.
 3. If the wiki answer is missing, stale, or too shallow, locate the smallest relevant upstream repositories or documentation.
-4. Prefer primary sources: repository files, upstream docs, releases, tags, commits, issue discussions from maintainers, and official project pages.
-5. Clone missing repositories lazily under `repositories/<repository-name>/` only when source inspection is needed.
-6. Before relying on an existing checkout when freshness matters, fetch or sync it against the configured upstream.
-7. Inspect repository docs, build files, dependency files, source layout, tests, examples, CI, and relevant commits or releases as required by the question.
-8. For branch, issue, or PR questions, inspect the requested GitHub object and the relevant ref instead of assuming the default branch.
-9. For material-driven topic questions, use `.agents/workflows/topic-evidence-discovery.md` to search related issues, PRs, commits, branches, and files before synthesizing wiki knowledge.
-10. When local checkout evidence is used, record the checkout path, ref, and commit SHA in the answer or wiki citation.
-11. Answer with clear human-readable explanation. For public wiki updates, follow `.agents/policies/wiki-writing-style-policy.md`: Chinese narrative by default, English technical identifiers preserved, prose-first, self-contained, and concise but information-rich.
-12. Decide whether the durable knowledge should update `wiki/`.
-13. If updating `wiki/`, maintain `wiki/index.md`, relevant area indexes, `wiki/overview.md`, and `wiki/log.md` according to `.agents/policies/wiki-organization-policy.md`.
-14. If the update is about agent process, command patterns, placement rules, or reusable quality gates, update `.agents/` or `AGENTS.md` instead of rendered wiki pages.
+4. When the answer or page depends on important concepts, use `.agents/workflows/concept-evidence-lookup.md` to stabilize definitions from wiki, local repositories, GitHub history, or official external docs before writing.
+5. Prefer primary sources: repository files, upstream docs, releases, tags, commits, issue discussions from maintainers, and official project pages.
+6. Clone missing repositories lazily under `repositories/<repository-name>/` only when source inspection is needed.
+7. Before relying on an existing checkout when freshness matters, fetch or sync it against the configured upstream.
+8. Inspect repository docs, build files, dependency files, source layout, tests, examples, CI, and relevant commits or releases as required by the question.
+9. For branch, issue, or PR questions, inspect the requested GitHub object and the relevant ref instead of assuming the default branch.
+10. For material-driven topic questions, use `.agents/workflows/topic-evidence-discovery.md` to search related issues, PRs, commits, branches, and files before synthesizing wiki knowledge.
+11. When local checkout evidence is used, record the checkout path, ref, and commit SHA in the answer or wiki citation.
+12. Answer with clear human-readable explanation. For public wiki updates, follow `.agents/policies/wiki-writing-style-policy.md`: Chinese narrative by default, English technical identifiers preserved, prose-first, self-contained, and concise but information-rich.
+13. Decide whether the durable knowledge should update `wiki/`.
+14. If updating `wiki/`, maintain `wiki/index.md`, relevant area indexes, `wiki/overview.md`, and `wiki/log.md` according to `.agents/policies/wiki-organization-policy.md`.
+15. If the update is about agent process, command patterns, placement rules, or reusable quality gates, update `.agents/` or `AGENTS.md` instead of rendered wiki pages.
 
 ## Update Decision
 

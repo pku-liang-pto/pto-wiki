@@ -13,6 +13,7 @@ Read these before acting:
 
 - `AGENTS.md`
 - `.agents/workflows/wiki-lookup-and-update.md`
+- `.agents/workflows/concept-evidence-lookup.md`
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-update-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
@@ -23,16 +24,19 @@ Read these before acting:
 
 Also read `.agents/policies/document-material-policy.md` when user-supplied materials are involved.
 
+Use `concept-evidence-lookup` before answering or updating pages when important concepts, acronyms, platform terms, APIs, or repository-specific identifiers need internet, GitHub, or code-repository lookup.
+
 ## Core Workflow
 
 1. Search existing `wiki/` before upstream research.
 2. Identify the smallest source set that can answer the question.
 3. Prefer primary sources: repository files, upstream docs, releases, tags, commits, maintainer issue/PR comments, and official pages.
-4. Use local checkouts under `repositories/<repository-name>/` only when source inspection is needed.
-5. Record the inspected path, ref, commit SHA, PR, issue, tag, release, material path, checksum, or retrieval date when freshness matters.
-6. Separate verified facts, inferred architecture, stale evidence, conflicts, and open questions.
-7. Update `wiki/` only when the finding is durable, source-backed, and useful without replaying raw research.
-8. Keep reusable agent requirements in `.agents/`, not in rendered wiki pages.
+4. Define important concepts locally instead of sending readers to source links; cite repository, GitHub, material, or official documentation evidence near the definition.
+5. Use local checkouts under `repositories/<repository-name>/` only when source inspection is needed.
+6. Record the inspected path, ref, commit SHA, PR, issue, tag, release, material path, checksum, or retrieval date when freshness matters.
+7. Separate verified facts, inferred architecture, stale evidence, conflicts, and open questions.
+8. Update `wiki/` only when the finding is durable, source-backed, and useful without replaying raw research.
+9. Keep reusable agent requirements in `.agents/`, not in rendered wiki pages.
 
 ## Update Shape
 

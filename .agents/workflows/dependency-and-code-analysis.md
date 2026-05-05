@@ -29,6 +29,8 @@ Inspect code structure before making architectural claims:
 - extension points
 - tests and examples that show intended usage
 
+When code analysis introduces important concepts, APIs, runtime layers, protocols, platform terms, or repository-specific identifiers, run `.agents/workflows/concept-evidence-lookup.md`. Explain the concept locally, then cite the source files, docs, commits, or official external references that prove the definition.
+
 ## Explanation Standard
 
 Summaries must connect code facts to human meaning. Avoid dumping file lists. Explain why a dependency, module, or entry point matters to the target set.

@@ -89,6 +89,29 @@ parent Python process
 
 The same sequence explains why current L3 evidence is strong but local: fork inheritance, shared-memory mailbox, TensorMap addresses, and process-local callable registry all assume one host process tree. A remote L3 implementation would need an explicit replacement for each of those local assumptions.
 
+`simpler` allreduce example 的 source code 把这个 local L3 control plane 写得很直接：
+
+```python
+worker = Worker(level=3, platform="a2a3",
+                runtime="tensormap_and_ringbuffer",
+                device_ids=device_ids,
+                chip_bootstrap_configs=cfgs)
+worker.init()
+
+def orch_fn(orch, _args, cfg):
+    chip_args = TaskArgs()
+    chip_args.add_tensor(make_tensor_arg(host_inputs[i]), TensorArgType.INPUT)
+    chip_args.add_tensor(make_tensor_arg(host_outputs[i]), TensorArgType.OUTPUT_EXISTING)
+    chip_args.add_tensor(window_scratch_tensor, TensorArgType.INOUT)
+    chip_args.add_scalar(ctx.nranks)
+    chip_args.add_scalar(ctx.device_ctx)
+    orch.submit_next_level(chip_callable, chip_args, cfg, worker=i)
+
+worker.run(orch_fn, args=None, config=CallConfig())
+```
+
+这段代码证明的 implemented behavior 很窄也很具体：一个 parent Python process 创建 L3 worker，`init()` fork local chip children 并 bootstrap HCCL/window，然后 host orchestration function 提交 next-level chip tasks。它没有 remote worker discovery、remote callable registry 或跨 host run loop。
+
 ## 目标分布式路径
 
 材料包中的目标蓝图把 runtime 推向 remote L3：
@@ -116,6 +139,24 @@ Host Orchestrator
 ## HCCL 的位置
 
 HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。HCCL 公开 collective、send/recv、all-to-all 等 API，且 HCCL CMake target 包含 AIV collective/send/recv 实现。`simpler` 通过 comm C API 和 `CommContext` 把 HCCL window 暴露给 chip kernel；PTO-ISA 在 kernel 内通过 comm primitive 消费这些地址和同步能力。
+
+在 allreduce/FFN TP examples 中，HCCL/window 通常表现为 `ChipCommBootstrapConfig` 和 `ChipContext`：
+
+```python
+ChipCommBootstrapConfig(
+    rank=rank,
+    nranks=nranks,
+    rootinfo_path=rootinfo_path,
+    window_size=window_size,
+)
+
+ctx.local_window_base
+ctx.actual_window_size
+ctx.buffer_ptrs["scratch"]
+ctx.device_ctx
+```
+
+这些字段说明 data-plane resource 已经进入 chip context：rank、window base/size、scratch buffer 和 device comm context。它仍然不是 control-plane API；它不会注册 remote callable，也不会创建 remote worker。
 
 因此：
 
@@ -149,3 +190,9 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 - remote worker lifecycle 的 owner 和 API 边界尚未定稿。
 - orchestration-level collective 先实现为 PyPTO sugar、runtime callable，还是 PTO-ISA primitive lowering 仍未确认。
 - HCCL、HCOMM、URMA、RoCE 在目标 runtime 中的 backend boundary 需要后续代码证明。
+
+## What To Remember
+
+当前已经能作为学习材料讲清楚的是 single-host L3：parent process 建立 hierarchy，Orchestrator 用 TensorMap 建依赖，Scheduler 派发 task，WorkerThread 把工作交给 chip child 或 SubWorker，HCCL/sim backend 提供 rank/window data-plane。remote L3/DistWorker 是目标方向，不是当前已证明的 runtime control plane。
+
+因此，读到 “distributed” 时不要直接理解成跨机器完整系统。先问它是 PyPTO hierarchy expression、`simpler` L3 scheduling、PTO-ISA communication primitive、HCCL data-plane，还是 material blueprint 中的 future remote worker。

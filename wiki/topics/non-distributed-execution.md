@@ -64,16 +64,20 @@ Key non-distributed stages:
 
 Use `repositories/pypto/examples/hello_world.py` as the smallest concrete path:
 
-```text
-HelloWorldProgram
-  -> tile_add(a, b, c)
-      -> pl.load(a) / pl.load(b)
-      -> pl.add(tile_a, tile_b)
-      -> pl.store(tile_c, c)
-  -> orchestrator(...)
-      -> self.tile_add(...)
-  -> HelloWorldProgram.as_python()
+```python
+@pl.function(type=pl.FunctionType.InCore)
+def tile_add(self, a, b, c):
+    tile_a = pl.load(a, [0, 0], [128, 128])
+    tile_b = pl.load(b, [0, 0], [128, 128])
+    tile_c = pl.add(tile_a, tile_b)
+    return pl.store(tile_c, [0, 0], c)
+
+@pl.function(type=pl.FunctionType.Orchestration)
+def orchestrator(self, a, b, out_c):
+    return self.tile_add(a, b, out_c)
 ```
+
+这段 source excerpt 是普通执行的第一张图：`tile_add` 表达 tile kernel，`orchestrator` 表达 program call graph。`HelloWorldProgram.as_python()` 只是把这套结构打印出来；真正编译时会进入 parser、IR、pass manager 和 backend codegen。
 
 What this teaches:
 
@@ -97,7 +101,22 @@ PTO-ISA starts below PyPTO: it gives kernel authors and compiler backends a tile
 - matmul/add/softmax-style compute
 - pipeline and double-buffering style optimization in GEMM/Flash Attention examples
 
-A non-distributed PTO-ISA operator usually has two halves. The host/operator half registers a callable interface and prepares launch/build artifacts. The kernel half operates on tensors through tile abstractions: global memory is described as `GlobalTensor`, local compute uses `Tile`, and instructions move data between memory spaces before compute and store. Communication instructions exist in the repo, but they should be read after this compute/data-movement model is clear.
+A non-distributed PTO-ISA operator usually has two halves. The host/operator half registers a callable interface and prepares launch/build artifacts. The kernel half operates on tensors through tile abstractions: global memory is described as `GlobalTensor`, local compute uses `Tile`, and instructions move data between memory spaces before compute and store. Communication instructions exist in the repo, but in this learning path they come later: first understand compute/data movement, then read communication primitive semantics.
+
+PTO-ISA 的 code shape 可以用 GEMM kernel 片段理解：
+
+```cpp
+GlobalDataSrcA gmA(currentSrc0 + kIter * baseK);
+GlobalDataSrcB gmB(currentSrc1 + kIter * baseK);
+TLOAD(aMatTile[cur], gmA);
+TLOAD(bMatTile[cur], gmB);
+TMOV(aTile[cur], aMatTile[cur]);
+TMOV(bTile[cur], bMatTile[cur]);
+TMATMUL_ACC(cTile, cTile, aTile[cur], bTile[cur]);
+TSTORE(dstGlobal, cTile);
+```
+
+这里没有 Python DSL，也没有 runtime scheduler。它只说明 kernel 如何把 GM block 搬到 tile memory，执行 matmul accumulator，再写回 GM。读 distributed communication primitive 前，先能解释这段普通 data movement。
 
 ## Normal simpler L2 Flow
 
@@ -119,6 +138,18 @@ RuntimeBuilder / KernelCompiler
 
 `host_build_graph` is easier for development/debugging. `tensormap_and_ringbuffer` is the production-oriented path where AICPU/device-side logic uses TensorMap and ring buffers for dependency discovery, task slots, output heap, and flow control.
 
+在 Python API 层，L2 runtime 的最小 shape 是：
+
+```python
+worker = Worker(level=2, platform="a2a3sim", device_id=0,
+                runtime="tensormap_and_ringbuffer")
+worker.init()
+worker.run(chip_callable, chip_args, CallConfig())
+worker.close()
+```
+
+这段 code 说明普通 runtime path 的核心对象是 `Worker`、`ChipCallable`、`TaskArgs` 和 `CallConfig`。PyPTO 的 `@pl.program` 到这里已经变成 runtime-facing callable/artifacts；PTO-ISA kernel 到这里也已经被打包成 child callable。
+
 For maintainers, TensorMap is the key idea that connects non-distributed and distributed runtime behavior. A task writes an output tensor at an address; later tasks that read the same tensor can be connected to that producer without manually listing every edge. Ring buffers make this practical for repeated submissions: tasks, dependency records, and output buffers live in bounded queues instead of one unbounded host-built graph.
 
 ```text
@@ -137,3 +168,7 @@ Distributed execution adds L3 host orchestration, SubWorkers, multi-chip windows
 
 - Which non-distributed PyPTO model example should become the canonical “complete NN” baseline for future distributed comparison?
 - Should `tensormap_and_ringbuffer` become the only documented runtime variant once `host_build_graph` is only a debug path?
+
+## What To Remember
+
+Non-distributed execution is not “less important distributed execution.” It is the basis that makes distributed claims meaningful. PyPTO must first express and lower a normal program, PTO-ISA must first explain tile movement and compute, and `simpler` L2 must first launch chip work correctly. Only after those three facts are clear should L3, rank/window, collectives, or remote-worker designs be introduced.

@@ -12,9 +12,9 @@ Concepts 是读 PTO-CANN wiki 时反复需要的基础词典和短教材。它�
 
 ## Pages
 
-- [Basic Terms](./basic-terms.md): 非分布式阅读路径中的 PyPTO、PTO-ISA、tile、runtime 和 L2 launch 基础术语。
-- [Distributed Execution Terms](./distributed-execution-terms.md): 分布式 runtime 文档中的标准术语和状态标签。
-- [CANN Foundation](./cann-foundation.md): CANN/HCCL/HCOMM/SHMEM/HIXL 在本 wiki 中的支撑层定位和当前覆盖限制。
+- [Basic Terms](./basic-terms.md): 用一个普通 program 的执行链路解释 PyPTO、PTO-ISA、tile、runtime、AICPU/AICore/AIV 和 L2 launch 基础术语。
+- [Distributed Execution Terms](./distributed-execution-terms.md): 用 control plane / data plane、rank/window、Worker level、status label 解释 distributed runtime 文档中的标准词。
+- [CANN Foundation](./cann-foundation.md): 解释 CANN、ACL、HCCL、HCOMM、SHMEM、HIXL、RoCE/URMA 在本 wiki 中是 supporting substrate 还是尚未 profile 的 open area。
 
 ## Reading Hint
 

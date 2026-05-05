@@ -59,6 +59,35 @@ PTO-ISA 是 tiles、memory spaces、instruction semantics、custom operator kern
 
 CANN/HCCL/HCOMM/URMA evidence 在本轮主要支撑 communication 和 memory movement。除非未来有 dedicated source evidence 证明更高层 runtime ownership，否则它们应读作 data-plane substrate。
 
+维护者做 triage 时可以把 source code 先压缩成三类 signature：
+
+```python
+# PyPTO ownership signature
+@pl.function(type=pl.FunctionType.InCore)
+def kernel(...):
+    tile = pl.load(...)
+    ...
+    return pl.store(..., output)
+```
+
+```cpp
+// PTO-ISA ownership signature
+GlobalTensor<...> gm(ptr);
+TLOAD(tile, gm);
+TMATMUL(acc, lhs, rhs);
+TSTORE(gm_out, acc);
+```
+
+```python
+# simpler ownership signature
+worker = Worker(level=3, device_ids=[...], runtime="tensormap_and_ringbuffer")
+args = TaskArgs()
+args.add_tensor(make_tensor_arg(t), TensorArgType.INPUT)
+orch.submit_next_level(chip_callable, args, cfg, worker=i)
+```
+
+如果 bug report 的证据主要长得像第一段，先查 PyPTO language/parser/pass/codegen；像第二段，先查 PTO-ISA kernel semantics、layout、pipeline、SoC backend；像第三段，先查 `simpler` worker lifecycle、TaskArgs、TensorMap、Scheduler、mailbox 或 HCCL window bootstrap。跨层 bug 当然存在，但接手时应先从最贴近 symptom 的 signature 开始。
+
 ## Target-Set Coverage And Ownership Gaps
 
 当前 wiki 只完成了部分 configured target set 的 source-backed profile。没有 profile 的 repository 不能从本页直接推断 ownership；它们只表示 target set 中存在该方向，具体实现与边界仍需后续 source pass。
@@ -113,3 +142,13 @@ CANN/HCCL/HCOMM/URMA evidence 在本轮主要支撑 communication 和 memory mov
 | SDMA async completion | Open PR still represents unfinished async backend work | `emerging` | track [simpler PR #696](https://github.com/hw-native-sys/simpler/pull/696) or replacement completion backend | merged async completion PR + updated examples/tests |
 | complete distributed NN example | Current evidence has complete NN non-distributed examples and distributed partial examples, but not complete distributed NN | `TODO` | design a vertical slice from `llama_mini` plus simpler L3 FFN/collective path | runnable model-level distributed example and evidence ledger update |
 | CANN-side ownership | HCCL is partially inspected but HCOMM/SHMEM/HIXL are not | `open question` | run a CANN-side repository documentation pass | CANN repository profiles with source refs |
+
+## What To Read Next
+
+如果你要接手功能开发，先按这个顺序读：第一，读 [Basic Terms](../concepts/basic-terms.md) 建立 PyPTO / PTO-ISA / simpler 的层级边界；第二，读 [PTO Examples](../examples/pto/) 用具体例子把表达、kernel、runtime、distributed partial path 串起来；第三，再读对应 repository profile 或 topic page。这样可以避免一开始就把 distributed design、kernel primitive、runtime scheduler 和 CANN data-plane 混在一起。
+
+如果你要改 wiki，先读 [Evidence](../evidence/) 和当前页面的 risk table。wiki 的任务不是把所有 source 全部搬进来，而是把已经能自洽教学的知识写成 durable chapter，并把没有证据的部分明确留在 `open question` 或 `design-intended`。
+
+## What To Remember
+
+接手这套 PTO wiki 时，最重要的规则是先定位 ownership，再判断状态。PyPTO 解释 program 如何表达和 lower；PTO-ISA 解释 kernel 内 tile instruction 如何工作；`simpler` 解释 callable/tensor/task 如何被 launch 和 schedule；CANN/HCCL 目前主要解释 execution substrate 和 data-plane。任何跨越这些边界的 claim，都必须回到 evidence ledger 重新拆成更小的行为。

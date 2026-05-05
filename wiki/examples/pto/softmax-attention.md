@@ -47,6 +47,21 @@ Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source
 
 Flash Attention 的直觉是“不把完整 attention matrix 当作巨大中间结果存下来”。它用 block-wise processing 和 online softmax state 在保持数值正确性的同时减少 memory pressure。Paged Attention 再加入 KV cache block 管理：query 仍要和 key/value 交互，但 key/value 的物理存放会通过 block table 间接访问。这就是为什么它同时考验 compiler expression、kernel memory behavior 和 runtime buffer dependency。
 
+Paged Attention 的 PyPTO code 直接展示了 QK、softmax、PV 三段结构：
+
+```python
+sij = kernel_qk_matmul(qi, kj, sij_buf)
+sij_valid = pl.slice(sij, [q_tile, valid_len], [0, 0])
+
+pij_f16, mi, li = kernel_softmax_prepare(
+    sij_valid, 1.0, pij_f16_buf, mi_sm_buf, li_sm_buf
+)
+
+oi_tmp = kernel_pv_matmul(pij_f16, vj, oi_tmp_buf)
+```
+
+三个 called kernels 分别对应 attention 的三个实现压力点：QK matmul 是 CUBE compute，softmax prepare 是 VECTOR/reduction，PV matmul 又回到 CUBE compute。source 中的 `kernel_qk_matmul` 会 `pl.load(..., transpose=True)` 读取 K block，再 `pl.matmul(qi_l0a, kj_l0b)`；`kernel_softmax_prepare` 会 `row_max -> row_expand_sub -> exp -> row_sum`。这些细节比只说“attention example”更有用，因为它们告诉开发者该去哪一类 kernel 中查问题。
+
 Run surface：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -70,6 +85,8 @@ Run surface：
 
 这个示例的阅读重点是 runtime 数据结构，而不是 attention 数学本身。Paged attention 会产生多个中间 tensor 和依赖关系；`tensormap_and_ringbuffer` runtime 让 task、dependency 和 output storage 被 bounded rings 管理，TensorMap 则把同一 tensor address 的 producer/consumer 自动连起来。读它可以理解为什么 `simpler` 的 docs 反复强调 Scope、Ring 和 TensorMap。
 
+`simpler` 的 paged-attention orchestration C++ 也保留同样的 stage shape：`rt_submit_aic_task(FUNC_QK_MATMUL, ...)` 产生 score tensor，vector task 做 softmax/update，随后 `rt_submit_aic_task(FUNC_PV_MATMUL, ...)` 产生 output。读它时要注意同一个 algorithm 在 PyPTO 是 DSL function calls，在 `simpler` runtime 是 task submission + TensorMap dependency。
+
 Run surface：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -79,3 +96,11 @@ Run surface：
 ## What This Example Family Proves
 
 Attention 示例证明 optimization 分布在三层：PyPTO 表达 algorithm，PTO-ISA 控制 tile/memory behavior，simpler 控制 task readiness、dependency discovery 和 buffer reuse。它不是 remote distributed proof。
+
+## What To Read Next
+
+读完本页后，继续读 [Complete Models](./complete-models.md)。Softmax、attention、KV cache 和 normalization 在 `llama_mini` 中会成为 decoder flow 的中间 stage；理解它们之后，complete model graph 才不只是一个长函数列表。
+
+## What To Remember
+
+Attention 的学习价值在于它同时触碰 algorithm expression、kernel memory pressure 和 runtime dependency management。PyPTO Flash/Paged Attention 证明表达能力，PTO-ISA Flash Attention 证明 kernel baseline，`simpler` paged-attention 证明 runtime flow-control shape；三者都不是 remote distributed runtime proof。

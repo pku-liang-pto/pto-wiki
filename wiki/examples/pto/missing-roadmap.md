@@ -53,9 +53,44 @@ PyPTO model graph
 | Validation | rank-local 和 cross-rank validation output |
 | Status evidence | command/example/test/PR/source ref 进入 evidence ledger |
 
+缺失示例不能只交一个 README。它至少应该让 reader 看见类似下面的 source shape：
+
+```python
+# PyPTO side: model stage becomes hierarchy-aware work
+@pl.function(type=pl.FunctionType.Orchestration, level=pl.Level.HOST)
+def distributed_decoder_block(...):
+    local = self.partitioned_ffn_or_attention(...)
+    reduced = pl.all_reduce_or_runtime_equivalent(local, ...)
+    return self.next_stage(reduced, ...)
+```
+
+```python
+# simpler side: runtime shows rank-local task ownership
+args.add_tensor(make_tensor_arg(rank_local_input), TensorArgType.INPUT)
+args.add_tensor(make_tensor_arg(rank_local_output), TensorArgType.OUTPUT_EXISTING)
+orch.submit_next_level(stage_callable, args, cfg, worker=rank)
+```
+
+```cpp
+// PTO-ISA side: kernel or communication primitive is visible
+TLOAD(tile, gm);
+TMATMUL_ACC(acc, acc, lhs, rhs);
+TSTORE(gm_out, acc);
+```
+
+真实实现不必长得完全一样，但必须同时暴露 model graph、partition/runtime submission、kernel/data-plane primitive 和 validation signal。否则它仍然只是 design note 或 partial demo。
+
 ## What Not To Infer
 
 - 有 PTO-ISA communication primitive，不等于 PyPTO 已有高层 collective API。
 - 有 HCCL window/data-plane，不等于 HCCL 负责 PTO runtime control plane。
 - 有 `Worker(level=3)` single-host L3，不等于 remote DistWorker 已实现。
 - 有 complete non-distributed NN，不等于 complete distributed NN 已实现。
+
+## What To Read Next
+
+读 [Distributed Runtime](./distributed-runtime.md) 可以看到当前已经证明的 partials；读 [Complete Models](./complete-models.md) 可以看到 complete non-distributed model reference；读 [Distributed Execution](../../topics/distributed-execution.md) 可以看到这些 gaps 在系统蓝图中的位置。
+
+## What To Remember
+
+本页的作用是阻止 wiki 过早升级状态。一个 missing example 只有在 model、lowering、runtime、kernel/data-plane、validation 和 evidence ledger 都闭合时，才可以从 `TODO` / `design-intended` 改为 `implemented`。

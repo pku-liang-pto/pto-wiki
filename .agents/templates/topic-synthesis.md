@@ -16,6 +16,10 @@ last_updated: YYYY-MM-DD
 
 Explain the concept directly, using concise Chinese prose and a small ASCII diagram when helpful. Do not make evidence links or tables carry the teaching burden.
 
+## Implementation Shape
+
+When the topic describes implemented code, embed short source excerpts or source-shaped pseudocode and explain each excerpt. A topic page should let a developer recognize the real code before opening the repository.
+
 ## Foundation
 
 For advanced or distributed topics, cite the basic terms, non-distributed execution flow, repository profiles, and examples that the reader should understand first. Do not let the topic appear detached from its non-distributed basis.

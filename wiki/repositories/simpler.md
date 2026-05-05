@@ -26,6 +26,20 @@ last_updated: 2026-05-05
 
 L3 之后不要先理解成“分布式系统”，而要先理解成“把多个 L2 worker 和 Python SubWorker 放进 host-side DAG scheduler”。材料 `00_README.md` 中的 remote L3、cross-host callable registration、RoCE/URMA control plane 是下一层设计目标，不是当前 L2-L3 基础能力。
 
+```text
+simpler owns runtime lifecycle
+
+Python host process
+  -> Worker(level=2): ChipWorker for one Ascend device
+       -> host runtime .so
+       -> AICPU scheduler kernel
+       -> AICore/AIV compute kernels
+  -> Worker(level=3): host-side DAG over L2 chip workers + SubWorkers
+       -> Orchestrator builds dependencies
+       -> Scheduler dispatches ready slots
+       -> WorkerManager selects child workers
+```
+
 上游 `simpler/docs/` 本身是本 wiki 的重要学习材料。更完整的 runtime mechanics synthesis 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；本 repo profile 只保留仓库级定位和主要入口。
 
 ## 上游文档学习主线
@@ -84,21 +98,114 @@ Python test/example
 
 ## 关键模块
 
-| 模块 | 作用 | 状态 |
-| --- | --- | --- |
-| `python/simpler/worker.py` | `Worker(level=2/3/4)` factory、mailbox layout、child process loop | `implemented` |
-| `python/simpler/task_interface.py` | `TaskArgs`、`ChipCallable`、`ChipBootstrapConfig`、`ChipContext`、comm/window bootstrap | `implemented` |
-| `docs/chip-level-arch.md` | L2 host/AICPU/AICore 启动和协作路径 | `implemented` documentation |
-| `src/a2a3/docs/runtimes.md` | `host_build_graph` vs `tensormap_and_ringbuffer` runtime 设计 | `implemented` documentation |
-| `src/common/worker/chip_worker.cpp` | L2 `ChipWorker`，调用 `pto2_run_runtime` | `implemented` |
-| `src/common/hierarchical/worker_manager.h` | worker pool、THREAD/PROCESS mode、process mailbox ABI | `implemented` |
-| `src/common/hierarchical/orchestrator.*` | DAG submit、TensorMap lookup/insert、Scope/Ring 管理 | `implemented` |
-| `src/common/hierarchical/scheduler.*` | wiring queue、ready queue、completion queue、worker dispatch | `implemented` |
-| `src/common/platform_comm/comm.h` | backend-neutral C API: init/window/query/barrier/destroy | `implemented` |
-| `src/common/platform_comm/comm_context.h` | device-visible `CommContext` ABI、rank/window metadata | `implemented` |
-| `examples/workers/l3/` | L3 examples and hardware demos | `implemented`/`emerging` |
+读源码时优先按 ownership 进入，而不是按目录名猜层级。`src/a2a3` 和 `src/a5` 更接近 platform/runtime variant；`src/common` 承载大量 L3+ host runtime 逻辑；Python wrapper 则把 `Worker`、`TaskArgs` 和 callable registration 暴露给 examples。
+
+这些模块不是平级文件清单，而是三条运行路径。
+
+第一条是 **L2 chip launch path**。用户从 `python/simpler/worker.py` 创建 `Worker(level=2)`，`python/simpler/task_interface.py` 提供 `TaskArgs`、`ChipCallable`、`ChipBootstrapConfig` 和 `ChipContext` 这些 Python-facing handles。进入 C++ 后，`src/common/worker/chip_worker.cpp` 持有 device、runtime symbol、stream、binary artifact 和 tensor storage，最终调用 host runtime C API，例如 `pto2_run_runtime`。`docs/chip-level-arch.md` 是这条路径的解释文档：它把 host program、AICPU scheduler、AICore/AIV kernels 三者放在同一条启动链上。
+
+```text
+L2 chip launch path
+-------------------
+Worker(level=2)
+  -> ChipCallable + TaskArgs + CallConfig
+  -> ChipWorker::run(...)
+  -> pto2_run_runtime(...)
+  -> AICPU scheduler initializes graph
+  -> AICore/AIV kernels consume task descriptors
+```
+
+第二条是 **L3+ host DAG path**。`src/common/hierarchical/orchestrator.*` 在 submit 阶段分配 task slot、读取 `TaskArgs` 的 tensor tags、更新 TensorMap，并把等待连边的 slot 放入 scheduler queue。`src/common/hierarchical/scheduler.*` 用 wiring queue、ready queue 和 completion queue 维护 fanin/fanout；`src/common/hierarchical/worker_manager.h` 管 child worker pool，在 THREAD mode 直接调用 child，在 PROCESS mode 通过 shared-memory mailbox 派发 callable/config/args blob。`src/a2a3/docs/runtimes.md` 中的 `tensormap_and_ringbuffer` 解释了为什么 task slots、output buffers、dependency records 和 scopes 都要 ring 化。
+
+```text
+L3+ host DAG path
+-----------------
+orchestration function
+  -> Orchestrator: submit slot + TensorMap dependency lookup
+  -> Scheduler: promote ready tasks and release fanout
+  -> WorkerManager: dispatch to ChipWorker, SubWorker, or nested Worker
+```
+
+第三条是 **communication data-plane path**。`src/common/platform_comm/comm.h` 是 backend-neutral C API，负责 init/window/query/barrier/destroy 这类通信域操作；`src/common/platform_comm/comm_context.h` 是 device-visible ABI，包含 rank、rank count、window metadata 等 device 侧需要读的信息。它能支撑 current HCCL/window examples，但不拥有 remote worker lifecycle、callable registry 或 host-to-host control plane。
+
+```text
+communication support path
+--------------------------
+comm_init / comm_alloc_windows
+  -> produce CommContext
+  -> device code sees ranks and windows
+  -> runtime still owns task lifecycle separately
+```
+
+这些模块合在一起说明：`simpler` 不是 PTO-ISA kernel library，也不是 PyPTO language frontend。它拥有 runtime boundary：worker lifecycle、runtime binary loading、task graph scheduling、TensorMap dependency discovery、mailbox/process model、communication window bootstrap 和 child-worker dispatch。
+
+## Source Code Walkthrough
+
+`python/simpler/worker.py` 的文件头已经展示了 `Worker` 的真实 API shape：
+
+```python
+# L2: one NPU chip
+w = Worker(level=2, device_id=8,
+           platform="a2a3", runtime="tensormap_and_ringbuffer")
+w.init()
+w.run(chip_callable, chip_args, config)
+w.close()
+
+# L3: multiple chips + SubWorkers
+w = Worker(level=3, device_ids=[8, 9], num_sub_workers=2,
+           platform="a2a3", runtime="tensormap_and_ringbuffer")
+cid = w.register(lambda args: postprocess())
+w.init()
+```
+
+这段不是 tutorial filler；它说明 `simpler` 的 public runtime surface 是 `Worker(level=N)`。L2 直接运行 `ChipCallable`；L3 需要先 register callables/subworkers，再 `init()` fork child workers，最后 `run()` 一个 orchestration function。
+
+同一个文件还定义了 PROCESS mode 的 mailbox layout：
+
+```python
+_OFF_STATE = 0
+_OFF_CALLABLE = 8
+_OFF_CONFIG = 16
+_CFG_FMT = struct.Struct("=iiiii1024s")
+_OFF_ARGS = (_OFF_CONFIG + _CFG_FMT.size + 7) & ~7
+
+_IDLE = 0
+_TASK_READY = 1
+_TASK_DONE = 2
+_SHUTDOWN = 3
+```
+
+这说明 parent/child process 不是用 Python function call 直接通信，而是通过 shared-memory mailbox。`callable`、`CallConfig` 和 encoded args 都有固定 offset；`_OFF_ARGS` 还显式做 8-byte alignment，避免 strict-alignment platform 上的 runtime fault。
+
+child process loop 的核心是状态机：
+
+```python
+while True:
+    state = _mailbox_load_i32(state_addr)
+    if state == _TASK_READY:
+        callable_ptr = struct.unpack_from("Q", buf, _OFF_CALLABLE)[0]
+        cfg = _read_config_from_mailbox(buf)
+        cw.run_from_blob(callable_ptr, args_ptr, cfg)
+        _mailbox_store_i32(state_addr, _TASK_DONE)
+    elif state == _SHUTDOWN:
+        cw.finalize()
+        break
+```
+
+这个片段解释了为什么当前 L3 evidence 是 single-host strong、remote-host weak：PROCESS mode 依赖 forked child、shared memory、process-local callable pointer/blob 和 local state polling。Remote L3 必须替换这些 assumptions，不能从本地 mailbox 自动推出。
 
 ## L2 示例
+
+L2 examples should be read as a ladder, not as isolated demo names. `hello_worker` only proves the worker lifecycle and allocator plumbing; `vector_add` adds the first full kernel run; `paged_attention` moves from toy worker API into the production `tensormap_and_ringbuffer` runtime shape.
+
+```text
+hello_worker
+  -> can construct/init/close one ChipWorker
+vector_add
+  -> can compile one AIV kernel, run it, copy result back, compare golden
+paged_attention
+  -> can submit multiple AIC/AIV tasks through TensorMap/ring runtime
+```
 
 | 示例 | 说明 | 状态 |
 | --- | --- | --- |
@@ -113,6 +220,21 @@ Python test/example
 | lifecycle check | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | worker init, malloc/free, close complete | runtime binaries not built |
 | smallest full L2 run | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | golden check passes | PTO-ISA headers/build cache missing on first run |
 | L3 hardware context | inspect `examples/workers/l3/allreduce_distributed` and `ffn_tp_parallel` before running | can explain rank/window and TensorMap dependency | requires A2/A3 multi-device hardware |
+
+## Safe First Change
+
+维护者第一次改 `simpler` 时，最好选择仍在一个 boundary 内的改动。L2 example 或 README 改动只验证 `ChipWorker` lifecycle；TensorMap/ring-buffer 改动要能说明 producer/consumer edge 如何变化；L3 scheduling 改动要先说清 state 在 parent process、scheduler thread、child process mailbox、AICPU scheduler 还是 AICore/AIV kernel。
+
+```text
+safe local change
+  -> examples/workers/l2 or small L3 example
+  -> run/inspect matching pytest
+  -> status remains local L2/L3
+
+unsafe inference
+  -> local HCCL window works
+  -> therefore remote L3 is implemented
+```
 
 ## Host-side DAG 层
 
@@ -157,6 +279,12 @@ Python test/example
 - `emerging`: SDMA async completion、多 callable DAG 的更广组合、deferred completion 的后续统一。
 - `design-intended`: remote L3、跨 host child worker、remote callable registration、RoCE/URMA remote control plane。
 
+## What This Page Proves
+
+本页可以支撑三个结论。第一，`simpler` 的 L2 path 是已实现的 Ascend launch path：host runtime、AICPU scheduler 和 AICore/AIV kernels 共同完成单 chip execution。第二，`simpler` 的 L3 path 是已实现的 single-host hierarchy runtime：parent process 可以调度 L2 chip worker 和 Python SubWorker。第三，HCCL/window bootstrap 是 distributed data-plane 支撑能力。
+
+本页不能证明 remote L3、跨 host child worker、remote callable registry 或 RoCE/URMA control plane 已经实现；这些仍需要 future source pass、merged PR、stable example 或 test evidence。
+
 ## Evidence-Based Interpretation
 
 本页把 `simpler` 放在 wiki 的 runtime foundation layer：L2 `ChipWorker` 是最小可运行单元，L3 是 host-side DAG scheduler 组合多个 L2 chip worker 和 Python `SubWorker` 的层级 runtime。这个判断来自 `docs/chip-level-arch.md`、`src/a2a3/docs/runtimes.md`、`docs/orchestrator.md`、`docs/scheduler.md`、`python/simpler/worker.py` 和 `examples/workers/l2` / `examples/workers/l3`。材料中的 remote L3/DistWorker 设计应读作下一层目标，而不是覆盖这条已实现的 L2/L3 foundation。
@@ -166,3 +294,7 @@ Python test/example
 - remote control channel 会成为 `simpler` 内部 backend，还是由独立 distributed runtime 调用 `simpler` local worker？
 - 当前 mailbox ABI 会保留为 local fast path，还是会抽象成 local/remote 双 backend？
 - deferred completion 与 SDMA/URMA async completion 最终的统一 wait condition ABI 尚需从后续 PR 确认。
+
+## What To Remember
+
+读 `simpler` 时先记住一条线：L2 让一个 chip 跑起来，L3 把多个 child workers 组织成 host-side DAG，HCCL/window 支撑 data-plane communication。只要问题涉及 remote host、remote callable、persistent run loop 或 platform ABI decoupling，就不要从当前 L3 local examples 直接推断为 `implemented`。

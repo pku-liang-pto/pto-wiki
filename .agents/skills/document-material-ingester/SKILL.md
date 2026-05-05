@@ -13,6 +13,7 @@ Read:
 
 - `AGENTS.md`
 - `.agents/workflows/document-material-ingestion.md`
+- `.agents/workflows/concept-evidence-lookup.md`
 - `.agents/policies/document-material-policy.md`
 - `.agents/policies/wiki-content-boundary-policy.md`
 - `.agents/policies/wiki-organization-policy.md`
@@ -20,6 +21,8 @@ Read:
 - `wiki/index.md`
 - `wiki/overview.md`
 - `wiki/evidence/index.md` when present
+
+Use `concept-evidence-lookup` when materials introduce important concepts, acronyms, platform terms, protocols, APIs, or code identifiers that need stable definitions from official external docs, GitHub history, or local target repositories.
 
 ## Input Handling
 
@@ -33,12 +36,13 @@ Read:
 ## Wiki Update
 
 1. Read enough of every used material to identify title, date, topic, claims, repositories, people, and concepts.
-2. Search existing `wiki/` for overlap before creating pages.
-3. Create or update topic-scoped evidence ledgers under `wiki/evidence/` using `.agents/templates/evidence-ledger.md`.
-4. Create or update `wiki/topics/` or `wiki/concepts/` only when materials support durable synthesis.
-5. Cite evidence ledgers where topic claims need material/GitHub/source routing support.
-6. Preserve contradictions, stale claims, missing coverage, and open questions.
-7. Update indexes, `wiki/overview.md` when broad synthesis changes, and `wiki/log.md` with `material-ingest`.
+2. Stabilize important concepts before synthesis; public material pages must explain them locally, not only link to outside sources.
+3. Search existing `wiki/` for overlap before creating pages.
+4. Create or update topic-scoped evidence ledgers under `wiki/evidence/` using `.agents/templates/evidence-ledger.md`.
+5. Create or update `wiki/topics/` or `wiki/concepts/` only when materials support durable synthesis.
+6. Cite evidence ledgers where topic claims need material/GitHub/source routing support.
+7. Preserve contradictions, stale claims, missing coverage, and open questions.
+8. Update indexes, `wiki/overview.md` when broad synthesis changes, and `wiki/log.md` with `material-ingest`.
 
 ## Boundaries
 
