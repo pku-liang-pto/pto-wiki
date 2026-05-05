@@ -107,6 +107,55 @@ Code anchors:
 - `demos/baseline/gemm_basic/README.md`: fixed GEMM shape、24-core split、K tiling、double buffering。
 - `demos/baseline/allgather_async/README.md`: rank/device mapping and SDMA/URMA async communication run scripts.
 
+## Source Code Walkthrough
+
+PTO-ISA 的核心类型可以直接从 `include/pto/common/pto_tile.hpp` 读出来。`GlobalTensor` 代表 GM 中的数据和 shape/stride metadata：
+
+```cpp
+template <typename Element_, typename Shape_, typename Stride_, Layout Layout_>
+struct GlobalTensor {
+    using DType = __gm__ Element_;
+    static constexpr Layout layout = Layout_;
+
+    PTO_INTERNAL GlobalTensor(DType *data,
+                              const Shape &shape = defaultShape,
+                              const Stride &stride = defaultStride) {
+        data_ = data;
+        // dynamic shape/stride fields are copied here
+    }
+};
+```
+
+`Tile` 则是 kernel 内的 on-chip work unit：
+
+```cpp
+template <TileType Loc_, typename Element_, const int Rows_, const int Cols_, ...>
+struct Tile {
+    static constexpr TileType Loc = Loc_;
+    static constexpr int Rows = Rows_;
+    static constexpr int Cols = Cols_;
+    static constexpr int Numel = Rows * Cols;
+    static_assert(Rows > 0 && Cols > 0, "Invalid Tile Layout.");
+};
+```
+
+这两个类型解释了为什么 PTO-ISA 页面一直强调 tensor/tile split：`GlobalTensor` 关心 GM address、shape、stride；`Tile` 关心 on-chip memory location、element type、rows/cols、layout 和 valid shape。kernel instruction 在这两个世界之间搬数据。
+
+GEMM demo 展示 instruction sequence，来自 `demos/baseline/gemm_basic/csrc/kernel/gemm_basic_custom.cpp`：
+
+```cpp
+GlobalDataSrcA gmA(currentSrc0 + kIter * baseK);
+GlobalDataSrcB gmB(currentSrc1 + kIter * baseK);
+TLOAD(aMatTile[cur], gmA);
+TLOAD(bMatTile[cur], gmB);
+TMOV(aTile[cur], aMatTile[cur]);
+TMOV(bTile[cur], bMatTile[cur]);
+TMATMUL_ACC(cTile, cTile, aTile[cur], bTile[cur]);
+TSTORE(dstGlobal, cTile);
+```
+
+这段代码是 PTO-ISA 的真实 reading target。`TLOAD` 和 `TSTORE` 是 data movement；`TMOV` 是 tile memory movement；`TMATMUL_ACC` 是 compute accumulator update。它证明 repository owns kernel instruction semantics。它不证明 host DAG scheduling，因为这里没有 `Worker`、`TaskArgs`、TensorMap 或 SubWorker。
+
 ## Communication ISA
 
 在普通 tile compute model 之上，`include/pto/comm/README.md` 把通信指令分为 point-to-point、collective、async 和 backend-specific path。重点 API 包括 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、`TTEST`，以及 async path 的 `AsyncSession`、`AsyncEvent`。`async_types.hpp` 中可以看到 SDMA 与 URMA session/context 的并列结构和 engine-agnostic `AsyncSession`。

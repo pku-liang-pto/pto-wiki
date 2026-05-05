@@ -42,6 +42,38 @@ hidden [S,D]
 
 这个例子的重要性不在于模型规模，而在于它第一次把前面章节的多个概念放进一个完整 decoder flow。RMSNorm 对应 normalization pattern；Q/K/V projection 和 MLP 对应 GEMM/FFN；attention 对应 softmax、mask、RoPE 和 PV matmul；residual 把多个阶段连成 model graph。未来 distributed NN 示例必须解释这些阶段如何被切分、哪些 tensor 留在 rank-local、哪些 tensor 需要跨 rank communication。
 
+`llama_mini` 的 source code 不是一个黑盒 model name。它显式定义 repeated kernel building blocks：
+
+```python
+@pl.function(type=pl.FunctionType.InCore)
+def kernel_matmul(self, a, b, output):
+    tile_a_l1 = pl.load(a, [0, 0], [seq_len, head_dim],
+                        target_memory=pl.MemorySpace.Mat)
+    tile_b_l1 = pl.load(b, [0, 0], [head_dim, head_dim],
+                        target_memory=pl.MemorySpace.Mat)
+    tile_a_l0a = pl.move(tile_a_l1, target_memory=pl.MemorySpace.Left)
+    tile_b_l0b = pl.move(tile_b_l1, target_memory=pl.MemorySpace.Right)
+    tile_c_l0c = pl.matmul(tile_a_l0a, tile_b_l0b)
+    return pl.store(tile_c_l0c, [0, 0], output)
+```
+
+decoder orchestration 然后把这些 kernels 串起来：
+
+```python
+q = self.kernel_matmul(normed, wq, q)
+k = self.kernel_matmul(normed, wk, k)
+v = self.kernel_matmul(normed, wv, v)
+q_rot = self.kernel_rope(q, cos_emb, sin_emb, q_rot)
+scores = self.kernel_matmul_trans_b(q_rot, k_rot, scores)
+probs = self.kernel_softmax(masked, probs)
+attn_out = self.kernel_matmul_attn(probs, v, attn_out)
+gate = self.kernel_matmul(normed2, w_gate, gate)
+up = self.kernel_matmul(normed2, w_up, up)
+mlp_out = self.kernel_matmul(swish_up, w_down, mlp_out)
+```
+
+这段 code excerpt 是 complete-model page 的核心：complete model 不是一个新 runtime；它是多个已学 kernel pattern 的 orchestration。它证明 PyPTO 可以表达 compact decoder flow，但没有把这些 stages 分配到 ranks，也没有证明 `simpler` 会运行一个完整 distributed model graph。
+
 关键 building blocks 可以这样读：
 
 | Block | Local meaning | Why it matters for future distributed NN |

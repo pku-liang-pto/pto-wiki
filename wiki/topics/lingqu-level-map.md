@@ -31,6 +31,25 @@ Lingqu design level
 
 L1 / `CHIP_DIE` 是最容易误读的一行。PyPTO `Level` enum 和 Lingqu mapping 中有这个层级，但本轮 wiki 没有把它单独核验成稳定 runtime surface；它不能和 `simpler` L2 `CHIP` 或 L3 `HOST` 一样写成完整 implemented path。因此本页把它标成 `open question` with enum/design evidence，而不是把 partial runtime semantics 写死。证据边界见 [Lingqu Level Map Evidence](../evidence/lingqu-level-map.md#claim-map)。
 
+PyPTO 的 source enum 证明“语言/IR 可以命名这些层级”：
+
+```cpp
+enum class Level : uint8_t {
+  AIV = 0,
+  AIC = 1,
+  CORE_GROUP = 2,
+  CHIP_DIE = 3,
+  CHIP = 4,
+  HOST = 5,
+  CLUSTER_0 = 6,
+  CLUSTER_1 = 7,
+  CLUSTER_2 = 8,
+  GLOBAL = 9
+};
+```
+
+但 runtime source 证明的是另一件事。`simpler` examples 中稳定可读的 API 是 `Worker(level=2)` 和 `Worker(level=3)`；L4+ 目前更多来自 design/material terminology。这个差异就是表格中 status label 的来源。
+
 | Lingqu level | PyPTO level | runtime 读法 | 当前状态 |
 | --- | --- | --- | --- |
 | L0 | `AIV` / `AIC` / `CORE_GROUP` | InCore / tile-level kernel | `implemented` through PTO-ISA and PyPTO kernel path |

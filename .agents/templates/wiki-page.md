@@ -28,6 +28,8 @@ last_updated: YYYY-MM-DD
 
 Add sourced explanation in concise, information-rich Chinese prose. Separate verified facts from inferred relationships and design-intended targets.
 
+For pages about implemented code, include short source excerpts or source-shaped pseudocode plus explanation. Source links support audit; they are not the teaching content.
+
 ## Sources
 
 - Source link or local path.

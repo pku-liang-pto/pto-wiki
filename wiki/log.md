@@ -87,3 +87,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-05] review-update | Implement standalone learning content rewrite spec
 
 根据 `docs/specs/2026-05-05-wiki-standalone-learning-content-upgrade.md`，系统升级 public wiki contents：Home/Overview/area indexes 更聚焦阅读路径；repository chapters 强化 ownership、architecture diagram、source anchors、examples/tests、proof boundaries 和 safe first change；PTO example chapters 补足背景、run surface、source comparison、what it proves / does not prove；topics/concepts/glossary 增加 mental model、status boundary、What To Remember；evidence ledgers 增加 status-change criteria；materials index 明确 source-material 与 synthesized wiki 的边界。
+
+## [2026-05-05] review-update | Add implementation code walkthroughs
+
+根据 PR review，进一步提升 standalone-learning 标准：repository/topic/example pages 不能只列 source paths 或 run tables，必须嵌入短 source excerpts 或 source-shaped pseudocode，并解释代码证明哪一层实现、不能证明什么。重点补强 [GEMM / FFN](./examples/pto/gemm-ffn.md)、[Distributed Runtime](./examples/pto/distributed-runtime.md)、repository profiles、[Non-Distributed Execution](./topics/non-distributed-execution.md)、[simpler Runtime Architecture](./topics/simpler-runtime-architecture.md) 和 [Distributed Execution](./topics/distributed-execution.md)。同步更新 `.agents` writing/health rules，避免后续页面退回 code-free summary。

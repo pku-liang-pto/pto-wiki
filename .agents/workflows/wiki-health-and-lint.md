@@ -28,6 +28,8 @@ Use periodically or when the wiki has grown after several updates:
 - public pages written primarily as English/internal process prose when Chinese learning narrative would be clearer for this wiki
 - long repository/topic/example pages missing an opening `How To Read This Page` section or equivalent lookup guidance
 - pages where tables are the only explanation for core concepts
+- repository/topic/example pages that discuss implemented code but contain no embedded source excerpt or source-shaped pseudocode
+- source-path tables that are not followed by explanation of what the code proves and does not prove
 - missing topic or concept pages for terms repeatedly referenced in multiple pages
 - missing paired `wiki/evidence/<topic>.md` pages for topic pages that rely on material, GitHub, external-document, or cross-repository synthesis claims
 - distributed or advanced topic pages without links to foundation concepts, non-distributed execution, repository profiles, or examples

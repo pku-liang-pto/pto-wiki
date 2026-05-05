@@ -32,6 +32,25 @@ PyPTO hello
 
 这个例子的价值在于它把 PyPTO 的两层函数边界暴露得最清楚。`InCore` 不是普通 Python helper，而是将来会进入 tile/kernel lowering 的 compute body；`Orchestration` 不是 kernel，而是描述 kernel call 和 tensor flow 的外层 program logic。后续 matmul、attention、LLaMA mini 都保留这个分工，只是 body 更复杂。
 
+最小源码如下：
+
+```python
+@pl.program
+class HelloWorldProgram:
+    @pl.function(type=pl.FunctionType.InCore)
+    def tile_add(self, a, b, c):
+        tile_a = pl.load(a, [0, 0], [128, 128])
+        tile_b = pl.load(b, [0, 0], [128, 128])
+        tile_c = pl.add(tile_a, tile_b)
+        return pl.store(tile_c, [0, 0], c)
+
+    @pl.function(type=pl.FunctionType.Orchestration)
+    def orchestrator(self, a, b, out_c):
+        return self.tile_add(a, b, out_c)
+```
+
+这段代码让 reader 不需要打开仓库也能看见 PyPTO source shape。`tile_add` 的 body 是 load/compute/store；`orchestrator` 只做 kernel call。后续所有更复杂示例都可以回到这个基本 split：kernel body 解释 tile work，orchestration body 解释 program graph。
+
 Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source/README inspection，证据见 [Examples Feature Map Evidence](../../evidence/examples-feature-map.md#claim-map)）：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -57,6 +76,18 @@ Run surface：
 `repositories/simpler/examples/workers/l2/vector_add` 是最小完整 L2 run：host 编译或加载 AIV kernel，创建 `ChipCallable`，构造 `TaskArgs`，拷贝 input buffers 到 device，运行 worker，copy-back output，再和 numpy golden 比较。
 
 这两个例子合起来回答 runtime 层的基础问题。`hello_worker` 先证明 worker lifecycle 不是概念名，而是有 init/memory/close contract；`vector_add` 再把 callable、tensor buffers、device copy、kernel execution 和 golden validation 接起来。它们比 L3 allreduce 更适合做第一条 runtime 学习路径，因为没有 rank/window 和 communication 干扰。
+
+runtime 侧的实现形状可以从 `simpler` 的 public API 读成这样：
+
+```python
+worker = Worker(level=2, platform="a2a3sim", device_id=0,
+                runtime="tensormap_and_ringbuffer")
+worker.init()
+worker.run(chip_callable, chip_args, CallConfig())
+worker.close()
+```
+
+这说明 `simpler` example 的核心对象不是 `@pl.program`，而是 `Worker`、`ChipCallable`、`TaskArgs` 和 `CallConfig`。PyPTO hello 证明 expression；PTO-ISA add 证明 kernel/operator；`simpler` L2 vector add 证明 runtime launch lifecycle。
 
 Run surface：
 

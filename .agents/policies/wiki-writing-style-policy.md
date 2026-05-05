@@ -19,8 +19,9 @@ Preferred order:
 2. `How To Read This Page` for long repository, topic, and example chapters.
 3. A compact ASCII diagram when relationships, execution flow, or hierarchy matter.
 4. Concrete examples or a simple walkthrough.
-5. Tables only after the prose has introduced the idea.
-6. Nearby citations or evidence links for claims that need audit support.
+5. Short embedded source excerpts or source-shaped pseudocode when the page is about implemented code.
+6. Tables only after the prose and source walkthrough have introduced the idea.
+7. Nearby citations or evidence links for claims that need audit support.
 
 ## Prose Quality
 
@@ -31,6 +32,8 @@ Write concise but information-rich prose.
 - Use concrete nouns: `PyPTO parser`, `PTO-ISA GEMM demo`, `simpler L2 ChipWorker`, not vague phrases like "the system".
 - Make status boundaries explicit: `implemented`, `emerging`, `design-intended`, `TODO`, `open question`, `not-run`.
 - Do not make readers leave the wiki to understand the main concept. Source links are for audit.
+- Repository, topic, and example pages that discuss implemented behavior must show what the code looks like: short excerpts, identifier-level sketches, or source-shaped pseudocode plus explanation of what that code proves and does not prove.
+- A table of source paths is not a substitute for a code walkthrough. Use tables for lookup after the code shape has been explained.
 - For long pages, optimize for chapter-style learning first and quick lookup second. Use strong headings and opening reading guidance instead of shrinking the page into a map.
 - Repository pages are repository-centered learning chapters: teach purpose, architecture, important examples, source-verified implementation state, and material-derived design context while preserving status boundaries.
 - Materials under `wiki/materials/` may be used as writing-quality references for structure and depth, but Examples/Topics/Repositories should synthesize, compress, cross-link, and update the material shape when the wiki page has a different job.
@@ -54,6 +57,8 @@ Avoid:
 - table-only pages for core concepts
 - English-only summaries when writing a public learning page
 - long raw source excerpts
+- code-free repository/topic/example pages for implemented features
+- source-path tables without embedded code explanation
 - sentences that only say "see this source"
 - agent instructions in `wiki/`
 - broad claims without nearby source/evidence

@@ -104,6 +104,70 @@ Code anchors:
 - `python/pypto/runtime/distributed_runner.py`: L3 runner via `simpler.Worker(level=3)`.
 - `src/codegen/distributed/distributed_codegen.cpp`: `submit_next_level` / `submit_sub` lowering.
 
+## Source Code Walkthrough
+
+最小 PyPTO program 的代码不是 abstract diagram，而是下面这种形状，来自 `examples/hello_world.py`：
+
+```python
+@pl.program
+class HelloWorldProgram:
+    @pl.function(type=pl.FunctionType.InCore)
+    def tile_add(self, a, b, c):
+        tile_a = pl.load(a, [0, 0], [128, 128])
+        tile_b = pl.load(b, [0, 0], [128, 128])
+        tile_c = pl.add(tile_a, tile_b)
+        return pl.store(tile_c, [0, 0], c)
+
+    @pl.function(type=pl.FunctionType.Orchestration)
+    def orchestrator(self, a, b, out_c):
+        return self.tile_add(a, b, out_c)
+```
+
+这段代码让 reader 看到 PyPTO 的真实边界：`InCore` function 写 tile-level computation，`Orchestration` function 写 program-level call graph。`pl.load/add/store` 是 language API，不是 PTO-ISA C++ instruction，也不是 `simpler` task submission。编译器负责把这个 Python source 转成 IR，再 lower 到 backend artifacts。
+
+`compile()` 的实现说明普通 path 和 distributed path 在同一个入口处分叉。源文件 `python/pypto/ir/compile.py` 先运行 pass manager，再交给 backend codegen：
+
+```python
+pm = PassManager.get_strategy(strategy)
+transformed_program = pm.run_passes(
+    program,
+    dump_ir=dump_passes,
+    output_dir=passes_dump_dir,
+)
+files = generate(transformed_program, backend_type=backend_type, ...)
+_write_files(files, output_dir)
+```
+
+这段实现证明 PyPTO 的核心不是直接执行 Python 函数，而是 `program -> passes -> generated files`。后面是否返回 `CompiledProgram` 或 `DistributedCompiledProgram`，取决于 transformed program 是否包含 L3+ hierarchy semantics。没有这个分叉，就不能正确判断一个 bug 属于 compiler output、normal runner，还是 distributed runner。
+
+PyPTO 的 hierarchy terminology 也有源码定义，来自 `include/pypto/ir/function.h`：
+
+```cpp
+enum class FunctionType : uint8_t {
+  Orchestration = 1,
+  InCore = 2,
+  AIC = 3,
+  AIV = 4,
+  Group = 5,
+  Spmd = 6
+};
+
+enum class Level : uint8_t {
+  AIV = 0,
+  AIC = 1,
+  CORE_GROUP = 2,
+  CHIP_DIE = 3,
+  CHIP = 4,
+  HOST = 5,
+  CLUSTER_0 = 6,
+  CLUSTER_1 = 7,
+  CLUSTER_2 = 8,
+  GLOBAL = 9
+};
+```
+
+这里能证明 PyPTO 能表达 function type 和 hierarchy level；不能单独证明 L4-L6 runtime 已经实现。runtime support 必须继续看 `distributed_runner.py`、`simpler.Worker(level=3)` 和对应 tests。
+
 ## 普通 Runtime Path
 
 `python/pypto/runtime/runner.py` 暴露 `run(program, *tensors, config=RunConfig(...))`，默认 platform 是 `a2a3sim`，也支持 `a2a3`、`a5sim`、`a5`。`RunConfig` 控制 platform、device id、tolerance、optimization strategy、是否 dump passes、是否 codegen-only、runtime/compile profiling 等。

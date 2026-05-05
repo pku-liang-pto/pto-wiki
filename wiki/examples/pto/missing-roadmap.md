@@ -53,6 +53,33 @@ PyPTO model graph
 | Validation | rank-local 和 cross-rank validation output |
 | Status evidence | command/example/test/PR/source ref 进入 evidence ledger |
 
+缺失示例不能只交一个 README。它至少应该让 reader 看见类似下面的 source shape：
+
+```python
+# PyPTO side: model stage becomes hierarchy-aware work
+@pl.function(type=pl.FunctionType.Orchestration, level=pl.Level.HOST)
+def distributed_decoder_block(...):
+    local = self.partitioned_ffn_or_attention(...)
+    reduced = pl.all_reduce_or_runtime_equivalent(local, ...)
+    return self.next_stage(reduced, ...)
+```
+
+```python
+# simpler side: runtime shows rank-local task ownership
+args.add_tensor(make_tensor_arg(rank_local_input), TensorArgType.INPUT)
+args.add_tensor(make_tensor_arg(rank_local_output), TensorArgType.OUTPUT_EXISTING)
+orch.submit_next_level(stage_callable, args, cfg, worker=rank)
+```
+
+```cpp
+// PTO-ISA side: kernel or communication primitive is visible
+TLOAD(tile, gm);
+TMATMUL_ACC(acc, acc, lhs, rhs);
+TSTORE(gm_out, acc);
+```
+
+真实实现不必长得完全一样，但必须同时暴露 model graph、partition/runtime submission、kernel/data-plane primitive 和 validation signal。否则它仍然只是 design note 或 partial demo。
+
 ## What Not To Infer
 
 - 有 PTO-ISA communication primitive，不等于 PyPTO 已有高层 collective API。

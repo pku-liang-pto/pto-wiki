@@ -44,6 +44,30 @@ Missing roadmap
 
 FFN 和 attention 也是同样规则。PyPTO FFN/attention 证明 model block expression；PTO-ISA GEMM/Flash Attention 证明 kernel implementation direction；`simpler` FFN TP/paged-attention runtime 证明 runtime dependency 和 data-plane partial。complete distributed NN 只有在 model graph、partitioning、PyPTO lowering、`simpler` execution、PTO-ISA kernels/communication 和 validation 同时出现时，才能从 `TODO` 升级。
 
+下面三段 code-shaped evidence 展示为什么同一个 “add/matmul/FFN” 不能混成一个 status：
+
+```python
+# PyPTO: expression
+tile_c = pl.add(tile_a, tile_b)
+return pl.store(tile_c, [0, 0], c)
+```
+
+```cpp
+// PTO-ISA: kernel instruction sequence
+TLOAD(aMatTile[cur], gmA);
+TMOV(aTile[cur], aMatTile[cur]);
+TMATMUL_ACC(cTile, cTile, aTile[cur], bTile[cur]);
+TSTORE(dstGlobal, cTile);
+```
+
+```python
+# simpler: runtime scheduling
+args.add_tensor(make_tensor_arg(host_partial[i]), TensorArgType.INPUT)
+orch.submit_next_level(allreduce_sum_cc, args, cfg, worker=i)
+```
+
+第一段证明 language expression；第二段证明 kernel instruction semantics；第三段证明 runtime task submission 和 TensorMap dependency surface。一个合格 example chapter 必须像这样告诉 reader “source code 长什么样” 和 “这段 code 证明哪一层”。
+
 ## What To Remember
 
 Example pages are not a coverage matrix. A qualified example chapter must teach the concept, name concrete source paths and commands, label run status, explain proof/non-proof boundaries, and show the next page in the learning ladder. 证据 ledger 仍是 [Examples Feature Map Evidence](../evidence/examples-feature-map.md)。

@@ -43,6 +43,32 @@ parent Python process
   -> host compares every rank with golden sum
 ```
 
+源码中的 control-plane shape 来自 `repositories/simpler/examples/workers/l3/allreduce_distributed/main.py`：
+
+```python
+worker = Worker(
+    level=3,
+    platform="a2a3",
+    runtime="tensormap_and_ringbuffer",
+    device_ids=device_ids,
+    chip_bootstrap_configs=cfgs,
+)
+worker.init()
+
+def orch_fn(orch, _args, cfg):
+    chip_args = TaskArgs()
+    chip_args.add_tensor(make_tensor_arg(host_inputs[i]), TensorArgType.INPUT)
+    chip_args.add_tensor(make_tensor_arg(host_outputs[i]), TensorArgType.OUTPUT_EXISTING)
+    chip_args.add_tensor(window_scratch_tensor, TensorArgType.INOUT)
+    chip_args.add_scalar(ctx.nranks)
+    chip_args.add_scalar(ctx.device_ctx)
+    orch.submit_next_level(chip_callable, chip_args, cfg, worker=i)
+
+worker.run(orch_fn, args=None, config=CallConfig())
+```
+
+这段 code 已经暴露了边界：L3 parent process 创建 `Worker(level=3)` 并提交 chip tasks；HCCL window/scratch 通过 `chip_bootstrap_configs` 和 `ChipContext` 进入 rank-local kernel args；`submit_next_level` 派发给 local child worker。这里没有 remote host discovery，也没有跨 host callable registry。
+
 Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source inspection）：
 
 | Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
@@ -81,6 +107,8 @@ Run surface：
 `repositories/pypto/tests/st/distributed/test_l3_distributed.py` 证明 PyPTO 可以表达 hierarchy program，并通过 distributed runner/codegen 接到 `simpler.Worker(level=3)`。Skipped 或 partial tests 只能作为 `emerging` / `design-intended` evidence。
 
 PyPTO hierarchy tests 是 compiler/runtime bridge evidence。它们证明 DSL/IR/codegen 可以产生 host orchestrator、`submit_next_level` / `submit_sub`、`TaskArgs` 和 runner integration。它们不替代 PTO-ISA kernel communication demo，也不替代 `simpler` 的 worker lifecycle evidence。
+
+因此，本页的 code reading rule 是：看到 `submit_next_level` 时，它证明 hierarchy dispatch；看到 `child_memory=True` 或 comm window pointer 时，它证明 device-visible data-plane pointer；看到 skipped PyPTO distributed test 时，它只证明 intended path，不证明 implemented runtime。
 
 Run surface：
 

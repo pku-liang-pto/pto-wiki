@@ -32,7 +32,7 @@ Basic terms
 ## Public Areas
 
 - [Repositories](./repositories/) teaches code ownership: which repo owns DSL/codegen, tile/kernel semantics, runtime scheduling, and current distributed surfaces.
-- [Examples](./examples/) teaches by concrete cases: every chapter names the concept, run surface, source paths, proof boundary, and next example.
+- [Examples](./examples/) teaches by concrete cases: every chapter names the concept, shows source-shaped code, explains run surface, proof boundary, and next example.
 - [Topics](./topics/) teaches cross-repository behavior: execution flow, runtime architecture, distributed blueprint/status, level mapping, and takeover risks.
 - [Concepts](./concepts/) teaches reusable vocabulary: the words that otherwise look similar across PyPTO, PTO-ISA, `simpler`, and CANN.
 - [Materials](./materials/) exposes user-provided source materials as readable public references. Synthesized wiki pages remain the canonical learning layer when source status matters.

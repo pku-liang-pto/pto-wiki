@@ -59,6 +59,35 @@ PTO-ISA 是 tiles、memory spaces、instruction semantics、custom operator kern
 
 CANN/HCCL/HCOMM/URMA evidence 在本轮主要支撑 communication 和 memory movement。除非未来有 dedicated source evidence 证明更高层 runtime ownership，否则它们应读作 data-plane substrate。
 
+维护者做 triage 时可以把 source code 先压缩成三类 signature：
+
+```python
+# PyPTO ownership signature
+@pl.function(type=pl.FunctionType.InCore)
+def kernel(...):
+    tile = pl.load(...)
+    ...
+    return pl.store(..., output)
+```
+
+```cpp
+// PTO-ISA ownership signature
+GlobalTensor<...> gm(ptr);
+TLOAD(tile, gm);
+TMATMUL(acc, lhs, rhs);
+TSTORE(gm_out, acc);
+```
+
+```python
+# simpler ownership signature
+worker = Worker(level=3, device_ids=[...], runtime="tensormap_and_ringbuffer")
+args = TaskArgs()
+args.add_tensor(make_tensor_arg(t), TensorArgType.INPUT)
+orch.submit_next_level(chip_callable, args, cfg, worker=i)
+```
+
+如果 bug report 的证据主要长得像第一段，先查 PyPTO language/parser/pass/codegen；像第二段，先查 PTO-ISA kernel semantics、layout、pipeline、SoC backend；像第三段，先查 `simpler` worker lifecycle、TaskArgs、TensorMap、Scheduler、mailbox 或 HCCL window bootstrap。跨层 bug 当然存在，但接手时应先从最贴近 symptom 的 signature 开始。
+
 ## Target-Set Coverage And Ownership Gaps
 
 当前 wiki 只完成了部分 configured target set 的 source-backed profile。没有 profile 的 repository 不能从本页直接推断 ownership；它们只表示 target set 中存在该方向，具体实现与边界仍需后续 source pass。

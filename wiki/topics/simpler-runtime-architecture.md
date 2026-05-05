@@ -90,6 +90,18 @@ Every task carries exactly three handles through the hierarchy:
 
 `TaskArgs` changes physical form as it moves. At user submit time it is a builder object; inside the task slot it is stored on parent heap; in PROCESS mode it is encoded into a shared-memory mailbox; at the L2 edge `ChipWorker::run` packs it into `ChipStorageTaskArgs` for `pto2_run_runtime`. Tags are consumed by Orchestrator during submit and are not carried into scheduler, worker thread, child process, or runtime `.so`.
 
+开发者真正会写到的 L3 submit code 长这样：
+
+```python
+args = TaskArgs()
+args.add_tensor(make_tensor_arg(x), TensorArgType.INPUT)
+args.add_tensor(make_tensor_arg(y), TensorArgType.OUTPUT_EXISTING)
+args.add_scalar(ctx.nranks)
+orch.submit_next_level(chip_callable, args, cfg, worker=i)
+```
+
+`TensorArgType.INPUT` / `OUTPUT_EXISTING` 不是装饰性标签。Orchestrator 在 submit 阶段读取这些 tags，TensorMap 用 tensor address 建 producer/consumer 边；Scheduler 后面看到的是已经成形的 task dependency，而不是重新理解 Python tensor semantics。
+
 ## TensorMap, Ring, And Scope
 
 The core scheduling trick is TensorMap. When a task marks a tensor as input, Orchestrator looks up the current producer of that tensor address. When a task marks a tensor as output or inout, Orchestrator records the new producer. This lets examples such as paged attention or FFN tensor parallel build dependencies from data flow instead of manually wiring every edge.
@@ -106,6 +118,23 @@ PROCESS mode explains two important restrictions:
 - Forking must happen before C++ scheduler and worker threads start, avoiding fork-in-multithreaded-process hazards.
 
 This local fork/mailbox model is also the reason remote L3 cannot be inferred from current L3 examples. A remote worker needs discovery, serialization, callable registration, lifecycle, and control channel semantics that local copy-on-write does not provide.
+
+`python/simpler/worker.py` 中的 mailbox loop 解释了这个限制：
+
+```python
+while True:
+    state = _mailbox_load_i32(state_addr)
+    if state == _TASK_READY:
+        callable_ptr = struct.unpack_from("Q", buf, _OFF_CALLABLE)[0]
+        cfg = _read_config_from_mailbox(buf)
+        cw.run_from_blob(callable_ptr, args_ptr, cfg)
+        _mailbox_store_i32(state_addr, _TASK_DONE)
+    elif state == _SHUTDOWN:
+        cw.finalize()
+        break
+```
+
+本地 child process 通过 shared-memory mailbox 读 callable/config/args，再调用 `ChipWorker.run_from_blob()`。这不是 network protocol。remote L3 要把 `callable_ptr`、args blob、completion state 和 error reporting 改造成跨 process/host 可传输的 control plane。
 
 ## Example Ladder Inside simpler
 

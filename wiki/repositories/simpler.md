@@ -116,6 +116,61 @@ Python test/example
 
 这些模块合在一起说明：`simpler` 不是 PTO-ISA kernel library，也不是 PyPTO language frontend。它拥有 runtime boundary：worker lifecycle、runtime binary loading、task graph scheduling、TensorMap dependency discovery、mailbox/process model、communication window bootstrap 和 child-worker dispatch。
 
+## Source Code Walkthrough
+
+`python/simpler/worker.py` 的文件头已经展示了 `Worker` 的真实 API shape：
+
+```python
+# L2: one NPU chip
+w = Worker(level=2, device_id=8,
+           platform="a2a3", runtime="tensormap_and_ringbuffer")
+w.init()
+w.run(chip_callable, chip_args, config)
+w.close()
+
+# L3: multiple chips + SubWorkers
+w = Worker(level=3, device_ids=[8, 9], num_sub_workers=2,
+           platform="a2a3", runtime="tensormap_and_ringbuffer")
+cid = w.register(lambda args: postprocess())
+w.init()
+```
+
+这段不是 tutorial filler；它说明 `simpler` 的 public runtime surface 是 `Worker(level=N)`。L2 直接运行 `ChipCallable`；L3 需要先 register callables/subworkers，再 `init()` fork child workers，最后 `run()` 一个 orchestration function。
+
+同一个文件还定义了 PROCESS mode 的 mailbox layout：
+
+```python
+_OFF_STATE = 0
+_OFF_CALLABLE = 8
+_OFF_CONFIG = 16
+_CFG_FMT = struct.Struct("=iiiii1024s")
+_OFF_ARGS = (_OFF_CONFIG + _CFG_FMT.size + 7) & ~7
+
+_IDLE = 0
+_TASK_READY = 1
+_TASK_DONE = 2
+_SHUTDOWN = 3
+```
+
+这说明 parent/child process 不是用 Python function call 直接通信，而是通过 shared-memory mailbox。`callable`、`CallConfig` 和 encoded args 都有固定 offset；`_OFF_ARGS` 还显式做 8-byte alignment，避免 strict-alignment platform 上的 runtime fault。
+
+child process loop 的核心是状态机：
+
+```python
+while True:
+    state = _mailbox_load_i32(state_addr)
+    if state == _TASK_READY:
+        callable_ptr = struct.unpack_from("Q", buf, _OFF_CALLABLE)[0]
+        cfg = _read_config_from_mailbox(buf)
+        cw.run_from_blob(callable_ptr, args_ptr, cfg)
+        _mailbox_store_i32(state_addr, _TASK_DONE)
+    elif state == _SHUTDOWN:
+        cw.finalize()
+        break
+```
+
+这个片段解释了为什么当前 L3 evidence 是 single-host strong、remote-host weak：PROCESS mode 依赖 forked child、shared memory、process-local callable pointer/blob 和 local state polling。Remote L3 必须替换这些 assumptions，不能从本地 mailbox 自动推出。
+
 ## L2 示例
 
 | 示例 | 说明 | 状态 |
