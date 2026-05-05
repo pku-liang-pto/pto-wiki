@@ -9,7 +9,7 @@ last_updated: 2026-05-05
 
 # Materials
 
-这里公开存放用户提供、并已经被 wiki 使用的原始材料。它们是 audit source，不是主要学习路径。读者应该先读 [Examples](../examples/)、[Repositories](../repositories/) 和 [Topics](../topics/)；当需要核对原始论述、PR timeline、材料覆盖或设计目标时，再进入本区。
+这里公开存放用户提供、并已经被 wiki 使用的 source materials。它们既可直接阅读，也可以作为学习如何写长篇、结构化、source-backed 技术材料的参考。合成后的 Examples、Topics、Repositories 仍是 canonical wiki layer；Materials 保留原始论述、PR timeline、材料覆盖和设计目标，便于读者追溯。
 
 ## PTO Runtime Distributed Bundle
 

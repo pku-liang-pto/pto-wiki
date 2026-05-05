@@ -49,6 +49,6 @@ When navigation or synthesis changes, update `wiki/index.md`, the relevant area 
 
 - Do not put target-specific facts in `.agents/`.
 - Do not put reusable agent operating instructions in `wiki/`.
-- Do not copy whole upstream or user-supplied documents into learning pages. If the user explicitly wants public raw materials, place them under `wiki/materials/` with an index and cite them as audit sources.
+- Do not copy whole upstream or user-supplied documents into learning pages. If the user explicitly wants public source materials, place them under `wiki/materials/` with an index and cite them as learning/audit sources.
 - Do not update the wiki for one-off debugging state, unsupported guesses, or transient command output.
 - Keep GitHub task state separate from durable wiki knowledge unless it explains durable design or compatibility.

@@ -36,7 +36,7 @@ L3 之后不要先理解成“分布式系统”，而要先理解成“把多�
 | `docs/orchestrator.md` | TensorMap、Ring、Scope 和 `submit_*` 的 7-step flow | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#tensormap-ring-and-scope) |
 | `docs/scheduler.md` | wiring queue、ready queue、completion queue 和 fanout release | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components) |
 | `docs/worker-manager.md` | THREAD/PROCESS mode、fork ordering、shared-memory mailbox、nested Worker children | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#thread-and-process-modes) |
-| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [Examples](../examples/), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
+| `examples/workers/` docs | raw `Worker` API examples for L2 lifecycle, vector add, L3 dispatch, allreduce, FFN TP | [PTO Examples](../examples/pto/), [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#example-ladder-inside-simpler) |
 
 ## L0-L2 Ascend 启动路径
 

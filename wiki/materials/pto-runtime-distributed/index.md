@@ -9,7 +9,7 @@ last_updated: 2026-05-05
 
 # PTO Runtime Distributed Material Bundle
 
-本目录公开保留 PTO Runtime distributed 材料包的原始 Markdown 文件。学习页面已经把主要知识综合到 [Distributed Execution](../../topics/distributed-execution.md)、[Examples](../../examples/) 和 [simpler Runtime Architecture](../../topics/simpler-runtime-architecture.md)；这里用于审计原始材料。
+本目录公开保留 PTO Runtime distributed 材料包的原始 Markdown 文件。它们是 public source-material library：可直接阅读，也可用于学习如何组织长篇技术材料。学习页面已经把主要知识综合到 [Distributed Execution](../../topics/distributed-execution.md)、[PTO Examples](../../examples/pto/) 和 [simpler Runtime Architecture](../../topics/simpler-runtime-architecture.md)；需要核对原始论述时再回到这里。
 
 ## Files
 

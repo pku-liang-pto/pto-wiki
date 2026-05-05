@@ -18,4 +18,4 @@ This area holds feature, design, workflow, behavior, issue-family, and material-
 - [Lingqu Level Map](./lingqu-level-map.md): Lingqu、PyPTO 与 runtime 层级对齐。
 - [Developer Takeover Guide](./developer-takeover-guide.md): 面向潜在维护者的接手顺序、边界判断和高风险区域。
 
-示例学习路径已经移到公开 [Examples](../examples/) 区域；旧的 [Examples Feature Map](./examples-feature-map.md) 仅保留为兼容入口。
+示例学习路径已经移到公开 [PTO Examples](../examples/pto/) 区域；旧的 [Examples Feature Map](./examples-feature-map.md) 仅保留为兼容入口。

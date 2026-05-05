@@ -24,7 +24,7 @@ wiki/                 Human-readable Markdown wiki and website source
 .agents/              Reusable agent workflows, policies, templates, and skills
 config/target-set.yml Current target set configuration
 materials/            Local workspace for ad hoc user-supplied document materials
-wiki/materials/       Public raw material bundles used as audit sources
+wiki/materials/       Public source-material library for learning and audit
 repositories/         Target repository submodules and local checkout workspace
 resources/            Images and other static resources
 ```

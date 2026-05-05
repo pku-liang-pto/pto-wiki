@@ -23,10 +23,14 @@ export default defineConfig({
       {
         text: 'Examples',
         items: [
-          { text: '学习路径', link: '/examples/' },
-          { text: '运行环境', link: '/examples/run-surfaces' },
-          { text: '跨仓库示例族', link: '/examples/cross-repo-families' },
-          { text: '缺失路线图', link: '/examples/missing-roadmap' }
+          { text: 'Examples index', link: '/examples/' },
+          { text: 'PTO overview', link: '/examples/pto/' },
+          { text: 'Hello / Elementwise', link: '/examples/pto/hello-elementwise' },
+          { text: 'GEMM / FFN', link: '/examples/pto/gemm-ffn' },
+          { text: 'Softmax / Attention', link: '/examples/pto/softmax-attention' },
+          { text: 'Complete Models', link: '/examples/pto/complete-models' },
+          { text: 'Distributed Runtime', link: '/examples/pto/distributed-runtime' },
+          { text: 'Missing Roadmap', link: '/examples/pto/missing-roadmap' }
         ]
       },
       {
@@ -83,10 +87,14 @@ export default defineConfig({
       {
         text: 'Examples',
         items: [
-          { text: '学习路径', link: '/examples/' },
-          { text: '运行环境', link: '/examples/run-surfaces' },
-          { text: '跨仓库示例族', link: '/examples/cross-repo-families' },
-          { text: '缺失路线图', link: '/examples/missing-roadmap' }
+          { text: 'Examples index', link: '/examples/' },
+          { text: 'PTO overview', link: '/examples/pto/' },
+          { text: 'Hello / Elementwise', link: '/examples/pto/hello-elementwise' },
+          { text: 'GEMM / FFN', link: '/examples/pto/gemm-ffn' },
+          { text: 'Softmax / Attention', link: '/examples/pto/softmax-attention' },
+          { text: 'Complete Models', link: '/examples/pto/complete-models' },
+          { text: 'Distributed Runtime', link: '/examples/pto/distributed-runtime' },
+          { text: 'Missing Roadmap', link: '/examples/pto/missing-roadmap' }
         ]
       },
       {

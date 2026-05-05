@@ -25,6 +25,7 @@ Use periodically or when the wiki has grown after several updates:
 - sparse pages that should be merged or expanded
 - pages that read like a learning guide to outside sources instead of standalone learning material
 - public pages written primarily as English/internal process prose when Chinese learning narrative would be clearer for this wiki
+- long repository/topic/example pages missing an opening `How To Read This Page` section or equivalent lookup guidance
 - pages where tables are the only explanation for core concepts
 - missing topic or concept pages for terms repeatedly referenced in multiple pages
 - missing paired `wiki/evidence/<topic>.md` pages for topic pages that rely on material, GitHub, external-document, or cross-repository synthesis claims

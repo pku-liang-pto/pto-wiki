@@ -38,11 +38,11 @@ Update `wiki/index.md` whenever adding, renaming, or deleting a durable wiki pag
 Use stable directories for recurring page types:
 
 - `wiki/repositories/`: repository profiles.
-- `wiki/examples/`: public example learning paths, run surfaces, cross-repository example families, and missing-example roadmaps.
+- `wiki/examples/`: public example domains. Put current PTO examples under `wiki/examples/pto/`; keep run surface and cross-repository source comparison inside each concrete example chapter.
 - `wiki/topics/`: feature, design, workflow, issue family, or behavior syntheses.
 - `wiki/evidence/`: topic-scoped evidence ledgers for user materials, GitHub references, external documents, repository anchors, claim maps, negative findings, and open questions.
 - `wiki/concepts/`: reusable technical concepts, APIs, protocols, acronyms, and architecture ideas.
-- `wiki/materials/`: public original materials used as audit sources.
+- `wiki/materials/`: public source-material library used for direct reading, writing-style reference, and audit.
 
 Add new top-level wiki directories only when repeated pages justify the area. Prefer extending these areas before introducing a new taxonomy.
 

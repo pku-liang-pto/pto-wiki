@@ -11,15 +11,16 @@ Public wiki pages are learning material, not research notes or agent instruction
 
 ## Page Shape
 
-Start public learning pages with the mental model, not the evidence table.
+Start public learning pages with the mental model, not the evidence table. Long chapter-style pages are allowed and often preferred when they teach a substantial concept, repository, or example family.
 
 Preferred order:
 
 1. One short paragraph explaining what the page teaches.
-2. A compact ASCII diagram when relationships, execution flow, or hierarchy matter.
-3. Concrete examples or a simple walkthrough.
-4. Tables only after the prose has introduced the idea.
-5. Nearby citations or evidence links for claims that need audit support.
+2. `How To Read This Page` for long repository, topic, and example chapters.
+3. A compact ASCII diagram when relationships, execution flow, or hierarchy matter.
+4. Concrete examples or a simple walkthrough.
+5. Tables only after the prose has introduced the idea.
+6. Nearby citations or evidence links for claims that need audit support.
 
 ## Prose Quality
 
@@ -30,6 +31,9 @@ Write concise but information-rich prose.
 - Use concrete nouns: `PyPTO parser`, `PTO-ISA GEMM demo`, `simpler L2 ChipWorker`, not vague phrases like "the system".
 - Make status boundaries explicit: `implemented`, `emerging`, `design-intended`, `TODO`, `open question`, `not-run`.
 - Do not make readers leave the wiki to understand the main concept. Source links are for audit.
+- For long pages, optimize for chapter-style learning first and quick lookup second. Use strong headings and opening reading guidance instead of shrinking the page into a map.
+- Repository pages are repository-centered learning chapters: teach purpose, architecture, important examples, source-verified implementation state, and material-derived design context while preserving status boundaries.
+- Materials under `wiki/materials/` may be used as writing-quality references for structure and depth, but Examples/Topics/Repositories should synthesize, compress, cross-link, and update the material shape when the wiki page has a different job.
 
 ## Visual Intuition
 

@@ -1,5 +1,5 @@
 ---
-title: "Missing Example Roadmap"
+title: "PTO Missing Example Roadmap"
 type: topic
 status: draft
 sources:
@@ -8,9 +8,13 @@ sources:
 last_updated: 2026-05-05
 ---
 
-# Missing Example Roadmap
+# PTO Missing Example Roadmap
 
-当前最重要的缺失示例是 complete distributed NN。已有证据已经覆盖两个端点：PyPTO 有 `llama_mini` 这样的 complete non-distributed model expression，simpler/PTO-ISA 有 allreduce、allgather、FFN tensor parallel 等 distributed partial examples。缺的是把它们连成一个 model-level vertical slice。
+当前最重要的缺失示例是 complete distributed NN。已有证据覆盖两个端点：PyPTO 有 `llama_mini` 这样的 complete non-distributed model expression，simpler/PTO-ISA 有 allreduce、allgather、FFN tensor parallel 等 distributed partial examples。缺的是把它们连成一个 model-level vertical slice。
+
+## How To Read This Page
+
+把本页当作 status boundary。它不是 implementation plan，而是判断未来 example 何时能从 `TODO` / `design-intended` 升级到 `implemented` 的 checklist。
 
 ## 目标形态
 

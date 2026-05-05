@@ -8,7 +8,7 @@ last_updated: 2026-05-04
 
 # Evidence
 
-This area holds topic-scoped evidence ledgers. Evidence pages are not document libraries and do not copy raw materials. They record source sets, material routing, repository anchors, GitHub references, claim maps, negative findings, and open questions that support synthesized topic pages.
+This area holds topic-scoped evidence ledgers. Evidence pages are not source-material libraries and do not copy whole materials. They record source sets, material routing, repository anchors, GitHub references, claim maps, negative findings, and open questions that support synthesized topic pages.
 
 ## Status Labels
 

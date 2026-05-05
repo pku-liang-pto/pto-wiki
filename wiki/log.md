@@ -66,7 +66,7 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ## [2026-05-05] navigation-update | Public learning navigation and examples area
 
-将 public top nav 和 sidebar 对齐为 Home、Repositories、Examples、Topics、Concepts、Materials。新增 [Examples](./examples/) 区域并把示例学习内容拆分为 learning path、run surfaces、cross-repository families 和 missing roadmap；将原始材料移动到 [Materials](./materials/) 作为公开 audit source；新增 wiki writing style policy，要求 public narrative 以中文为主、保留 English technical identifiers、prose-first、self-contained、concise but information-rich。
+将 public top nav 和 sidebar 对齐为 Home、Repositories、Examples、Topics、Concepts、Materials。新增 [Examples](./examples/) / [PTO Examples](./examples/pto/) 区域，并按 example granularity 拆成 hello/elementwise、GEMM/FFN、softmax/attention、complete models、distributed runtime 和 missing roadmap；run surface 与 source comparison 跟随每个具体 example chapter。将 source materials 移动到 [Materials](./materials/) 作为 public source-material library；新增 wiki writing style policy，要求 public narrative 以中文为主、保留 English technical identifiers、chapter-style、prose-first、self-contained、concise but information-rich。
 
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
