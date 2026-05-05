@@ -100,19 +100,42 @@ Python test/example
 
 读源码时优先按 ownership 进入，而不是按目录名猜层级。`src/a2a3` 和 `src/a5` 更接近 platform/runtime variant；`src/common` 承载大量 L3+ host runtime 逻辑；Python wrapper 则把 `Worker`、`TaskArgs` 和 callable registration 暴露给 examples。
 
-| 模块 | 作用 | 状态 |
-| --- | --- | --- |
-| `python/simpler/worker.py` | `Worker(level=2/3/4)` factory、mailbox layout、child process loop | `implemented` |
-| `python/simpler/task_interface.py` | `TaskArgs`、`ChipCallable`、`ChipBootstrapConfig`、`ChipContext`、comm/window bootstrap | `implemented` |
-| `docs/chip-level-arch.md` | L2 host/AICPU/AICore 启动和协作路径 | `implemented` documentation |
-| `src/a2a3/docs/runtimes.md` | `host_build_graph` vs `tensormap_and_ringbuffer` runtime 设计 | `implemented` documentation |
-| `src/common/worker/chip_worker.cpp` | L2 `ChipWorker`，调用 `pto2_run_runtime` | `implemented` |
-| `src/common/hierarchical/worker_manager.h` | worker pool、THREAD/PROCESS mode、process mailbox ABI | `implemented` |
-| `src/common/hierarchical/orchestrator.*` | DAG submit、TensorMap lookup/insert、Scope/Ring 管理 | `implemented` |
-| `src/common/hierarchical/scheduler.*` | wiring queue、ready queue、completion queue、worker dispatch | `implemented` |
-| `src/common/platform_comm/comm.h` | backend-neutral C API: init/window/query/barrier/destroy | `implemented` |
-| `src/common/platform_comm/comm_context.h` | device-visible `CommContext` ABI、rank/window metadata | `implemented` |
-| `examples/workers/l3/` | L3 examples and hardware demos | `implemented`/`emerging` |
+这些模块不是平级文件清单，而是三条运行路径。
+
+第一条是 **L2 chip launch path**。用户从 `python/simpler/worker.py` 创建 `Worker(level=2)`，`python/simpler/task_interface.py` 提供 `TaskArgs`、`ChipCallable`、`ChipBootstrapConfig` 和 `ChipContext` 这些 Python-facing handles。进入 C++ 后，`src/common/worker/chip_worker.cpp` 持有 device、runtime symbol、stream、binary artifact 和 tensor storage，最终调用 host runtime C API，例如 `pto2_run_runtime`。`docs/chip-level-arch.md` 是这条路径的解释文档：它把 host program、AICPU scheduler、AICore/AIV kernels 三者放在同一条启动链上。
+
+```text
+L2 chip launch path
+-------------------
+Worker(level=2)
+  -> ChipCallable + TaskArgs + CallConfig
+  -> ChipWorker::run(...)
+  -> pto2_run_runtime(...)
+  -> AICPU scheduler initializes graph
+  -> AICore/AIV kernels consume task descriptors
+```
+
+第二条是 **L3+ host DAG path**。`src/common/hierarchical/orchestrator.*` 在 submit 阶段分配 task slot、读取 `TaskArgs` 的 tensor tags、更新 TensorMap，并把等待连边的 slot 放入 scheduler queue。`src/common/hierarchical/scheduler.*` 用 wiring queue、ready queue 和 completion queue 维护 fanin/fanout；`src/common/hierarchical/worker_manager.h` 管 child worker pool，在 THREAD mode 直接调用 child，在 PROCESS mode 通过 shared-memory mailbox 派发 callable/config/args blob。`src/a2a3/docs/runtimes.md` 中的 `tensormap_and_ringbuffer` 解释了为什么 task slots、output buffers、dependency records 和 scopes 都要 ring 化。
+
+```text
+L3+ host DAG path
+-----------------
+orchestration function
+  -> Orchestrator: submit slot + TensorMap dependency lookup
+  -> Scheduler: promote ready tasks and release fanout
+  -> WorkerManager: dispatch to ChipWorker, SubWorker, or nested Worker
+```
+
+第三条是 **communication data-plane path**。`src/common/platform_comm/comm.h` 是 backend-neutral C API，负责 init/window/query/barrier/destroy 这类通信域操作；`src/common/platform_comm/comm_context.h` 是 device-visible ABI，包含 rank、rank count、window metadata 等 device 侧需要读的信息。它能支撑 current HCCL/window examples，但不拥有 remote worker lifecycle、callable registry 或 host-to-host control plane。
+
+```text
+communication support path
+--------------------------
+comm_init / comm_alloc_windows
+  -> produce CommContext
+  -> device code sees ranks and windows
+  -> runtime still owns task lifecycle separately
+```
 
 这些模块合在一起说明：`simpler` 不是 PTO-ISA kernel library，也不是 PyPTO language frontend。它拥有 runtime boundary：worker lifecycle、runtime binary loading、task graph scheduling、TensorMap dependency discovery、mailbox/process model、communication window bootstrap 和 child-worker dispatch。
 
@@ -172,6 +195,17 @@ while True:
 这个片段解释了为什么当前 L3 evidence 是 single-host strong、remote-host weak：PROCESS mode 依赖 forked child、shared memory、process-local callable pointer/blob 和 local state polling。Remote L3 必须替换这些 assumptions，不能从本地 mailbox 自动推出。
 
 ## L2 示例
+
+L2 examples should be read as a ladder, not as isolated demo names. `hello_worker` only proves the worker lifecycle and allocator plumbing; `vector_add` adds the first full kernel run; `paged_attention` moves from toy worker API into the production `tensormap_and_ringbuffer` runtime shape.
+
+```text
+hello_worker
+  -> can construct/init/close one ChipWorker
+vector_add
+  -> can compile one AIV kernel, run it, copy result back, compare golden
+paged_attention
+  -> can submit multiple AIC/AIV tasks through TensorMap/ring runtime
+```
 
 | 示例 | 说明 | 状态 |
 | --- | --- | --- |

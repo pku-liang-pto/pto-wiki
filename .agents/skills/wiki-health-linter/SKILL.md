@@ -28,8 +28,9 @@ Read:
 6. Check public top navigation and left sidebar expose the same primary hierarchy: Home, Repositories, Examples, Topics, Concepts, Materials. Evidence, Usage, Log, Projects, and Toolchain Map may remain linked but should not become primary public learning sidebar areas.
 7. Check reusable agent rules are not leaking into rendered wiki pages.
 8. Check factual durable claims have nearby citations.
-9. Check important concepts introduced in changed public pages have local definitions, mental models or code-shaped explanations when needed, status boundaries, and citations.
-10. Check `wiki/log.md` has an append-only entry for durable operations.
+9. Check table blocks in changed public pages: tables should summarize already-explained concepts, not carry architecture, module ownership, example behavior, run semantics, or source interpretation by themselves.
+10. Check important concepts introduced in changed public pages have local definitions, mental models or code-shaped explanations when needed, status boundaries, and citations.
+11. Check `wiki/log.md` has an append-only entry for durable operations.
 
 ## Content Checks
 
@@ -42,6 +43,8 @@ Use when the wiki has grown or after broad updates:
 - rendered wiki pages that carry agent workflow instructions, reusable process rules, or template directions
 - pages that read like a learning guide to outside sources instead of standalone learning material
 - pages where tables are the only explanation for core concepts
+- module/source-path tables that replace architecture prose
+- run-command tables that replace example walkthroughs
 - important acronyms, protocols, platform components, APIs, or repository-specific identifiers that require lookup but are left undefined
 - repeated terms missing `wiki/concepts/` coverage
 - topic pages missing paired `wiki/evidence/<topic>.md` when they rely on material, GitHub, external-document, or cross-repository synthesis claims

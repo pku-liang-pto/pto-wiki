@@ -15,8 +15,9 @@ Run these checks before and after durable wiki maintenance:
 7. Check public navigation labels are descriptive enough to identify the page subject without opening it. Avoid vague labels such as `Stack`, `README`, or `Overview` when the page has a concrete topic.
 8. Check public learning pages follow the writing style policy: mostly Chinese narrative, English technical identifiers preserved, concise but information-rich prose, and diagrams/examples where they reduce cognitive load.
 9. Check public `wiki/materials/` pages meet the same self-contained reading bar as other public pages: important acronyms and platform terms are defined at first use, source paths are explained locally, and design-intended claims remain labeled.
-10. Check durable factual claims include nearby citations.
-11. Check `wiki/log.md` has an append-only entry for the operation.
+10. Audit Markdown table blocks in changed public pages. For each table, ask whether the surrounding prose already explains the concept; if the table lists files, modules, examples, commands, statuses, or sources, it must be lookup support rather than the teaching content.
+11. Check durable factual claims include nearby citations.
+12. Check `wiki/log.md` has an append-only entry for the operation.
 
 ## Content Lint
 
@@ -31,6 +32,8 @@ Use periodically or when the wiki has grown after several updates:
 - public sidebar or nav entries with overly compressed labels that make pages hard to choose
 - long repository/topic/example pages missing an opening `How To Read This Page` section or equivalent lookup guidance
 - pages where tables are the only explanation for core concepts
+- repository or topic pages where module/source-path tables replace architecture prose
+- example pages where run tables replace source-shaped walkthroughs and expected behavior explanation
 - repository/topic/example pages that discuss implemented code but contain no embedded source excerpt or source-shaped pseudocode
 - public material pages that read like raw extracted files instead of maintained learning material
 - material pages that introduce specialized terms without concise in-page definitions and a local mental model

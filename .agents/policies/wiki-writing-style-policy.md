@@ -34,6 +34,8 @@ Write concise but information-rich prose.
 - Do not make readers leave the wiki to understand the main concept. Source links are for audit.
 - Repository, topic, and example pages that discuss implemented behavior must show what the code looks like: short excerpts, identifier-level sketches, or source-shaped pseudocode plus explanation of what that code proves and does not prove.
 - A table of source paths is not a substitute for a code walkthrough. Use tables for lookup after the code shape has been explained.
+- Tables must not be the first or only place where a reader learns a concept. If a table lists modules, examples, run commands, sources, statuses, or terms, the surrounding prose must explain the system shape that makes the rows meaningful.
+- Module/source-path tables are especially risky. Prefer prose groups and source-shaped flows such as `language -> IR -> codegen -> runner` or `Worker -> ChipWorker -> AICPU scheduler -> AICore kernel`, then keep paths as citations or compact anchors.
 - For long pages, optimize for chapter-style learning first and quick lookup second. Use strong headings and opening reading guidance instead of shrinking the page into a map.
 - Repository pages are repository-centered learning chapters: teach purpose, architecture, important examples, source-verified implementation state, and material-derived design context while preserving status boundaries.
 - Materials under `wiki/materials/` are public learning pages when exposed in the sidebar. They must define important terms where introduced, explain source paths locally instead of saying only "see source", and include diagrams or source-shaped pseudocode when the material depends on execution flow or code behavior.
@@ -56,6 +58,7 @@ Keep diagrams small enough to read on the rendered page.
 Avoid:
 
 - table-only pages for core concepts
+- architecture sections where a table of files/modules is carrying the explanation
 - English-only summaries when writing a public learning page
 - long raw source excerpts
 - code-free repository/topic/example pages for implemented features

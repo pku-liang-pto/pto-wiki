@@ -78,21 +78,42 @@ PTO-ISA primitive semantics, simpler worker lifecycle, HCCL backend behavior
 
 读源码时把 PyPTO 分成 language、IR/pass、codegen、runner 四层。Language 层解释用户能写什么；IR/pass 层解释 program 如何被转换；codegen 层解释生成什么 artifact；runner 层解释这些 artifact 如何交给 simulator/hardware/runtime。
 
-| 模块 | 作用 | 状态 |
-| --- | --- | --- |
-| `python/pypto/language/` | Python DSL、decorators、typing、ops、parser | `implemented` |
-| `include/pypto/ir/` / `python/pypto/ir/` | IR node、builder、compile API、pass manager、printer | `implemented` |
-| `src/ir/op/` | tensor/tile/sync op registries and implementations | `implemented` |
-| `src/codegen/pto/` | PTO codegen for non-distributed kernels | `implemented` |
-| `src/codegen/orchestration/` | orchestration codegen for runtime-facing host/device orchestration | `implemented` |
-| `python/pypto/runtime/runner.py` | compile-and-run workflow with `RunConfig` | `implemented` |
-| `examples/` | hello world、kernel examples、model examples | `implemented` |
-| `include/pypto/ir/function.h` | `Level`、`Role`、`LevelToLinquLevel()` | `implemented` |
-| `src/codegen/distributed/distributed_codegen.cpp` | 生成最高层 orchestrator Python 入口；lower hierarchy calls | `implemented` |
-| `python/pypto/runtime/distributed_runner.py` | L3 distributed program execution via `simpler.Worker(level=3)` | `implemented` |
-| `tests/st/distributed/test_l3_distributed.py` | HOST orchestrator -> CHIP worker -> SubWorker 端到端测试 | `implemented` |
-| `tests/st/distributed/test_l3_parallel_reduce.py` | 多 chip callable + SubWorker reduce 设计测试 | `emerging`，当前 skip |
-| `tests/ut/codegen/test_distributed_codegen.py` | distributed codegen unit tests | `implemented` |
+普通 PyPTO 的第一条主线是 **language to IR**。`python/pypto/language/` 定义 decorators、typing、ops 和 parser；`include/pypto/ir/` 与 `python/pypto/ir/` 承载 IR node、builder、compile API、pass manager 和 printer；`src/ir/op/` 放 tensor/tile/sync op 的 registry 和实现。读这一层时，不要问“它能不能跑硬件”，先问“Python source 被解析成了什么 IR，哪些 pass 改变了它”。
+
+```text
+language to IR
+--------------
+@pl.program / @pl.function source
+  -> parser records functions, types, control flow
+  -> IR program with ops and symbols
+  -> PassManager lowers tensor-level intent toward tile/runtime intent
+```
+
+第二条主线是 **normal codegen and runner**。`src/codegen/pto/` 生成 non-distributed kernel-facing artifacts；`src/codegen/orchestration/` 生成 runtime-facing host/device orchestration；`python/pypto/runtime/runner.py` 用 `RunConfig` 选择 platform、device、tolerance、dump/profile/codegen-only 等运行参数。`examples/` 是读这条主线的最好入口：hello world 展示最小 language shape，kernel examples 展示 tile ops，model examples 展示 FFN/attention/LLM block 级 program。
+
+```text
+normal compile/run path
+-----------------------
+IR after passes
+  -> PTO codegen + orchestration codegen
+  -> generated files and CompiledProgram
+  -> runtime.run(..., config=RunConfig(platform="a2a3sim" | "a2a3" | ...))
+```
+
+第三条主线是 **distributed extension**。`include/pypto/ir/function.h` 定义 `Level`、`Role` 和 `LevelToLinquLevel()`，说明 PyPTO source 可以表达 HOST/CHIP/CORE_GROUP 等 hierarchy。`src/codegen/distributed/distributed_codegen.cpp` 负责把 hierarchy call lower 成最高层 Python orchestrator、`submit_next_level` 和 `submit_sub`；`python/pypto/runtime/distributed_runner.py` 当前把 L3 program 交给 `simpler.Worker(level=3)`。`tests/st/distributed/test_l3_distributed.py` 是 implemented L3 path；`tests/st/distributed/test_l3_parallel_reduce.py` 仍是 emerging，因为当前 skip；`tests/ut/codegen/test_distributed_codegen.py` 证明 codegen 形状，但不证明 hardware/runtime 成功。
+
+```text
+distributed extension path
+--------------------------
+hierarchy-aware IR
+  -> distributed codegen emits Python orchestrator
+  -> distributed_runner collects SubWorker callables
+  -> simpler.Worker(level=3) registers children and runs
+
+status boundary:
+  implemented: single-host L3 runner path and codegen unit tests
+  not proven: remote L3, multi-host lifecycle, complete distributed NN
+```
 
 Code anchors:
 
@@ -179,6 +200,19 @@ enum class Level : uint8_t {
 ## 非分布式示例和测试表面
 
 README 将 examples 明确分成 hello world、kernel examples 和 model examples，并给出 `python examples/hello_world.py`、`python examples/kernels/06_softmax.py`、`python examples/models/01_ffn.py` 这类入口。unit tests 的 README 命令是 `python -m pytest tests/ut -n auto --maxprocesses 8 -v`。
+
+这组 examples 的学习顺序是：先用 `hello_world.py` 看清 `InCore` / `Orchestration` split，再用 kernel examples 看 `elementwise -> matmul -> softmax -> normalization` 的 primitive growth，最后用 model examples 看 FFN、Flash Attention、Paged Attention 和 `llama_mini` 如何把多个 primitives 组合成模型块。表格只是 lookup；真正的逻辑是从一个 tile add 扩展到 model-level program，再回到 tests 验证 parser/pass/codegen 行为。
+
+```text
+hello_world.py
+  -> minimal program shape
+kernels/*
+  -> primitive families: elementwise, matmul, softmax, normalization
+models/*
+  -> model blocks: FFN, attention, paged attention, mini decoder
+tests/ut
+  -> parser/pass/codegen/type behavior
+```
 
 | 文件 | 重点 | 运行/验证表面 |
 | --- | --- | --- |

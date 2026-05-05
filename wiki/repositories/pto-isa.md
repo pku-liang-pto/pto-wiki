@@ -73,6 +73,19 @@ test script
 
 ## 非分布式示例路径
 
+非分布式 examples 应按“能运行的 operator story”来读。`add` 是最小 PyTorch custom op：证明 PTO kernel 可以被包装、build、install、由 `torch_npu` 调用并与 golden 比较。`gemm_basic` 开始出现 tiling、per-core split、K 分块、double buffering 和 pipeline sync。`flash_atten` 与 `kernels/manual/*` 更接近性能/算法复杂度；CPU demos 则用于在没有 NPU 时先检查 instruction semantics 和算法 shape。
+
+```text
+add
+  -> custom-op packaging and golden correctness
+gemm_basic
+  -> tile shape, split-K/per-core layout, double buffering
+flash attention / manual kernels
+  -> complex operator and performance-oriented implementation
+cpu demos
+  -> semantics/debug path before hardware
+```
+
 | 示例 | 说明 | 状态 |
 | --- | --- | --- |
 | `demos/baseline/add` | PTO kernel 封装为 `torch_npu` 自定义 PyTorch operator；host 侧用 `TORCH_LIBRARY`/`TORCH_LIBRARY_IMPL` 注册 schema 和实现 | `implemented` |
@@ -85,18 +98,38 @@ test script
 
 源码入口可以按 three-layer reading 分组：public headers teach the interface, demos teach runnable operator packaging, tests teach primitive semantics under CPU/NPU backends.
 
-| 区域 | 作用 | 状态 |
-| --- | --- | --- |
-| `include/pto/` | public PTO tile/ISA headers | `implemented` |
-| `include/pto/common/` | Tile、Shape、Stride、instruction infrastructure | `implemented` |
-| `include/pto/cpu/` | CPU simulation/debug support | `implemented` |
-| `include/pto/npu/` | SoC-specific NPU implementations for A2/A3/A5 | `implemented` |
-| `demos/baseline/` | PyTorch operator examples with CMake/wheel packaging | `implemented` |
-| `demos/cpu/` | cross-platform CPU simulation demos | `implemented` |
-| `kernels/manual/` | hand-optimized operator implementations | `implemented` |
-| `include/pto/comm/` | communication ISA public API and implementations | `implemented` |
-| `include/pto/comm/async_common/` | SDMA/URMA async session type abstraction | `implemented` |
-| `tests/npu/*/comm/st/testcase/` | NPU communication ST for A2/A3 and A5 | `implemented` |
+第一层是 **public instruction interface**。`include/pto/pto-inst.hpp` 是用户和 examples 最常引用的 all-in-one header；`include/pto/common/` 定义 `Tile`、`Shape`、`Stride`、`GlobalTensor` 和 instruction infrastructure；`include/pto/cpu/` 提供 CPU simulation/debug path；`include/pto/npu/` 按 SoC 提供 A2/A3/A5 后端实现。读这一层时要问：一个 instruction 在 CPU simulation 和 NPU backend 中分别如何解释？
+
+```text
+public instruction interface
+----------------------------
+include/pto/pto-inst.hpp
+  -> common Tile / GlobalTensor / Shape / Stride
+  -> cpu simulation implementation
+  -> npu SoC-specific implementation
+```
+
+第二层是 **runnable operator packaging**。`demos/baseline/` 把 PTO kernel 包成 PyTorch custom op，通常包含 CMake/wheel build、kernel source、host wrapper 和 `test.py` golden check；`demos/cpu/` 让开发者在无 NPU 环境先验证 instruction semantics；`kernels/manual/` 放更接近性能调优的 hand-written kernels。读这一层时要问：kernel body 的 tile instruction 如何被 host/operator wrapper 暴露给测试？
+
+```text
+runnable operator packaging
+---------------------------
+kernel source
+  -> custom-op wrapper / CMake / wheel
+  -> Python test.py
+  -> compare with torch/numpy golden
+```
+
+第三层是 **communication primitive layer**。`include/pto/comm/` 定义 `TPUT`、`TGET`、`TNOTIFY`、`TWAIT`、collective/async 等 communication ISA；`include/pto/comm/async_common/` 把 SDMA/URMA session、event 和 context 抽象到 engine-aware 类型；`tests/npu/*/comm/st/testcase/` 验证 A2/A3 与 A5 的 NPU communication behavior。读这一层时要问：这是 kernel/rank/data movement primitive，还是已经上升到 PyPTO orchestration API 或 simpler remote worker lifecycle？当前证据只能证明前者。
+
+```text
+communication primitive layer
+-----------------------------
+TPUT / TGET / TNOTIFY / TWAIT
+  -> SDMA or URMA async session
+  -> rank/device testcases
+  -> runtime-level collective still needs PyPTO + simpler evidence
+```
 
 Code anchors:
 

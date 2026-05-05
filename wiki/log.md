@@ -99,3 +99,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-05] policy-update | Add automatic concept evidence lookup skill
 
 新增 `.agents/skills/concept-evidence-lookup/` 和 `.agents/workflows/concept-evidence-lookup.md`，把重要概念 lookup 稳定成 reusable agent skill。后续回答问题或更新文档时，若涉及关键缩写、protocol、platform component、API、runtime layer、hardware term 或 repository-specific identifier，agent 应先查 existing wiki、local repositories、GitHub history 或 official internet docs，再在正文中给出本地定义、mental model、project-specific role、status boundary 和 citations。同步更新 AGENTS、wiki lookup、repo documentation、material ingestion、topic evidence、source citation 和 health lint rules，使该能力在文档更新和问答场景自动触发。
+
+## [2026-05-06] review-update | Replace module tables with architecture prose
+
+根据 PR review 中对 table-driven writing 的反馈，重新审查 public wiki table blocks，重点修正 repository profiles 中用 module/source-path table 承载架构解释的问题。将 [simpler](./repositories/simpler.md) 的关键模块表改写为 L2 chip launch、L3+ host DAG、communication data-plane 三条运行路径；将 [pto-isa](./repositories/pto-isa.md) 的主要结构表改写为 public instruction interface、runnable operator packaging、communication primitive layer 三层；将 [pypto](./repositories/pypto.md) 的核心模块表改写为 language-to-IR、normal codegen/runner、distributed extension 三条主线。同步强化 `.agents` writing/health rules，要求后续 table audit 检查每个表格是否只是 lookup support，而不是正文解释的替代品。
