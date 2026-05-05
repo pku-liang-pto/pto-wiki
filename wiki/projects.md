@@ -47,4 +47,4 @@ last_updated: 2026-05-05
 | `distributed-runtime` | not profiled | material mentions only; low | inspect repo before assigning remote L3 ownership |
 | `serving-lib`, `pto-li`, `ptoas` | not profiled | target-set config only; low | document only when serving/library/toolchain questions require them |
 | `hccl` | partial evidence | `master` commit `e8c897660d2afd02b1428b1daa2ce9576f00a5cd`; partial for communication support | create CANN communication profile if data-plane claims expand |
-| `hcomm`, `shmem`, `hixl`, `cann-recipes-infer` | not profiled | target-set config/material mentions only; low | do not infer ownership or behavior without a dedicated pass |
+| `hcomm`, `shmem`, `hixl`, `cann-recipes-infer` | not profiled | target-set config/material mentions only; low | 只能读作待检查线索；不能据此推断 ownership 或 behavior |

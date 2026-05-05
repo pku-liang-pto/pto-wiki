@@ -12,9 +12,17 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ---
 
+## [2026-05-03] policy-update | Add wiki organization and health rules
+
+Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.
+
+## [2026-05-03] policy-update | Add document material ingestion rules
+
+Added reusable workflow and skill coverage for updating the wiki from document files, folders, and zip archives without committing raw supplied materials.
+
 ## [2026-05-04] source-ingestion | PTO Runtime distributed material bundle
 
-将 `materials/pto-runtime-distributed.zip` 提取为 tracked source evidence `materials/pto-runtime-distributed/`，排除 archive metadata files。checksum 和材料覆盖记录在 topic-scoped evidence ledgers, starting with [Distributed Execution Evidence](./evidence/distributed-execution.md)。
+将用户提供的 `materials/pto-runtime-distributed.zip` 作为原始输入检查，排除 archive metadata files，并在用户决定公开材料后，把可阅读 Markdown 副本放入 [Materials / PTO Runtime Distributed](./materials/pto-runtime-distributed/index.md)。checksum 和材料覆盖记录在 topic-scoped evidence ledgers, starting with [Distributed Execution Evidence](./evidence/distributed-execution.md)。
 
 ## [2026-05-04] repo-profile | simpler, pto-isa, pypto documentation pass
 
@@ -72,10 +80,6 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 根据 rendered wiki 内容 review，对 public learning pages 和 evidence/material framing 做系统写作增强：为 overview、repository profiles、major topics、concept pages、example chapters 添加或强化 `How To Read This Page`、mental model、background explanation、cross-repository role boundaries、run-surface caveats 和 status-boundary prose。保留 `wiki/materials/pto-runtime-distributed/*.md` 原文作为 public source-material library，不在 source evidence 中 silent rewrite material contents。
 
-## [2026-05-03] policy-update | Add wiki organization and health rules
+## [2026-05-05] review-update | Multi-agent writing and policy audit
 
-Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.
-
-## [2026-05-03] policy-update | Add document material ingestion rules
-
-Added reusable workflow and skill coverage for updating the wiki from document files, folders, and zip archives without committing raw supplied materials.
+用 public learner、examples developer、evidence auditor 和 agent-rules maintainer 四类 reviewer 重新检查 public wiki。根据反馈补强 example run surfaces 的 exact cwd/commands/status，扩展 advanced example chapters，修正 Lingqu L1 status、developer takeover/process leakage、glossary 中文叙述和 materials framing；同步更新 `.agents/` policies/workflows/skills，明确 public `wiki/materials/` 只在用户显式要求时使用，topic page 一旦依赖 material/GitHub/external/cross-repo evidence 就必须引用 paired evidence ledger，并把 public navigation hierarchy 纳入 wiki health checks。

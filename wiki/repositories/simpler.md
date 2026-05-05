@@ -28,11 +28,11 @@ L3 之后不要先理解成“分布式系统”，而要先理解成“把多�
 
 上游 `simpler/docs/` 本身是本 wiki 的重要学习材料。更完整的 runtime mechanics synthesis 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；本 repo profile 只保留仓库级定位和主要入口。
 
-## Upstream Docs To Preserve In The Wiki
+## 上游文档学习主线
 
-`simpler` 的 docs 质量比普通 README 索引更高：它们分层解释了 L2 chip launch、L3+ hierarchy、task data flow、DAG construction、scheduler dispatch 和 worker process model。wiki 后续维护时不应只摘路径表，而要保留这些文档里的 mental model。
+`simpler` 的 docs 质量比普通 README 索引更高：它们分层解释了 L2 chip launch、L3+ hierarchy、task data flow、DAG construction、scheduler dispatch 和 worker process model。读者可以把这组文档当成 runtime 教材：先从 L2 三程序模型理解一个 chip 如何跑起来，再从 Orchestrator/Scheduler/WorkerManager 理解 L3+ 如何把多个 child worker 组合成 host-side DAG。
 
-| Upstream doc | What it teaches | Wiki destination |
+| Upstream doc | 它教什么 | Wiki destination |
 | --- | --- | --- |
 | `docs/chip-level-arch.md` | L2 三程序模型：host runtime、AICPU scheduler、AICore/AIV kernels；以及 Python/C/C++ API layers | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l2-three-program-model), [Non-Distributed Execution](../topics/non-distributed-execution.md) |
 | `docs/hierarchical_level_runtime.md` | L0-L6 level model；L3+ 的 Orchestrator/Scheduler/Worker component composition | [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md#l3-engine-components), [Lingqu Level Map](../topics/lingqu-level-map.md) |

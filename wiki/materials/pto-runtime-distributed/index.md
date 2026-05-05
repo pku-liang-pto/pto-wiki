@@ -11,7 +11,7 @@ last_updated: 2026-05-05
 
 本目录公开保留 PTO Runtime distributed 材料包的原始 Markdown 文件。它们是 public source-material library：可直接阅读，也可用于学习如何组织长篇技术材料。学习页面已经把主要知识综合到 [Distributed Execution](../../topics/distributed-execution.md)、[PTO Examples](../../examples/pto/) 和 [simpler Runtime Architecture](../../topics/simpler-runtime-architecture.md)；需要核对原始论述时再回到这里。
 
-原始材料文件保持内容完整，避免 wiki 在 public source-material library 中改写证据本身。后续如果需要修正材料里的状态判断，应在 synthesized wiki page 或 evidence ledger 中标注，而不是 silently rewrite material text。
+Canonical raw artifact 仍是 `materials/pto-runtime-distributed.zip`，其 checksum 记录在 [Distributed Execution Evidence](../../evidence/distributed-execution.md#source-set)。本目录中的 Markdown 文件是为了公开渲染而移动到 `wiki/materials/` 的 public copy；若发生 whitespace normalization 或 checksum 更新，应以 [Wiki Log](../../log.md) 和 evidence ledger 中记录的 per-file checksum 为准。后续如果需要修正材料里的状态判断，应在 synthesized wiki page 或 evidence ledger 中标注，而不是 silently rewrite material text。
 
 ## Files
 

@@ -18,11 +18,11 @@ last_updated: 2026-05-05
 
 | Area | Current Repositories | Notes |
 | --- | --- | --- |
-| PTO design and ISA | `pypto_top_level_documents`, `pto-isa` | Design and instruction-set knowledge should be documented with direct source references. |
-| PTO implementation and libraries | `pypto`, `pto-li`, `simpler` | Implementation relationships require repository documentation passes before this wiki states firm architecture. |
-| Runtime and serving | `distributed-runtime`, `serving-lib`, `ptoas` | Runtime and serving roles should be expanded from source, examples, and design docs. |
-| CANN communication and memory | `hcomm`, `hccl`, `shmem`, `hixl` | Dependency and interface relationships should be verified from upstream repos. |
-| CANN recipes | `cann-recipes-infer` | Recipe pages should link concrete examples to the libraries and runtime behavior they exercise. |
+| PTO design and ISA | `pypto_top_level_documents`, `pto-isa` | 当前 wiki 已使用 top-level design evidence 和 `pto-isa` profile；未 profile 的 design docs 仍只作为 supporting context。 |
+| PTO implementation and libraries | `pypto`, `pto-li`, `simpler` | `pypto` 与 `simpler` 已 profile；`pto-li` 仍是 coverage gap，不能从本页推断实现关系。 |
+| Runtime and serving | `distributed-runtime`, `serving-lib`, `ptoas` | `distributed-runtime`、serving、assembly/tooling roles 仍未完成 source-backed profile。 |
+| CANN communication and memory | `hcomm`, `hccl`, `shmem`, `hixl` | 当前只有 HCCL 有 partial supporting evidence；其余项目不承担本 wiki 的 ownership claim。 |
+| CANN recipes | `cann-recipes-infer` | 仍未 profile；只能作为未来 recipe/example coverage area。 |
 
 ## Reading Rule
 

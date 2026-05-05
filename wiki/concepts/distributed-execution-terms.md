@@ -57,11 +57,11 @@ Status evidence for these rows is summarized from [Distributed Execution Evidenc
 
 表里的状态标签要按“最窄行为”理解。例如 `CommContext` 的 `implemented` 说明当前源码/示例中有 rank/window metadata ABI；它不说明 remote worker lifecycle 已经存在。`URMA/RoCE` 同时出现两个状态，是因为 primitive/demo 层和 runtime control-plane 层不是同一件事。
 
-## 使用规则
+## 读法边界
 
-- 写 `implemented` 分布式能力时，必须能落到源码、测试、示例或合并 PR。
-- 写 remote L3、DistWorker、跨 host callable registry 时，默认使用 `design-intended`，除非后续出现可运行证据。
-- 引用 HCCL 时，只说明 collective/window/data movement 支撑，不把它说成 PTO runtime scheduler。
+- `implemented` 分布式能力表示本轮 evidence ledger 中有 source、test、example 或 merged PR 支撑。
+- remote L3、DistWorker、跨 host callable registry 在当前 wiki 中是 `design-intended`，因为还没有稳定可运行证据。
+- HCCL 在当前 wiki 中支撑 collective/window/data movement，不承担 PTO runtime scheduler 的含义。
 
 ## Cross-Repository Name Map
 

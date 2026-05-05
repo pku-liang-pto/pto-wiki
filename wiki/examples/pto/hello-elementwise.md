@@ -32,11 +32,11 @@ PyPTO hello
 
 这个例子的价值在于它把 PyPTO 的两层函数边界暴露得最清楚。`InCore` 不是普通 Python helper，而是将来会进入 tile/kernel lowering 的 compute body；`Orchestration` 不是 kernel，而是描述 kernel call 和 tensor flow 的外层 program logic。后续 matmul、attention、LLaMA mini 都保留这个分工，只是 body 更复杂。
 
-Run surface:
+Run surface（本轮 wiki pass 未本地执行这些命令；状态来自 source/README inspection，证据见 [Examples Feature Map Evidence](../../evidence/examples-feature-map.md#claim-map)）：
 
-| Entry | Hardware | Expected signal | Caveat |
-| --- | --- | --- | --- |
-| `python examples/hello_world.py` | no | 输出 `HelloWorldProgram.as_python()`，能看到 load/add/store 和 orchestration call | 证明 DSL/IR print path，不证明 hardware execution |
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/pypto/` | `python examples/hello_world.py` | no | 输出 `HelloWorldProgram.as_python()`，能看到 load/add/store 和 orchestration call | `not-run`; source-inspected | 证明 DSL/IR print path，不证明 hardware execution |
 
 ## PTO-ISA Add
 
@@ -44,11 +44,11 @@ Run surface:
 
 读 PTO-ISA add 时，可以把它和 PyPTO hello 的 `pl.load/add/store` 对齐：PyPTO 让用户用 DSL 表达同样的 load/compute/store 意图；PTO-ISA 展示这些意图在 C++ tile library、operator wrapper 和 `torch_npu` integration 中怎样出现。它不负责解释 `Worker(level=2)` 如何启动。
 
-Run surface:
+Run surface：
 
-| Entry | Hardware | Expected signal | Caveat |
-| --- | --- | --- | --- |
-| `./run.sh` 或 README build/install/test sequence | NPU path needs Ascend/CANN | wheel builds/installs，`test.py` 通过 `torch_npu` | 依赖 CANN、`ASCEND_HOME_PATH`、`PTO_LIB_PATH`、target SoC |
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/pto-isa/demos/baseline/add/` | `export ASCEND_HOME_PATH=/usr/local/Ascend/ && source /usr/local/Ascend/ascend-toolkit/set_env.sh && export PTO_LIB_PATH=[YOUR_PATH]/pto-isa && python3 setup.py bdist_wheel && pip install dist/*.whl && cd test && python3 test.py` | Ascend NPU + CANN + `torch_npu` | wheel builds/installs，`test.py` 通过 `torch_npu` custom op | `not-run`; README-inspected | 依赖 target SoC in `CMakeLists.txt`、CANN、`ASCEND_HOME_PATH`、`PTO_LIB_PATH` |
 
 ## simpler L2 Hello And Vector Add
 
@@ -58,12 +58,12 @@ Run surface:
 
 这两个例子合起来回答 runtime 层的基础问题。`hello_worker` 先证明 worker lifecycle 不是概念名，而是有 init/memory/close contract；`vector_add` 再把 callable、tensor buffers、device copy、kernel execution 和 golden validation 接起来。它们比 L3 allreduce 更适合做第一条 runtime 学习路径，因为没有 rank/window 和 communication 干扰。
 
-Run surface:
+Run surface：
 
-| Entry | Hardware | Expected signal | Caveat |
-| --- | --- | --- | --- |
-| `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | no NPU for sim | init、malloc/free、close 完成 | 依赖 runtime binaries/build cache |
-| `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | no NPU for sim | max error 和 golden check pass | signature/order mismatch 会先暴露 runtime/API 问题 |
+| Cwd | Entry | Hardware | Expected signal | Run status | Caveat |
+| --- | --- | --- | --- | --- | --- |
+| `repositories/simpler/` | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | no NPU for sim | init、malloc/free、close 完成 | `not-run`; README-inspected | 依赖 runtime binaries/build cache |
+| `repositories/simpler/` | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | no NPU for sim | max error 和 golden check pass | `not-run`; README-inspected | first run may clone PTO-ISA headers into build cache; signature/order mismatch 会先暴露 runtime/API 问题 |
 
 ## What This Example Family Proves
 

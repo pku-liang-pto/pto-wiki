@@ -12,7 +12,7 @@ last_updated: 2026-05-05
 
 示例学习内容已经移到公开的 [PTO Examples](../examples/pto/) 区域。
 
-本页只保留旧链接兼容。新的 example system 不再用一张 feature map 承担学习任务，而是按 concrete example granularity 拆成 chapter：每章直接解释背景、逻辑、run surface、source roles 和 caveats。
+本页是 compatibility redirect，不是 substantive learning topic。新的 example system 不再用一张 feature map 承担学习任务，而是按 concrete example granularity 拆成 chapter：每章直接解释背景、逻辑、run surface、source roles 和 caveats。
 
 - [PTO Examples](../examples/pto/)：example book overview。
 - [Hello / Elementwise](../examples/pto/hello-elementwise.md)：PyPTO hello、PTO-ISA add、simpler L2 vector add。

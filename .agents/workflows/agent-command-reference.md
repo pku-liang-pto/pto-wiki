@@ -62,7 +62,7 @@ Inspect PR title, body, state, base/head refs, commits, changed files, and relev
 
 `research topic from materials: <repo-name> <topic>`
 
-Use `.agents/workflows/topic-evidence-discovery.md`. Extract anchors from supplied materials, search wiki/source/history/GitHub, expand from strong matches, classify evidence, then write a standalone topic synthesis and paired evidence ledger when needed.
+Use `.agents/workflows/topic-evidence-discovery.md`. Extract anchors from supplied materials, search wiki/source/history/GitHub, expand from strong matches, classify evidence, then write a standalone topic synthesis. Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis must have and cite a paired `wiki/evidence/<topic>.md` ledger near the claims it supports.
 
 ## Health
 

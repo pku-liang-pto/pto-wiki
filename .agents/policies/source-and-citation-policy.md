@@ -21,6 +21,7 @@ Evidence supports the wiki; it does not replace explanation. Durable wiki pages 
 - Include commit, tag, or retrieval date when freshness matters.
 - For branch, issue, or PR-specific claims, cite the branch, issue URL, PR URL, commit SHA, or checked-out ref that was inspected.
 - For topic synthesis from supplied materials, cite the materials, search anchors, GitHub issues or PRs, commits, refs, and source files that support the synthesis.
+- For topic pages that use material, GitHub, external-document, or cross-repository synthesis evidence, create and cite a paired `wiki/evidence/<topic>.md` ledger; direct nearby repository citations alone do not require a ledger.
 - Mark claims as inference when they come from reading code structure rather than explicit docs.
 - Preserve conflicting evidence instead of forcing a false conclusion.
 - Do not turn source citations into a learning plan. If a page cites a source for an important concept, summarize the concept in the wiki page itself.

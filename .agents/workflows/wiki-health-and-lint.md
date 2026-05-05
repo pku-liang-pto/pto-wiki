@@ -11,9 +11,10 @@ Run these checks before and after durable wiki maintenance:
 3. Check Markdown links changed in the update for broken local targets.
 4. Check new pages have meaningful body content beyond headings and frontmatter.
 5. Check major topic and repository pages explain the knowledge directly, not only through tables or links to external sources.
-6. Check public learning pages follow the writing style policy: mostly Chinese narrative, English technical identifiers preserved, concise but information-rich prose, and diagrams/examples where they reduce cognitive load.
-7. Check durable factual claims include nearby citations.
-8. Check `wiki/log.md` has an append-only entry for the operation.
+6. Check public top navigation and left sidebar expose the same primary hierarchy: Home, Repositories, Examples, Topics, Concepts, Materials. Evidence, Usage, Log, Projects, and Toolchain Map may remain linked but should not become primary public learning sidebar areas.
+7. Check public learning pages follow the writing style policy: mostly Chinese narrative, English technical identifiers preserved, concise but information-rich prose, and diagrams/examples where they reduce cognitive load.
+8. Check durable factual claims include nearby citations.
+9. Check `wiki/log.md` has an append-only entry for the operation.
 
 ## Content Lint
 

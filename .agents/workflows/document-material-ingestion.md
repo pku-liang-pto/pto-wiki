@@ -15,7 +15,7 @@ Use this workflow when updating the wiki from a user-supplied document file, fol
 
 1. Identify whether the input is a file, folder, or zip archive.
 2. For folders, enumerate candidate files and skip generated caches, binaries that cannot be converted, and hidden/system files unless explicitly relevant.
-3. For zip archives, list members first, reject unsafe paths, then extract to a temporary workspace or a clearly named `materials/` workspace. Track extracted contents only when the user explicitly requests that bundle or the documentation pass defines it as source evidence. Put public raw-material bundles under `wiki/materials/` with an index page.
+3. For zip archives, list members first, reject unsafe paths, then extract to a temporary workspace or a clearly named `materials/` workspace. Commit a material bundle only under `wiki/materials/` when the user explicitly wants it public; keep raw originals intact, add or update the material index, and cite the bundle from topic evidence ledgers. Ad hoc materials remain untracked by default.
 4. For every material used, record path, archive member if any, checksum when feasible, ingestion date, and conversion method.
 5. Convert non-text documents only with available local tools. If conversion is partial or unavailable, record the limitation.
 

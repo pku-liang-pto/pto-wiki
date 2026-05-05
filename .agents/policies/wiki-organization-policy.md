@@ -70,7 +70,7 @@ Each durable page should link to:
 - related repository, topic, or concept pages
 - source evidence near the claims it supports
 
-Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis should cite a paired `wiki/evidence/<topic>.md` page where the evidence is needed. Small topic pages based only on nearby direct repository citations do not need a paired evidence page.
+Topic pages that depend on user-supplied materials, GitHub issues or PRs, external documents, or cross-repository synthesis must have and cite a paired `wiki/evidence/<topic>.md` ledger near the claims it supports. Small topic pages based only on nearby direct repository citations do not need a paired evidence page.
 
 Use normal Markdown links for file paths and URLs. Do not require graph data or graph-specific wikilink syntax.
 

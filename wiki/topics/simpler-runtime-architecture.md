@@ -56,7 +56,7 @@ Python example / scene test
   -> host synchronizes and copies results back
 ```
 
-The important maintenance lesson is that L2 launch failures are boundary problems. A failure can come from Python binding setup, runtime binary lookup, C API symbol loading, device initialization, AICPU scheduling, kernel execution, or host/device copy-back. The wiki should not collapse all of these into “runtime failed.”
+读 L2 failure 时，关键不是把它统一称为 “runtime failed”，而是先定位失败发生在哪个边界。问题可能来自 Python binding setup、runtime binary lookup、C API symbol loading、device initialization、AICPU scheduling、kernel execution，也可能来自 host/device copy-back。只有把这些边界拆开，后续维护者才知道该看 Python wrapper、runtime `.so`、AICPU scheduler、AICore object，还是数据回拷路径。
 
 ## L3+ Engine Components
 

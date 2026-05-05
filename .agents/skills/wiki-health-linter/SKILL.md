@@ -24,9 +24,10 @@ Read:
 3. Check changed Markdown links resolve locally or cite external URLs.
 4. Check new pages have meaningful content beyond headings and frontmatter.
 5. Check major topic and repository pages explain knowledge directly, not only through tables or source links.
-6. Check reusable agent rules are not leaking into rendered wiki pages.
-7. Check factual durable claims have nearby citations.
-8. Check `wiki/log.md` has an append-only entry for durable operations.
+6. Check public top navigation and left sidebar expose the same primary hierarchy: Home, Repositories, Examples, Topics, Concepts, Materials. Evidence, Usage, Log, Projects, and Toolchain Map may remain linked but should not become primary public learning sidebar areas.
+7. Check reusable agent rules are not leaking into rendered wiki pages.
+8. Check factual durable claims have nearby citations.
+9. Check `wiki/log.md` has an append-only entry for durable operations.
 
 ## Content Checks
 
