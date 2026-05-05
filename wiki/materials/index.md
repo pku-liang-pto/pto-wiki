@@ -11,6 +11,15 @@ last_updated: 2026-05-05
 
 这里公开存放用户提供、并已经被 wiki 使用的 source materials。它们既可直接阅读，也可以作为学习如何写长篇、结构化、source-backed 技术材料的参考。合成后的 Examples、Topics、Repositories 仍是 canonical wiki layer；Materials 保留原始论述、PR timeline、材料覆盖和设计目标，便于读者追溯。
 
+```text
+Materials
+  -> original/source-material narrative
+Synthesized wiki pages
+  -> current learning layer with status labels and source boundaries
+Evidence ledgers
+  -> audit trail for claims, checksums, PRs/issues, and negative findings
+```
+
 ## How To Read This Area
 
 Materials 是公开资料库，不是 wiki 的最终答案。读者可以直接阅读材料来理解原始设计语境和写作风格，但当材料与源码状态不同步时，以 Examples、Topics、Repositories 中带状态标签的 synthesis 为准。尤其是 remote L3、DistWorker、RoCE/URMA control plane 等内容，材料中可以是目标蓝图，学习页必须继续标成 `design-intended`，直到源码、测试或 PR 证据改变。

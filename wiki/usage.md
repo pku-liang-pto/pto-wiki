@@ -11,7 +11,7 @@ last_updated: 2026-05-05
 
 # Usage
 
-本页说明如何运行和维护这个 Markdown/VitePress wiki。当前 target set 配置在 `config/target-set.yml`；公开学习内容位于 `wiki/`；本地 repository checkouts 位于 `repositories/`，用于 source inspection，不应作为 wiki 内容直接发布。
+本页说明如何运行和维护这个 Markdown/VitePress wiki。当前 target set 配置在 `config/target-set.yml`；公开学习内容位于 `wiki/`；本地 repository checkouts 位于 `repositories/`，用于 source inspection，不应作为 wiki 内容直接发布。更具体的 agent workflow 和 writing policy 位于 `.agents/`，不放在 rendered wiki 中。
 
 ## Pixi Commands
 
@@ -62,6 +62,10 @@ Rendered wiki 的公开 navigation/sidebar 保持小而稳定：Home、Repositor
 - `wiki/evidence/`: topic-scoped evidence ledgers for material, GitHub, external-document, and cross-repository claims.
 
 Agent operating rules are intentionally outside the rendered wiki, under `AGENTS.md` and `.agents/`.
+
+## Content Rule For Human Maintainers
+
+公开 wiki page 的目标是让读者直接学习 target set。写作时先解释概念、流程和例子，再给 source/evidence link。不要把 `wiki/` 写成 agent 操作手册；如果一句话是在告诉 agent 如何工作，它应该进入 `.agents/`，不是进入 public learning page。
 
 ## Repository Workspace
 

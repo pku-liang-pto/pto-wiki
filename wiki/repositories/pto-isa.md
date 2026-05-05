@@ -35,6 +35,19 @@ include/pto/pto-inst.hpp
   -> communication extension only after compute/data movement model is clear
 ```
 
+```text
+pto-isa owns kernel semantics
+
+GM tensor
+  -> TLOAD into on-chip Tile
+  -> tile compute: TADD / TMATMUL / activation / reduction
+  -> optional sync/comm primitive: TNOTIFY / TWAIT / TPUT / TGET
+  -> TSTORE back to GM
+
+not owned here:
+PyPTO high-level API, host DAG scheduling, remote worker lifecycle
+```
+
 ## Tile Programming 基础
 
 `include/pto/README.md` 说明 `include/pto/` 是 public header entry：`common/` 放 platform-independent Tile 和 instruction infrastructure，`cpu/` 放 CPU simulation/debug support，`npu/` 按 SoC 拆 A2/A3/A5 implementation，`comm/` 放 communication instruction library。
@@ -70,6 +83,8 @@ test script
 
 ## 主要结构
 
+源码入口可以按 three-layer reading 分组：public headers teach the interface, demos teach runnable operator packaging, tests teach primitive semantics under CPU/NPU backends.
+
 | 区域 | 作用 | 状态 |
 | --- | --- | --- |
 | `include/pto/` | public PTO tile/ISA headers | `implemented` |
@@ -82,6 +97,15 @@ test script
 | `include/pto/comm/` | communication ISA public API and implementations | `implemented` |
 | `include/pto/comm/async_common/` | SDMA/URMA async session type abstraction | `implemented` |
 | `tests/npu/*/comm/st/testcase/` | NPU communication ST for A2/A3 and A5 | `implemented` |
+
+Code anchors:
+
+- `include/pto/pto-inst.hpp`: public all-in-one instruction header for users and examples.
+- `include/pto/common/pto_tile.hpp`: `Shape`、`Stride`、`Tile`、`GlobalTensor` 等基础类型。
+- `include/pto/comm/README.md`: communication ISA narrative and API grouping.
+- `demos/baseline/add/test/test.py`: simplest custom op validation surface.
+- `demos/baseline/gemm_basic/README.md`: fixed GEMM shape、24-core split、K tiling、double buffering。
+- `demos/baseline/allgather_async/README.md`: rank/device mapping and SDMA/URMA async communication run scripts.
 
 ## Communication ISA
 
@@ -112,6 +136,10 @@ Communication ISA 应读作“kernel 内可以表达跨 rank / remote memory / a
 | GEMM optimization reading | inspect `demos/baseline/gemm_basic/README.md` and `test/test.py` | can explain fixed shapes, per-core split, double buffering | hardware/software stack unavailable for run |
 | communication primitive demo | `./run.sh 2 Ascend950PR_9599` in `demos/baseline/allgather_async` | allgather demos pass for ranks | CANN Toolkit/Ops, MPICH, enough NPU devices |
 
+## Safe First Change
+
+第一次改 `pto-isa` 应选一个能被 operator demo 或 focused test 覆盖的点。比如 add demo 的 wrapper/test、GEMM tiling parameter 注释、CPU simulation demo 的 expected result，比直接改 communication async session 更安全。改动前先判断它影响的是 compute instruction、data movement、communication primitive、SoC-specific backend，还是 packaging/test harness。
+
 ## 与 simpler 的关系
 
 `simpler` 的 L3 hardware examples 会通过 `simpler_setup.pto_isa.ensure_pto_isa_root()` 获取 PTO-ISA root，再用 `KernelCompiler.compile_incore()` 编译 AIC/AIV kernel。也就是说，PTO-ISA 是 kernel-level target；simpler 是运行和调度这些 kernel 的 runtime。
@@ -126,8 +154,16 @@ PyPTO 负责 Python DSL、IR、pass 和 codegen。它生成或调用的低层 ke
 
 本页把 `pto-isa` 解释为 kernel/ISA foundation，而不是 runtime orchestrator。证据来自 README、`include/pto/README.md`、baseline add/GEMM/Flash Attention demos、CPU demos、`include/pto/comm/README.md` 和 allgather async demo。通信 primitive 是 distributed execution 的必要支撑，但它只证明 kernel/rank/data movement 能力；worker lifecycle、DAG scheduling、remote callable registry 仍属于 runtime/PyPTO/simpler 组合需要证明的层面。
 
+## What This Page Proves
+
+本页可以证明 `pto-isa` 提供 tile/kernel-level compute、data movement 和 communication primitive，并且这些 primitive 有 baseline demos、CPU demos 或 NPU tests 作为证据。它不能证明 PyPTO 已经暴露某个 high-level collective API，也不能证明 `simpler` 已经拥有 remote L3 control plane。读 distributed claims 时，PTO-ISA evidence 只应升级 kernel/data-plane status，不应升级 compiler/runtime ownership status。
+
 ## 未决问题
 
 - PyPTO `pl.all_reduce` 等 orchestration-level collective 会直接发 PTO-ISA collective，还是先走 simpler runtime/HCCL window？
 - A5 URMA path 与 remote L3/RoCE blueprint 的关系还需要后续实现证明。
 - PTO-ISA roadmap 中 system scheduling extension 与 simpler scheduler 的边界尚未从源码中确认。
+
+## What To Remember
+
+`pto-isa` 是“kernel 如何表达”的答案，不是“program 如何被调度”的答案。先用 add/GEMM/Flash Attention 学普通 tile programming，再用 allgather async、`TWAIT/TNOTIFY`、SDMA/URMA 学 communication primitive。只有当 PyPTO 和 `simpler` 同时提供对应 evidence 时，才能把 kernel primitive 升级成 end-to-end distributed capability。

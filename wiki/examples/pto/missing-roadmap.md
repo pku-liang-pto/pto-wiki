@@ -59,3 +59,11 @@ PyPTO model graph
 - 有 HCCL window/data-plane，不等于 HCCL 负责 PTO runtime control plane。
 - 有 `Worker(level=3)` single-host L3，不等于 remote DistWorker 已实现。
 - 有 complete non-distributed NN，不等于 complete distributed NN 已实现。
+
+## What To Read Next
+
+读 [Distributed Runtime](./distributed-runtime.md) 可以看到当前已经证明的 partials；读 [Complete Models](./complete-models.md) 可以看到 complete non-distributed model reference；读 [Distributed Execution](../../topics/distributed-execution.md) 可以看到这些 gaps 在系统蓝图中的位置。
+
+## What To Remember
+
+本页的作用是阻止 wiki 过早升级状态。一个 missing example 只有在 model、lowering、runtime、kernel/data-plane、validation 和 evidence ledger 都闭合时，才可以从 `TODO` / `design-intended` 改为 `implemented`。

@@ -79,3 +79,11 @@ Run surface：
 ## What This Example Family Proves
 
 Attention 示例证明 optimization 分布在三层：PyPTO 表达 algorithm，PTO-ISA 控制 tile/memory behavior，simpler 控制 task readiness、dependency discovery 和 buffer reuse。它不是 remote distributed proof。
+
+## What To Read Next
+
+读完本页后，继续读 [Complete Models](./complete-models.md)。Softmax、attention、KV cache 和 normalization 在 `llama_mini` 中会成为 decoder flow 的中间 stage；理解它们之后，complete model graph 才不只是一个长函数列表。
+
+## What To Remember
+
+Attention 的学习价值在于它同时触碰 algorithm expression、kernel memory pressure 和 runtime dependency management。PyPTO Flash/Paged Attention 证明表达能力，PTO-ISA Flash Attention 证明 kernel baseline，`simpler` paged-attention 证明 runtime flow-control shape；三者都不是 remote distributed runtime proof。

@@ -26,6 +26,20 @@ last_updated: 2026-05-05
 
 L3 之后不要先理解成“分布式系统”，而要先理解成“把多个 L2 worker 和 Python SubWorker 放进 host-side DAG scheduler”。材料 `00_README.md` 中的 remote L3、cross-host callable registration、RoCE/URMA control plane 是下一层设计目标，不是当前 L2-L3 基础能力。
 
+```text
+simpler owns runtime lifecycle
+
+Python host process
+  -> Worker(level=2): ChipWorker for one Ascend device
+       -> host runtime .so
+       -> AICPU scheduler kernel
+       -> AICore/AIV compute kernels
+  -> Worker(level=3): host-side DAG over L2 chip workers + SubWorkers
+       -> Orchestrator builds dependencies
+       -> Scheduler dispatches ready slots
+       -> WorkerManager selects child workers
+```
+
 上游 `simpler/docs/` 本身是本 wiki 的重要学习材料。更完整的 runtime mechanics synthesis 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；本 repo profile 只保留仓库级定位和主要入口。
 
 ## 上游文档学习主线
@@ -84,6 +98,8 @@ Python test/example
 
 ## 关键模块
 
+读源码时优先按 ownership 进入，而不是按目录名猜层级。`src/a2a3` 和 `src/a5` 更接近 platform/runtime variant；`src/common` 承载大量 L3+ host runtime 逻辑；Python wrapper 则把 `Worker`、`TaskArgs` 和 callable registration 暴露给 examples。
+
 | 模块 | 作用 | 状态 |
 | --- | --- | --- |
 | `python/simpler/worker.py` | `Worker(level=2/3/4)` factory、mailbox layout、child process loop | `implemented` |
@@ -97,6 +113,8 @@ Python test/example
 | `src/common/platform_comm/comm.h` | backend-neutral C API: init/window/query/barrier/destroy | `implemented` |
 | `src/common/platform_comm/comm_context.h` | device-visible `CommContext` ABI、rank/window metadata | `implemented` |
 | `examples/workers/l3/` | L3 examples and hardware demos | `implemented`/`emerging` |
+
+这些模块合在一起说明：`simpler` 不是 PTO-ISA kernel library，也不是 PyPTO language frontend。它拥有 runtime boundary：worker lifecycle、runtime binary loading、task graph scheduling、TensorMap dependency discovery、mailbox/process model、communication window bootstrap 和 child-worker dispatch。
 
 ## L2 示例
 
@@ -113,6 +131,21 @@ Python test/example
 | lifecycle check | `python examples/workers/l2/hello_worker/main.py -p a2a3sim -d 0` | worker init, malloc/free, close complete | runtime binaries not built |
 | smallest full L2 run | `python examples/workers/l2/vector_add/main.py -p a2a3sim -d 0` | golden check passes | PTO-ISA headers/build cache missing on first run |
 | L3 hardware context | inspect `examples/workers/l3/allreduce_distributed` and `ffn_tp_parallel` before running | can explain rank/window and TensorMap dependency | requires A2/A3 multi-device hardware |
+
+## Safe First Change
+
+维护者第一次改 `simpler` 时，最好选择仍在一个 boundary 内的改动。L2 example 或 README 改动只验证 `ChipWorker` lifecycle；TensorMap/ring-buffer 改动要能说明 producer/consumer edge 如何变化；L3 scheduling 改动要先说清 state 在 parent process、scheduler thread、child process mailbox、AICPU scheduler 还是 AICore/AIV kernel。
+
+```text
+safe local change
+  -> examples/workers/l2 or small L3 example
+  -> run/inspect matching pytest
+  -> status remains local L2/L3
+
+unsafe inference
+  -> local HCCL window works
+  -> therefore remote L3 is implemented
+```
 
 ## Host-side DAG 层
 
@@ -157,6 +190,12 @@ Python test/example
 - `emerging`: SDMA async completion、多 callable DAG 的更广组合、deferred completion 的后续统一。
 - `design-intended`: remote L3、跨 host child worker、remote callable registration、RoCE/URMA remote control plane。
 
+## What This Page Proves
+
+本页可以支撑三个结论。第一，`simpler` 的 L2 path 是已实现的 Ascend launch path：host runtime、AICPU scheduler 和 AICore/AIV kernels 共同完成单 chip execution。第二，`simpler` 的 L3 path 是已实现的 single-host hierarchy runtime：parent process 可以调度 L2 chip worker 和 Python SubWorker。第三，HCCL/window bootstrap 是 distributed data-plane 支撑能力。
+
+本页不能证明 remote L3、跨 host child worker、remote callable registry 或 RoCE/URMA control plane 已经实现；这些仍需要 future source pass、merged PR、stable example 或 test evidence。
+
 ## Evidence-Based Interpretation
 
 本页把 `simpler` 放在 wiki 的 runtime foundation layer：L2 `ChipWorker` 是最小可运行单元，L3 是 host-side DAG scheduler 组合多个 L2 chip worker 和 Python `SubWorker` 的层级 runtime。这个判断来自 `docs/chip-level-arch.md`、`src/a2a3/docs/runtimes.md`、`docs/orchestrator.md`、`docs/scheduler.md`、`python/simpler/worker.py` 和 `examples/workers/l2` / `examples/workers/l3`。材料中的 remote L3/DistWorker 设计应读作下一层目标，而不是覆盖这条已实现的 L2/L3 foundation。
@@ -166,3 +205,7 @@ Python test/example
 - remote control channel 会成为 `simpler` 内部 backend，还是由独立 distributed runtime 调用 `simpler` local worker？
 - 当前 mailbox ABI 会保留为 local fast path，还是会抽象成 local/remote 双 backend？
 - deferred completion 与 SDMA/URMA async completion 最终的统一 wait condition ABI 尚需从后续 PR 确认。
+
+## What To Remember
+
+读 `simpler` 时先记住一条线：L2 让一个 chip 跑起来，L3 把多个 child workers 组织成 host-side DAG，HCCL/window 支撑 data-plane communication。只要问题涉及 remote host、remote callable、persistent run loop 或 platform ABI decoupling，就不要从当前 L3 local examples 直接推断为 `implemented`。

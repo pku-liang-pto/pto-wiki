@@ -9,30 +9,39 @@ last_updated: 2026-05-05
 
 # Projects
 
-本页列出当前 PTO-CANN target repositories，并标明哪些仓库已经被系统写成 repository profile。它是 coverage ledger，不是完整架构说明：没有完成 source-backed pass 的仓库只能按 target-set role 暂存，不能用来推断实现细节。
+本页列出当前 PTO-CANN target repositories，并标明哪些仓库已经被系统写成 repository profile。它是 reader-facing coverage map，不是完整架构说明：没有完成 source-backed pass 的仓库只能按 target-set role 暂存，不能用来推断实现细节。
+
+```text
+profiled repositories
+  -> safe for wiki ownership claims
+evidence-only / partial repositories
+  -> usable only in scoped topics
+not profiled repositories
+  -> target-set leads, not implementation facts
+```
 
 ## PTO
 
-| Repository | Role |
+| Repository | Role in target set |
 | --- | --- |
-| [pypto_top_level_documents](https://github.com/hengliao1972/pypto_top_level_design_documents) | Top-level PTO design documents. |
-| [serving-lib](https://github.com/hengliao1972/pypto-serving) | PTO serving library. |
-| [pto-li](https://github.com/hw-native-sys/pypto-lib) | PTO library project. |
-| [pypto](https://github.com/hw-native-sys/pypto/) | PTO implementation project. |
-| [ptoas](https://github.com/zhangstevenunity/PTOAS) | PTOAS project. |
-| [pto-isa](https://github.com/PTO-ISA/pto-isa) | PTO ISA project. |
-| [simpler](https://github.com/hw-native-sys/simpler) | Supporting project in the PTO target set. |
-| [distributed-runtime](https://github.com/hengliao1972/pypto_runtime_distributed) | Distributed PTO runtime. |
+| [pypto_top_level_documents](https://github.com/hengliao1972/pypto_top_level_design_documents) | PTO top-level design docs; currently evidence-only through Lingqu design material. |
+| [serving-lib](https://github.com/hengliao1972/pypto-serving) | Serving/library direction; not yet profiled. |
+| [pto-li](https://github.com/hw-native-sys/pypto-lib) | PTO library project; not yet profiled. |
+| [pypto](https://github.com/hw-native-sys/pypto/) | Python DSL/compiler/runtime-facing implementation; profiled. |
+| [ptoas](https://github.com/zhangstevenunity/PTOAS) | PTOAS/tooling direction; not yet profiled. |
+| [pto-isa](https://github.com/PTO-ISA/pto-isa) | PTO tile/kernel ISA and examples; profiled. |
+| [simpler](https://github.com/hw-native-sys/simpler) | Runtime worker hierarchy and Ascend launch/scheduling; profiled. |
+| [distributed-runtime](https://github.com/hengliao1972/pypto_runtime_distributed) | Distributed PTO runtime direction; material mentions only until source pass. |
 
 ## CANN
 
-| Repository | Role |
+| Repository | Role in target set |
 | --- | --- |
-| [hcomm](https://gitcode.com/cann/hcomm) | CANN communication project. |
-| [hccl](https://gitcode.com/cann/hccl) | CANN collective communication project. |
-| [shmem](https://gitcode.com/cann/shmem) | CANN shared memory project. |
-| [hixl](https://gitcode.com/cann/hixl) | CANN transfer or interconnect project. |
-| [cann-recipes-infer](https://gitcode.com/cann/cann-recipes-infer) | CANN inference recipe project. |
+| [hcomm](https://gitcode.com/cann/hcomm) | CANN communication direction; not profiled. |
+| [hccl](https://gitcode.com/cann/hccl) | Collective/data-plane communication support; partial evidence only. |
+| [shmem](https://gitcode.com/cann/shmem) | Shared-memory direction; not profiled. |
+| [hixl](https://gitcode.com/cann/hixl) | Transfer/interconnect direction; not profiled. |
+| [cann-recipes-infer](https://gitcode.com/cann/cann-recipes-infer) | Future CANN recipe/example coverage; not profiled. |
 
 ## Documentation Status
 

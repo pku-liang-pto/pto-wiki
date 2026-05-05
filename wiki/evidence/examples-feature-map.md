@@ -64,10 +64,20 @@ last_updated: 2026-05-05
 
 ## Negative Findings
 
-- The matrix is not a complete example index.
+- The matrix is not a complete example index; it records source surfaces used by current public example chapters.
 - Communication demos prove kernel/rank behavior, not PyPTO orchestration-level collectives.
-- Hardware-only L3 examples do not prove remote multi-host runtime.
-- No inspected example combines complete NN, PyPTO distributed execution, simpler runtime, and PTO-ISA optimized kernels end to end.
+- Hardware-only L3 examples prove current single-host L3 and data-plane paths, not remote multi-host runtime.
+- No inspected example combines complete NN, PyPTO distributed execution, `simpler` runtime, and PTO-ISA optimized kernels end to end.
+- `wiki/topics/examples-feature-map.md` is no longer a thin redirect; it explains the examples system and delegates concrete learning to [PTO Examples](../examples/pto/).
+
+## Status-Change Criteria
+
+| Current claim | Required evidence to change status |
+| --- | --- |
+| complete distributed NN is `TODO` | runnable example or test that combines model graph, partitioning, PyPTO lowering, `simpler` execution, kernel/data-plane support, and validation |
+| PyPTO orchestration-level collectives are `design-intended` | source/API/test evidence for stable collective expression and lowering path |
+| remote L3 examples are `design-intended` | source/example/test evidence for remote worker lifecycle, callable registration, and cross-host control channel |
+| skipped PyPTO parallel reduce is `emerging` | unskipped passing test or equivalent source-backed run surface |
 
 ## Open Questions
 

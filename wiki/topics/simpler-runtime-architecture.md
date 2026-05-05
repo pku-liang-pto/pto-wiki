@@ -138,3 +138,7 @@ The `--build` flag recompiles runtime binaries from source; without it, examples
 ## What This Page Adds To The Repo Profile
 
 The [simpler repository profile](../repositories/simpler.md) explains where the repository fits in PTO. This page explains the runtime mechanics in a self-contained way. For claims about `ChipWorker`, TensorMap, ring buffer, mailbox, SubWorker, L3, or deferred remote-worker work, this page is the foundation layer before distributed behavior is added.
+
+## What To Remember
+
+`simpler` 的核心不是一个单一 “run kernel” 函数，而是一套分层 runtime：L2 `ChipWorker` 负责真正 device launch；L3+ engine 用 Orchestrator、Scheduler、WorkerManager 把 task graph 派发到 child workers；TensorMap 和 ring buffer 让 data dependency 和 storage reuse 可持续。理解这个结构后，再读 distributed execution 时就能看出哪些是当前 single-host hierarchy，哪些还需要 future remote control-plane evidence。

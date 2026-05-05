@@ -77,3 +77,7 @@ Status evidence for these rows is summarized from [Distributed Execution Evidenc
 | Communication backend | HCCL backend or sim backend behind platform-neutral comm C API | backend selected indirectly through simpler runtime path | SDMA/URMA communication primitive demos | `implemented` as supporting data-plane; not the owner of runtime control flow. |
 | Remote distributed worker | remote child worker / remote L3 target in material bundle | higher Lingqu levels and generated hierarchy are partially present | URMA/RoCE primitive direction, not callable registry | `design-intended`; material blueprint, no stable remote control-plane test in inspected source. |
 | Lingqu level terminology | L0-L6 runtime model in docs/materials | `LevelToLinquLevel()` source-native identifier maps PyPTO enum to Lingqu level | not primary taxonomy | mixed: L3 implemented; L4-L6 mostly `design-intended` / `open question`. |
+
+## What To Remember
+
+分布式术语必须按层解释。`TPUT/TGET/TWAIT/TNOTIFY` 属于 kernel primitive；`Worker(level=3)` 属于 host runtime；HCCL 属于 communication backend/data-plane；DistWorker/remote L3 属于 future control-plane 目标。一个词出现在多个仓库时，先判断它在本句中承担哪一层责任，再给状态标签。

@@ -113,6 +113,16 @@ All material files are UTF-8 Markdown extracted from `materials/pto-runtime-dist
 - `pypto/tests/st/distributed/test_l3_parallel_reduce.py` is skipped, so it is `emerging`, not `implemented`.
 - GitHub compound search for PTO-ISA PR history hit search operator limits; PTO-ISA conclusions rely on README, headers, demos, and tests.
 
+## Status-Change Criteria
+
+| Current status | Evidence needed to change it |
+| --- | --- |
+| Remote L3 / DistWorker is `design-intended` | merged source and a stable example/test showing remote worker discovery, lifecycle, callable registration, cross-host control channel, and completion behavior |
+| PyPTO orchestration-level collectives are `design-intended` | stable public API, lowering/codegen path, tests, and a runtime example that explains what layer owns collective semantics |
+| SDMA async completion is `emerging` | merged completion backend PR plus updated tests/examples or upstream docs that define expected behavior |
+| HCCL remains data-plane supporting evidence | only a PTO runtime control-plane implementation, not HCCL API surface alone, can change worker-lifecycle claims |
+| Complete distributed NN example is `TODO` in public examples | runnable model-level distributed example with source path, command, environment assumptions, expected signal, and evidence-ledger row |
+
 ## Open Questions
 
 - Will remote L3 live inside `simpler`, a separate distributed runtime, or PyPTO runner integration?

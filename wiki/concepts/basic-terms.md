@@ -102,3 +102,7 @@ kernel tile instruction term
 worker / scheduler / launch / dependency term
   -> simpler runtime
 ```
+
+## What To Remember
+
+最小心智模型是三层：PyPTO 负责表达和 lowering；PTO-ISA 负责 kernel/tile semantics；`simpler` 负责 runtime launch 和 scheduling。所有 examples、topics 和 repository pages 都应能回到这三层，否则读者会很快把 language feature、kernel primitive 和 runtime behavior 混在一起。

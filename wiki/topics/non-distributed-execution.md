@@ -97,7 +97,7 @@ PTO-ISA starts below PyPTO: it gives kernel authors and compiler backends a tile
 - matmul/add/softmax-style compute
 - pipeline and double-buffering style optimization in GEMM/Flash Attention examples
 
-A non-distributed PTO-ISA operator usually has two halves. The host/operator half registers a callable interface and prepares launch/build artifacts. The kernel half operates on tensors through tile abstractions: global memory is described as `GlobalTensor`, local compute uses `Tile`, and instructions move data between memory spaces before compute and store. Communication instructions exist in the repo, but they should be read after this compute/data-movement model is clear.
+A non-distributed PTO-ISA operator usually has two halves. The host/operator half registers a callable interface and prepares launch/build artifacts. The kernel half operates on tensors through tile abstractions: global memory is described as `GlobalTensor`, local compute uses `Tile`, and instructions move data between memory spaces before compute and store. Communication instructions exist in the repo, but in this learning path they come later: first understand compute/data movement, then read communication primitive semantics.
 
 ## Normal simpler L2 Flow
 
@@ -137,3 +137,7 @@ Distributed execution adds L3 host orchestration, SubWorkers, multi-chip windows
 
 - Which non-distributed PyPTO model example should become the canonical “complete NN” baseline for future distributed comparison?
 - Should `tensormap_and_ringbuffer` become the only documented runtime variant once `host_build_graph` is only a debug path?
+
+## What To Remember
+
+Non-distributed execution is not “less important distributed execution.” It is the basis that makes distributed claims meaningful. PyPTO must first express and lower a normal program, PTO-ISA must first explain tile movement and compute, and `simpler` L2 must first launch chip work correctly. Only after those three facts are clear should L3, rank/window, collectives, or remote-worker designs be introduced.

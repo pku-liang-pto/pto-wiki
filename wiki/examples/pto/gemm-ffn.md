@@ -67,3 +67,11 @@ Run surface：
 ## What This Example Family Proves
 
 GEMM / FFN 证明三层关系：PyPTO 能表达 model block，PTO-ISA 能实现 performance kernel，simpler 能把 partitioned model stage 放进 multi-chip runtime。它仍然不是 complete distributed NN，因为完整 model graph、partitioning policy、PyPTO lowering、runtime execution 和 validation 还没有在一个 vertical slice 中闭合。
+
+## What To Read Next
+
+读完 GEMM / FFN 后，继续读 [Softmax / Attention](./softmax-attention.md)，因为 attention 会把 GEMM、reduction、softmax 和 memory behavior 组合起来。然后读 [Complete Models](./complete-models.md)，看 FFN 如何成为 LLaMA-style decoder 的一个 stage。
+
+## What To Remember
+
+GEMM 是 kernel/performance foundation；FFN 是 model block；FFN tensor parallel 是 runtime/distributed partial。不要把 PTO-ISA GEMM performance example、PyPTO FFN expression、`simpler` FFN TP runtime example 混成同一个 status。

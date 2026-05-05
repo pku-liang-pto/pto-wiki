@@ -149,3 +149,9 @@ HCCL 是 supporting evidence，不是 PTO Runtime 的 control-plane 替代品。
 - remote worker lifecycle 的 owner 和 API 边界尚未定稿。
 - orchestration-level collective 先实现为 PyPTO sugar、runtime callable，还是 PTO-ISA primitive lowering 仍未确认。
 - HCCL、HCOMM、URMA、RoCE 在目标 runtime 中的 backend boundary 需要后续代码证明。
+
+## What To Remember
+
+当前已经能作为学习材料讲清楚的是 single-host L3：parent process 建立 hierarchy，Orchestrator 用 TensorMap 建依赖，Scheduler 派发 task，WorkerThread 把工作交给 chip child 或 SubWorker，HCCL/sim backend 提供 rank/window data-plane。remote L3/DistWorker 是目标方向，不是当前已证明的 runtime control plane。
+
+因此，读到 “distributed” 时不要直接理解成跨机器完整系统。先问它是 PyPTO hierarchy expression、`simpler` L3 scheduling、PTO-ISA communication primitive、HCCL data-plane，还是 material blueprint 中的 future remote worker。

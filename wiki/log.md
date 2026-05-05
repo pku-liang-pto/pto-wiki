@@ -83,3 +83,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-05] review-update | Multi-agent writing and policy audit
 
 用 public learner、examples developer、evidence auditor 和 agent-rules maintainer 四类 reviewer 重新检查 public wiki。根据反馈补强 example run surfaces 的 exact cwd/commands/status，扩展 advanced example chapters，修正 Lingqu L1 status、developer takeover/process leakage、glossary 中文叙述和 materials framing；同步更新 `.agents/` policies/workflows/skills，明确 public `wiki/materials/` 只在用户显式要求时使用，topic page 一旦依赖 material/GitHub/external/cross-repo evidence 就必须引用 paired evidence ledger，并把 public navigation hierarchy 纳入 wiki health checks。
+
+## [2026-05-05] review-update | Implement standalone learning content rewrite spec
+
+根据 `docs/specs/2026-05-05-wiki-standalone-learning-content-upgrade.md`，系统升级 public wiki contents：Home/Overview/area indexes 更聚焦阅读路径；repository chapters 强化 ownership、architecture diagram、source anchors、examples/tests、proof boundaries 和 safe first change；PTO example chapters 补足背景、run surface、source comparison、what it proves / does not prove；topics/concepts/glossary 增加 mental model、status boundary、What To Remember；evidence ledgers 增加 status-change criteria；materials index 明确 source-material 与 synthesized wiki 的边界。

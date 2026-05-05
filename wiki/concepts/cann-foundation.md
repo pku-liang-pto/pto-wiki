@@ -26,16 +26,16 @@ PTO / PyPTO / simpler control and programming layers
        -> HCCL / HCOMM / SHMEM / HIXL / recipes
 ```
 
-In this wiki, CANN is the Ascend software-stack context below PTO. PTO layers decide what the program means and how PTO runtime schedules it; CANN-side components provide the device runtime, compiler/toolchain environment, logging/runtime APIs, and communication/memory/interconnect capabilities that make those programs executable on Ascend systems.
+在本 wiki 中，CANN 是 PTO 下方的 Ascend software-stack context。PTO/PyPTO/`simpler` 决定 program 表达什么、如何 lower、如何 schedule；CANN-side components 提供 device runtime、compiler/toolchain environment、logging/runtime APIs，以及 communication/memory/interconnect 能力，让这些 program 能在 Ascend systems 上执行。
 
-The most visible CANN dependency in the current PTO pass is not “remote runtime control.” It is the practical execution substrate:
+当前 PTO pass 中最明显的 CANN dependency 不是 “remote runtime control”，而是 practical execution substrate：
 
 - `ccec` and CANN toolchain pieces compile AICore/AICPU/runtime artifacts in `simpler` and PTO-ISA hardware paths.
 - `torch_npu` appears in PTO-ISA custom operator demos as the PyTorch dispatch/integration surface.
 - HCCL supports collective/send/recv/window-style data-plane behavior used by communication examples and `simpler` comm context paths.
 - CANN device runtime and logging affect `ChipWorker` initialization, device selection, streams, memory allocation, and AICPU logs.
 
-This is enough to understand why CANN matters, but not enough to assign ownership for every configured CANN repo. Except for partial HCCL evidence, CANN-side projects still need dedicated repository profiles before they become authoritative wiki sources.
+这些信息足以解释为什么 CANN 对 PTO 重要，但还不足以给每个 configured CANN repo 分配 ownership。除 partial HCCL evidence 外，CANN-side projects 仍需要 dedicated repository profiles，才能成为本 wiki 的 authoritative implementation source。
 
 ## Terms
 
@@ -74,3 +74,7 @@ Concrete examples:
 HCCL/HCOMM/SHMEM/HIXL evidence can support data movement, collective communication, memory sharing, or interconnect claims. It does not by itself prove PTO Runtime worker lifecycle, PyPTO syntax/API, simpler scheduler behavior, remote callable registry, or remote L3 control plane.
 
 因此，当前没有 dedicated source pass 的 CANN-side project 只表示 target-set coverage gap，不表示本 wiki 已能解释其实现 ownership。分布式页面中的 HCCL/HCOMM/SHMEM/HIXL 相关句子，都应按 data-plane support 或 `open question` 阅读。
+
+## What To Remember
+
+CANN/HCCL 是执行环境和通信/内存支撑层，不是 PyPTO syntax、PTO-ISA kernel semantics 或 `simpler` worker lifecycle 的替代解释。当前 wiki 可以用 HCCL 支撑 collective/window/data-plane 事实；不能用它证明 remote L3、DistWorker、callable registry 或 PTO scheduler 已经完成。

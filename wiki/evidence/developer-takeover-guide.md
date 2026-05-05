@@ -53,6 +53,15 @@ Maintainer-facing knowledge lives in the guide itself. This ledger records why t
 - Materials provide task categories, but the wiki does not copy them into a task tracker because implementation tasks need fresh source and issue verification.
 - Hardware/NPU examples were not executed in this wiki pass; example command rows are documentation evidence unless marked otherwise.
 
+## Status-Change Criteria
+
+| Current risk | Evidence needed to lower risk |
+| --- | --- |
+| Unprofiled target-set repositories remain ownership gaps | repository profile or topic evidence pass with inspected commit, source anchors, examples/tests, and boundaries |
+| Complete distributed NN example remains a takeover risk | selected vertical slice with runnable source, documented command, expected output, and proof/non-proof explanation |
+| Hardware/NPU examples remain `not-run` in this wiki pass | local run record with date, environment, command, output signal, and caveat if hardware-specific |
+| Material tasks are not copied as implementation tracker | fresh issue/PR/source verification that converts a material task into a current project task |
+
 ## Open Questions
 
 - Which team or repo should own the first complete distributed NN example?

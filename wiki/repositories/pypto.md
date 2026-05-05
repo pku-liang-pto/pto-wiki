@@ -39,6 +39,19 @@ Python DSL (@pl.program / @pl.function)
 
 `pypto/.gitmodules` 中 `runtime` submodule 指向 `https://github.com/hw-native-sys/simpler`；这是 runtime integration 的基础，但普通 PyPTO 页面不应从 distributed runner 开始。
 
+```text
+pypto owns expression and lowering
+
+Python decorators and type annotations
+  -> PyPTO IR
+  -> pass pipeline
+  -> backend-generated code/artifacts
+  -> normal runner or distributed runner
+
+not owned here:
+PTO-ISA primitive semantics, simpler worker lifecycle, HCCL backend behavior
+```
+
 ## 非分布式编程模型
 
 `examples/hello_world.py` 展示最小 PyPTO program：`@pl.program` class 中有 `InCore` function，使用 `pl.load` 把 global tensor load 成 tile，`pl.add` 做 tile compute，`pl.store` 写回 output；另一个 `Orchestration` function 调用 `InCore` kernel。README 的 examples 也按复杂度组织为 hello world、kernel examples、model examples。
@@ -63,6 +76,8 @@ Python DSL (@pl.program / @pl.function)
 
 ## 核心模块
 
+读源码时把 PyPTO 分成 language、IR/pass、codegen、runner 四层。Language 层解释用户能写什么；IR/pass 层解释 program 如何被转换；codegen 层解释生成什么 artifact；runner 层解释这些 artifact 如何交给 simulator/hardware/runtime。
+
 | 模块 | 作用 | 状态 |
 | --- | --- | --- |
 | `python/pypto/language/` | Python DSL、decorators、typing、ops、parser | `implemented` |
@@ -78,6 +93,16 @@ Python DSL (@pl.program / @pl.function)
 | `tests/st/distributed/test_l3_distributed.py` | HOST orchestrator -> CHIP worker -> SubWorker 端到端测试 | `implemented` |
 | `tests/st/distributed/test_l3_parallel_reduce.py` | 多 chip callable + SubWorker reduce 设计测试 | `emerging`，当前 skip |
 | `tests/ut/codegen/test_distributed_codegen.py` | distributed codegen unit tests | `implemented` |
+
+Code anchors:
+
+- `examples/hello_world.py`: 最小 `@pl.program` / `InCore` / `Orchestration` 示例。
+- `python/pypto/language/parser/README.md`: decorator-based parser、type annotation、SSA/control-flow handling。
+- `python/pypto/ir/pass_manager.py`: default lowering and optimization sequence.
+- `python/pypto/ir/compile.py`: `compile()` path and `CompiledProgram` / `DistributedCompiledProgram` split.
+- `python/pypto/runtime/runner.py`: normal `run()` and `RunConfig` surface.
+- `python/pypto/runtime/distributed_runner.py`: L3 runner via `simpler.Worker(level=3)`.
+- `src/codegen/distributed/distributed_codegen.cpp`: `submit_next_level` / `submit_sub` lowering.
 
 ## 普通 Runtime Path
 
@@ -115,6 +140,17 @@ README 将 examples 明确分成 hello world、kernel examples 和 model example
 | model control-flow scan | `python examples/models/03_flash_attention.py` | function representation prints | advanced DSL concepts not yet read |
 | unit-test confidence | `python -m pytest tests/ut -n auto --maxprocesses 8 -v` | unit tests pass | dev dependencies missing |
 | complete NN reading | inspect `examples/models/08_llama_mini.py` | can identify RMSNorm, QKV, RoPE, MLP, LM head | no CLI entrypoint in inspected file |
+
+## Safe First Change
+
+第一次改 PyPTO 时，优先选择仍在 language/compiler boundary 内的改动：example shape、parser/type error、small pass behavior、orchestration codegen unit test。不要用 runtime/hardware failure 直接反推 compiler bug；先检查 generated program、IR dump、pass output 和 `CompiledProgram` / `DistributedCompiledProgram` 分叉是否符合预期。
+
+```text
+safe compiler-side loop
+  -> edit example/parser/pass/codegen
+  -> inspect generated program or run unit test
+  -> only then reason about runtime
+```
 
 ## Distributed Extension: Level / Role
 
@@ -159,8 +195,16 @@ PyPTO 的 `LevelToLinquLevel()` 与 top-level design 中的 L0-L6 方向一致�
 
 本页的判断是：PyPTO 的主线是普通 DSL -> IR -> pass -> codegen -> runtime path；distributed codegen/runner 是在这条主线上识别 L3+ hierarchy 后进入的扩展路径。证据来自 README examples、`hello_world.py`、parser/pass/compile source、`function.h` level enum、distributed codegen tests 和 `distributed_runner.py`。因此“PyPTO 已支持 single-host L3 hierarchy execution”可以写为 `implemented`；“remote L3、多 host、完整 distributed NN”仍应写为 `design-intended` 或 `TODO`。
 
+## What This Page Proves
+
+本页可以证明 PyPTO 拥有普通 DSL/parser/pass/codegen/runtime-facing path，并且能识别 L3+ hierarchy program 后进入 distributed runner。它不能证明 remote worker lifecycle、multi-host communication、orchestration-level collectives 或 complete distributed NN 已经稳定实现；这些能力需要 `simpler` runtime、PTO-ISA communication primitive、HCCL/CANN data plane 和 PyPTO API/test evidence 一起支撑。
+
 ## 未决问题
 
 - PyPTO 打开的 L3 Distributed Programming Interface RFC 会如何稳定 `pl.at`、functional style 和 inline style？
 - orchestration-level collectives issue 中的 `pl.all_reduce` 等 API 会落在 PyPTO codegen、simpler runtime，还是 PTO-ISA communication primitive 的组合？
 - `test_l3_parallel_reduce.py` 的 skip 消除后，需要同步更新本页和 [PTO Examples](../examples/pto/)。
+
+## What To Remember
+
+读 PyPTO 时先记住 ordinary path，再读 distributed extension。普通 path 是 `@pl.program` -> IR -> passes -> codegen -> `runtime.run()`；distributed path 是 hierarchy program -> `DistributedCompiledProgram` -> `distributed_runner.py` -> `simpler.Worker(level=3)`。当前证据支持 single-host L3 hierarchy execution，不支持把 remote L3 或 complete distributed model 写成 `implemented`。

@@ -67,3 +67,7 @@ L1 / `CHIP_DIE` 是最容易误读的一行。PyPTO `Level` enum 和 Lingqu mapp
 ## 风险
 
 层级名很容易让读者误以为“enum 已存在 = runtime 已实现”。本 wiki 页面使用状态标签避免这个误读：PyPTO 的 `Level` enum 是表达能力，simpler examples 是执行能力，remote L4-L6 是目标能力。
+
+## What To Remember
+
+Lingqu level map 是 alignment tool，不是 implementation checklist。读到一个 level 时，要同时问三个问题：design 是否定义了它，PyPTO 是否能表达它，runtime source/example 是否证明它可运行。只有第三项成立时，才能把该层级写成 `implemented` runtime behavior。

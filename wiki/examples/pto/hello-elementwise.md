@@ -72,3 +72,11 @@ Run surface：
 - simpler vector add proves L2 runtime launch/copy-back lifecycle.
 
 它们合在一起构成最小 mental model，但仍然不证明 distributed behavior。
+
+## What To Read Next
+
+下一步读 [GEMM / FFN](./gemm-ffn.md)。GEMM 会把同样的 expression/kernel/runtime 分层带入 tiling、pipeline 和 model block；FFN TP 会第一次把这个分层放进 L3 multi-chip runtime。
+
+## What To Remember
+
+Add-like examples 是最小闭环，不是玩具附录。它们让读者先学会区分 expression、kernel semantics 和 runtime launch。后续任何 distributed claim 都应该能回到这个三层分工解释清楚。

@@ -43,6 +43,14 @@ This ledger supports [Non-Distributed Execution](../topics/non-distributed-execu
 - PTO-ISA demos prove kernel/operator behavior, not host-level scheduler semantics.
 - simpler L2 launch path does not imply cross-host worker discovery.
 
+## Status-Change Criteria
+
+| Current boundary | Evidence that would change it |
+| --- | --- |
+| Canonical complete-NN non-distributed baseline is still `open question` | selected PyPTO model example with stable run command, documented expected output, and linked source/test evidence |
+| `tensormap_and_ringbuffer` is documented as production-oriented but not the only runtime path | upstream docs or source removing/reclassifying `host_build_graph`, plus examples/tests updated to the new canonical path |
+| Non-distributed pages do not prove remote behavior | stable remote worker lifecycle evidence would still belong in distributed ledgers; this page would only add it as a later-layer dependency |
+
 ## Open Questions
 
 - Which model example should become the canonical complete-NN non-distributed baseline?

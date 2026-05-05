@@ -37,6 +37,7 @@ export default defineConfig({
         text: 'Topics',
         items: [
           { text: '非分布式执行', link: '/topics/non-distributed-execution' },
+          { text: 'Examples Feature Map', link: '/topics/examples-feature-map' },
           { text: 'simpler Runtime Architecture', link: '/topics/simpler-runtime-architecture' },
           { text: 'Distributed Execution', link: '/topics/distributed-execution' },
           { text: 'Lingqu Level Map', link: '/topics/lingqu-level-map' },
@@ -101,6 +102,7 @@ export default defineConfig({
         text: 'Topics',
         items: [
           { text: '非分布式执行', link: '/topics/non-distributed-execution' },
+          { text: 'Examples Feature Map', link: '/topics/examples-feature-map' },
           { text: 'simpler Runtime Architecture', link: '/topics/simpler-runtime-architecture' },
           { text: 'Distributed Execution', link: '/topics/distributed-execution' },
           { text: 'Lingqu Level Map', link: '/topics/lingqu-level-map' },

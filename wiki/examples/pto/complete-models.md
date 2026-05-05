@@ -79,3 +79,11 @@ Complete distributed NN is not implemented in the inspected evidence. The missin
 Detailed acceptance criteria live in [Missing Roadmap](./missing-roadmap.md).
 
 因此，`llama_mini` 当前应该被当作 complete non-distributed reference。它给未来 distributed model 提供 shape、stage 和 validation 目标，但不能单独证明 tensor parallel execution、collective lowering 或 remote worker behavior。
+
+## What To Read Next
+
+读完本页后，回到 [GEMM / FFN](./gemm-ffn.md) 看 FFN 如何变成 tensor-parallel runtime partial，再读 [Distributed Runtime](./distributed-runtime.md) 看 allreduce、allgather 和 PyPTO hierarchy tests 分别证明哪一层。最后用 [Missing Roadmap](./missing-roadmap.md) 检查 complete distributed NN 还缺哪些 evidence。
+
+## What To Remember
+
+`llama_mini` 是 complete non-distributed model reference。它帮助读者理解 model graph 和 stage boundaries，但它不是 distributed proof。未来 distributed model page 必须解释 partitioning、rank-local ownership、cross-rank communication、runtime scheduling 和 validation。

@@ -95,3 +95,11 @@ Run surface：
 - PTO-ISA allgather primitive is not PyPTO `pl.all_reduce`.
 - `Worker(level=3)` on one host is not remote DistWorker.
 - FFN TP is not complete distributed NN.
+
+## What To Read Next
+
+如果你想理解 L3 local runtime mechanics，继续读 [simpler Runtime Architecture](../../topics/simpler-runtime-architecture.md)。如果你想知道 remote L3 / complete distributed NN 何时能升级状态，读 [Missing Roadmap](./missing-roadmap.md)。如果你需要 audit source status，读 [Distributed Execution Evidence](../../evidence/distributed-execution.md) 和 [Examples Feature Map Evidence](../../evidence/examples-feature-map.md)。
+
+## What To Remember
+
+当前 distributed examples 是一组 partial proofs：`simpler` 证明 single-host L3 scheduling and data-plane examples，PTO-ISA 证明 kernel communication primitive，PyPTO 证明 hierarchy-aware lowering/runner。它们共同支持 distributed direction，但还没有组成 remote multi-host runtime 或 complete distributed NN。

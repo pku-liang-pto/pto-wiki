@@ -43,6 +43,14 @@ This ledger supports [Lingqu Level Map](../topics/lingqu-level-map.md). It exist
 - No inspected source made `GLOBAL` a stable runtime execution level.
 - Remote L4-L6 evidence is design material, not an implemented example.
 
+## Status-Change Criteria
+
+| Current status | Evidence needed to change it |
+| --- | --- |
+| L4-L6 are `design-intended` | source/test/example evidence that maps Lingqu levels to concrete process/host/device ownership and shows stable runtime execution |
+| `GLOBAL` is `open question` | upstream PyPTO/simpler docs or source that defines `GLOBAL` runtime semantics, plus a test/example using it |
+| `DistWorker` is design terminology | stable implementation naming, registration/lifecycle code, and example evidence that shows how it maps to actual workers |
+
 ## Open Questions
 
 - Will `GLOBAL` become a real runtime level or remain a compiler-side label?
