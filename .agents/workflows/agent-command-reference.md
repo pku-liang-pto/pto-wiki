@@ -58,6 +58,28 @@ Inspect issue body, state, labels, comments, linked PRs/commits, and referenced 
 
 Inspect PR title, body, state, base/head refs, commits, changed files, and relevant discussion. Fetch the PR head or branch before relying on source claims.
 
+## GitHub Operations
+
+`checkout pr: <number>`
+
+Use `github-pr-checkout`. Fetch PR metadata, add the head remote when needed, and create a local PR work branch with the correct writable push target.
+
+`review pr: <number>`
+
+Use `github-pr-reviewer`. Fetch the actual base branch, compute the merge-base, inspect the PR-only diff, and lead with findings.
+
+`publish pr` / `create pr`
+
+Use `github-pr-publisher`. Verify committed scope, run relevant checks, push the current branch, and create or update the PR with summary and testing.
+
+`resolve pr comments` / `fix pr checks`
+
+Use `github-pr-operator`. Fetch unresolved review threads or failing checks, classify issues, implement fixes, verify, commit, and push.
+
+`clean branches`
+
+Use `github-branch-cleaner`. Detect regular and squash-merged branches, present safe deletions, and wait for explicit approval before deleting anything.
+
 ## Topic Research
 
 `research topic from materials: <repo-name> <topic>`

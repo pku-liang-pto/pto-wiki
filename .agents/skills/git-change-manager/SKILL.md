@@ -1,6 +1,6 @@
 ---
 name: git-change-manager
-description: Use when preparing commits, staging related changes, writing commit messages, checking pre-commit readiness, or cleaning merged local and fork branches.
+description: Use when preparing commits, staging related changes, writing commit messages, checking pre-commit readiness, or verifying committed scope.
 ---
 
 # Git Change Manager
@@ -38,13 +38,7 @@ Rules:
 
 ## Branch Cleanup
 
-1. Identify fork and upstream remotes.
-2. Fetch/prune the fork remote.
-3. List local and fork remote branches, excluding current branch, `main`, and `HEAD`.
-4. Detect regular merged branches with `git branch --merged`.
-5. Detect squash-merged branches with `gh pr list --head <branch> --state merged` and compare branch tip to PR head SHA to avoid deleting reused branches.
-6. Present safe-to-delete and unfinished branches to the user.
-7. Delete only after explicit approval, and never delete upstream remote branches.
+Use `github-branch-cleaner` for cleaning merged local or remote branches. This skill only covers commits and committed scope verification.
 
 ## Post-Commit
 

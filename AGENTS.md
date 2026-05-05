@@ -4,25 +4,13 @@ This repository is a reusable technical wiki template. Agents must keep reusable
 
 ## Required Reading
 
-Before answering lookup requests, updating the wiki, or documenting repositories, read the relevant files:
+Before answering lookup requests, updating the wiki, documenting repositories, or operating GitHub tasks:
 
-- `.agents/workflows/agent-command-reference.md`
-- `.agents/workflows/wiki-lookup-and-update.md`
-- `.agents/workflows/concept-evidence-lookup.md`
-- `.agents/workflows/document-material-ingestion.md`
-- `.agents/workflows/repo-documentation.md`
-- `.agents/workflows/dependency-and-code-analysis.md`
-- `.agents/workflows/github-reference-documentation.md`
-- `.agents/workflows/topic-evidence-discovery.md`
-- `.agents/workflows/wiki-health-and-lint.md`
-- `.agents/policies/wiki-content-boundary-policy.md`
-- `.agents/policies/wiki-update-policy.md`
-- `.agents/policies/wiki-organization-policy.md`
-- `.agents/policies/wiki-writing-style-policy.md`
-- `.agents/policies/document-material-policy.md`
-- `.agents/policies/source-and-citation-policy.md`
-- `.agents/policies/repository-workspace-policy.md`
-- `.agents/policies/template-reuse-policy.md`
+1. Read `.agents/README.md` and `.agents/policies/agent-workflow-policy.md`.
+2. Select the smallest matching skill from `.agents/skills/`.
+3. Read only the workflows and policies named by that skill.
+
+Do not pre-read every workflow file. Workflows are reference procedures loaded through skills, not global required context.
 
 ## Core Rules
 

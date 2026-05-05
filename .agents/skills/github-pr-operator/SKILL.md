@@ -1,11 +1,22 @@
 ---
 name: github-pr-operator
-description: Use when checking out a PR, reviewing PR changes, addressing PR review comments, fixing PR CI failures, creating a PR, updating a PR, or preparing a PR for review.
+description: Use when a GitHub pull request task spans multiple PR operations, involves PR review comments or CI failures, or is too broad for a single checkout, review, or publish skill.
 ---
 
 # GitHub PR Operator
 
 Operate on GitHub pull requests with explicit PR context, correct refs, and clean push behavior.
+
+## Prefer Unit Skills
+
+Use the more specific skill when the request is clearly one operation:
+
+- `github-pr-checkout`: check out a PR head locally.
+- `github-pr-reviewer`: review or analyze a PR diff.
+- `github-pr-publisher`: push a branch and create or update a PR.
+- `github-branch-cleaner`: clean merged branches after PRs merge.
+
+Use this operator for compound PR work, unresolved review comments, failing PR checks, or ambiguous "resolve PR" requests.
 
 ## Setup
 

@@ -103,3 +103,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-06] review-update | Replace module tables with architecture prose
 
 根据 PR review 中对 table-driven writing 的反馈，重新审查 public wiki table blocks，重点修正 repository profiles 中用 module/source-path table 承载架构解释的问题。将 [simpler](./repositories/simpler.md) 的关键模块表改写为 L2 chip launch、L3+ host DAG、communication data-plane 三条运行路径；将 [pto-isa](./repositories/pto-isa.md) 的主要结构表改写为 public instruction interface、runnable operator packaging、communication primitive layer 三层；将 [pypto](./repositories/pypto.md) 的核心模块表改写为 language-to-IR、normal codegen/runner、distributed extension 三条主线。同步强化 `.agents` writing/health rules，要求后续 table audit 检查每个表格是否只是 lookup support，而不是正文解释的替代品。
+
+## [2026-05-06] policy-update | Refactor agent workflow routing
+
+将 `.agents` 重新定位为 skill-first workflow system：新增 `.agents/README.md` 和 `.agents/policies/agent-workflow-policy.md`，明确 agents 不应预读所有 workflows，而应先选最小匹配 skill，再加载该 skill 引用的 workflows/policies。新增 GitHub unit skills：`github-pr-checkout`、`github-pr-reviewer`、`github-pr-publisher`、`github-branch-cleaner`，并把 `github-pr-operator` 收窄为复合 PR work、review comments 和 CI failure 的 operator。同步更新 `agent-command-reference.md` 和 `git-change-manager`，把 branch cleanup 从 commit workflow 中拆出。
