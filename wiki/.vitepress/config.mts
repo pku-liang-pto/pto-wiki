@@ -55,7 +55,8 @@ export default defineConfig({
       {
         text: 'Future',
         items: [
-          { text: 'Future index', link: '/future/' }
+          { text: 'Future index', link: '/future/' },
+          { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
       {
@@ -126,7 +127,8 @@ export default defineConfig({
       {
         text: 'Future',
         items: [
-          { text: 'Future index', link: '/future/' }
+          { text: 'Future index', link: '/future/' },
+          { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
       {

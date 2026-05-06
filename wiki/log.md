@@ -111,3 +111,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-06] policy-update | Simplify persistent wiki agent harness
 
 将 `.agents` harness 简化为四个 primary wiki/harness skills：`wiki-qa-maintainer`、`wiki-researcher`、`wiki-review-maintainer`、`agent-harness-maintainer`。新增 [Future](./future/) 作为 public ongoing-work section，用于保存目标、约束、roadmap/task division、blocker、planned feature 和 design-intended behavior；raw QA histories 放在 [QA Evidence](./evidence/qa/) 而不是 public learning sidebar。新增 mechanical validators for skill shape, local Markdown links, and VitePress builds。
+
+## [2026-05-06] future-update | Add runtime dispatch and serving roadmap
+
+新增 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)，把 `simpler` PR #711、`pypto_top_level_documents/UBL128_serving.md`、`materials/A5_send_recv_dispatch.pdf`、`materials/L4_L3_data_plane_design.md` 和 `materials/RUNTIME_OPEN_PROBLEMS.md` 整理为 Future workstream。同步新增 [Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)，记录 PR state、external document commit/blob、local material checksums、claim map、negative findings 和 status-change criteria；更新 Future navigation、Evidence index、Home/Overview reading path。
