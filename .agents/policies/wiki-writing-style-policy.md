@@ -40,6 +40,7 @@ Write concise but information-rich prose.
 - Repository pages are repository-centered learning chapters: teach purpose, architecture, important examples, source-verified implementation state, and material-derived design context while preserving status boundaries.
 - Materials under `wiki/materials/` are public learning pages when exposed in the sidebar. They must define important terms where introduced, explain source paths locally instead of saying only "see source", and include diagrams or source-shaped pseudocode when the material depends on execution flow or code behavior.
 - Materials may be used as writing-quality references for structure and depth, but Examples/Topics/Repositories should synthesize, compress, cross-link, and update the material shape when the wiki page has a different job.
+- Future pages under `wiki/future/` are public learning pages, not task trackers. They must explain background, target/objective, constraints, current status, roadmap or task division when available, and evidence boundaries. They must not blur planned or design-intended behavior into implemented behavior.
 
 ## Visual Intuition
 

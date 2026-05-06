@@ -53,6 +53,13 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Future',
+        items: [
+          { text: 'Future index', link: '/future/' },
+          { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
+        ]
+      },
+      {
         text: 'Materials',
         items: [
           { text: 'Materials Home', link: '/materials/' },
@@ -115,6 +122,13 @@ export default defineConfig({
           { text: 'Basic Terms', link: '/concepts/basic-terms' },
           { text: 'CANN Foundation', link: '/concepts/cann-foundation' },
           { text: 'Distributed Terms', link: '/concepts/distributed-execution-terms' }
+        ]
+      },
+      {
+        text: 'Future',
+        items: [
+          { text: 'Future index', link: '/future/' },
+          { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
       {

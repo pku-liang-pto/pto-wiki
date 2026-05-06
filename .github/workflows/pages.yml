@@ -36,10 +36,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run harness checks
+        run: |
+          npm run test:validators
+          npm run agents:check
+          npm run wiki:links
+
       - name: Build wiki
-        run: npm run docs:build
-        env:
-          VITEPRESS_BASE: /pto-wiki/
+        run: npm run docs:build:pages
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

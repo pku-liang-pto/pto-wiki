@@ -9,7 +9,11 @@ platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 install = "npm ci"
 docs-dev = "npm run docs:dev"
 docs-build = "npm run docs:build"
+docs-build-pages = "npm run docs:build:pages"
 docs-preview = "npm run docs:preview"
+agents-check = "npm run agents:check"
+wiki-links = "npm run wiki:links"
+check = "npm run check"
 
 [dependencies]
 nodejs = ">=20,<23"

@@ -1,11 +1,11 @@
 ---
 name: github-pr-operator
-description: Use when checking out a PR, reviewing PR changes, addressing PR review comments, fixing PR CI failures, creating a PR, updating a PR, or preparing a PR for review.
+description: Use when checking out, reviewing, publishing, fixing CI or review comments for, or cleaning branches after GitHub pull requests.
 ---
 
 # GitHub PR Operator
 
-Operate on GitHub pull requests with explicit PR context, correct refs, and clean push behavior.
+Operate on GitHub pull requests with explicit PR context, correct refs, clean push behavior, and narrow branch cleanup.
 
 ## Setup
 
@@ -22,6 +22,7 @@ For a PR number:
 2. Validate state: open continues; closed warns; merged exits unless user explicitly wants historical inspection.
 3. If head repo is not the canonical repo, add/fetch a remote named for the head owner.
 4. Fetch the head branch and create a local `pr-<number>-work` branch tracking the writable push target.
+5. Report PR number, author, local branch, push remote, base branch, and head branch.
 
 ## Review PR
 
@@ -30,8 +31,18 @@ For a PR number:
 3. Verify the diff is PR-only, then inspect `git diff "$MERGE_BASE"...HEAD`.
 4. Read surrounding source when diff context is insufficient.
 5. Lead with findings: bugs, regressions, missing tests, risks. Keep summaries secondary.
+6. If there are no findings, say that clearly and mention remaining test gaps or unverified assumptions.
 
-## Fix PR Comments Or CI
+## Publish PR
+
+1. If no PR exists and the current branch is default, create a feature branch from the base.
+2. If there are uncommitted changes, use `git-change-manager` to verify, stage, and commit related files.
+3. Fetch and rebase on the base ref unless project policy or branch state makes rebase inappropriate.
+4. Push to the correct remote/head branch. Use `--set-upstream` for first push.
+5. Use `--force-with-lease` only after an intentional local history rewrite.
+6. Create or edit the PR with concise title, summary, testing section, and linked issue when applicable.
+
+## Fix CI Or Review Comments
 
 1. Fetch unresolved review threads and CI status.
 2. Classify review comments as actionable, discussable, or informational.
@@ -40,17 +51,21 @@ For a PR number:
 5. Make minimal code/docs changes on the PR branch, test, commit, and push.
 6. Do not reply to or resolve review threads unless the user explicitly asks or project policy requires it.
 
-## Create Or Update PR
+## Branch Cleanup
 
-1. If no PR exists and the current branch is default, create a feature branch from the base.
-2. Commit related changes with `git-change-manager`.
-3. Rebase on the base ref before push.
-4. Push to the correct remote/head branch; use `--force-with-lease` only for updating an existing PR branch after history rewrite.
-5. Create or edit the PR with a concise title, summary, testing section, and linked issue when applicable.
+1. Identify remotes and current branch.
+2. Fetch/prune candidate fork remote refs.
+3. List local merged branches and non-main branches.
+4. Detect squash-merged branches with `gh pr list --head <branch-name> --state merged --json number,title,headRefOid --limit 1`.
+5. Compare branch tip to the merged PR `headRefOid`; if they differ, treat the branch as unfinished.
+6. Present safe-to-delete and unfinished branches to the user and wait for explicit approval.
+7. Delete only approved local branches and fork-remote branches.
 
 ## Guardrails
 
 - Never diff against stale local `main`.
 - Never delete or rewrite another contributor's work without explicit user direction.
+- Never delete `main`, `HEAD`, the current branch, or upstream remote branches.
 - Never add AI co-author footers.
+- Never create a PR from the default branch; create a feature branch first.
 - Keep GitHub task state separate from durable wiki knowledge unless it becomes source evidence.

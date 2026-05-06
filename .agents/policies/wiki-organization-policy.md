@@ -41,7 +41,9 @@ Use stable directories for recurring page types:
 - `wiki/examples/`: public example domains. Put current PTO examples under `wiki/examples/pto/`; keep run surface and cross-repository source comparison inside each concrete example chapter.
 - `wiki/topics/`: feature, design, workflow, issue family, or behavior syntheses.
 - `wiki/evidence/`: topic-scoped evidence ledgers for user materials, GitHub references, external documents, repository anchors, claim maps, negative findings, and open questions.
+- `wiki/evidence/qa/`: raw persistent QA histories. These are audit material, not polished public learning pages.
 - `wiki/concepts/`: reusable technical concepts, APIs, protocols, acronyms, and architecture ideas.
+- `wiki/future/`: durable future, ongoing, roadmap, task-division, blocker, missing-example, planned, and design-intended knowledge that is not verified as implemented.
 - `wiki/materials/`: public source-material library used for direct reading, writing-style reference, and audit.
 
 Add new top-level wiki directories only when repeated pages justify the area. Prefer extending these areas before introducing a new taxonomy.
@@ -53,8 +55,8 @@ New durable pages should include lightweight YAML frontmatter:
 ```yaml
 ---
 title: "Page Title"
-type: repository | topic | evidence | concept | overview | index | usage
-status: draft | stable
+type: repository | topic | evidence | concept | future | overview | index | usage
+status: draft | stable | maintained
 sources: []
 last_updated: YYYY-MM-DD
 ---
@@ -79,7 +81,7 @@ Use normal Markdown links for file paths and URLs. Do not require graph data or 
 Before claiming a wiki update is complete, check:
 
 - no new page is orphaned from `wiki/index.md` or an area index
-- top navigation and left sidebar expose the same public hierarchy: Home, Repositories, Examples, Topics, Concepts, Materials
+- top navigation and left sidebar expose the same public hierarchy: Home, Repositories, Examples, Topics, Concepts, Future, Materials
 - links added by the change resolve
 - pages are not empty stubs
 - major topic and repository pages are understandable as standalone learning material before source links are followed
@@ -87,5 +89,6 @@ Before claiming a wiki update is complete, check:
 - the update has source citations near factual claims
 - distributed or advanced topics have a clear foundation path through basic terms, non-distributed execution, repository profiles, or examples
 - example pages include enough background, progression, comparison, optimization context, and missing-example status to teach the reader why the examples matter
+- future pages explain objective, constraints, status label, roadmap or task division when available, and evidence boundary
 - `wiki/log.md` has an entry for durable operations
 - broad synthesis changes are reflected in `wiki/overview.md` when warranted
