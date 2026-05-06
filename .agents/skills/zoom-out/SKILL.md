@@ -1,6 +1,6 @@
 ---
 name: zoom-out
-description: Tell the agent to zoom out and give broader context or a higher-level perspective. Use when you're unfamiliar with a section of code or need to understand how it fits into the bigger picture.
+description: Tells the agent to zoom out and give broader context or a higher-level perspective. Use when the user asks to zoom out or when broader context is needed to understand how a section of code fits into the bigger picture.
 disable-model-invocation: true
 ---
 

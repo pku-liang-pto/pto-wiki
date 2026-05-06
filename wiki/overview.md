@@ -61,6 +61,8 @@ Remote L3、DistWorker、cross-host callable registration、RoCE/URMA-backed rem
 
 第四层是 distributed synthesis。[Distributed Execution](./topics/distributed-execution.md) 解释 hierarchy、rank/window communication、HCCL data-plane support，以及 implemented single-host L3 与 design-intended remote L3 的边界。
 
+第五层是 future / ongoing work。[Future](./future/) 保存已经有持久学习价值、但还不能写成 implemented behavior 的 roadmap、task division、planned feature、blocker、missing example 和 design-intended behavior。Future 页面必须说明目标、约束、状态和证据边界，并链接回当前已经实现的基础页面。
+
 ## What To Remember
 
 PTO-CANN wiki 当前最重要的判断有三条。第一，非分布式基础不是附录：PyPTO 普通编译、PTO-ISA tile kernel、`simpler` L2 launch 是理解 distributed runtime 的必要前提。第二，examples 是最好的学习入口：hello/add 解释最小闭环，GEMM/attention 解释 kernel 和 performance，FFN TP/allreduce 解释当前 single-host distributed runtime。第三，HCCL 和 PTO-ISA communication primitives 支撑 data plane，但 remote worker lifecycle、remote callable registry 和 cross-host control plane 仍需要后续源码或可运行示例证明。

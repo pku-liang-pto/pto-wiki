@@ -38,7 +38,7 @@ Rules:
 
 ## Branch Cleanup
 
-Use `github-branch-cleaner` for cleaning merged local or remote branches. This skill only covers commits and committed scope verification.
+Use `github-pr-operator` for cleaning merged local or remote branches. This skill only covers commits and committed scope verification.
 
 ## Post-Commit
 

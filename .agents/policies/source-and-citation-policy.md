@@ -4,7 +4,7 @@ Factual wiki claims need evidence.
 
 Evidence supports the wiki; it does not replace explanation. Durable wiki pages should state the synthesized knowledge directly, then cite the source path, material file, PR, issue, commit, or evidence ledger that backs the statement. Avoid making readers leave the wiki just to learn the basic concept.
 
-Important concepts require concept evidence lookup before publication when their meaning depends on external documentation, GitHub history, local repository implementation, platform versions, or specialized acronyms. Use `.agents/workflows/concept-evidence-lookup.md` to decide the source set and writing shape.
+Important concepts require source-backed definition before publication when their meaning depends on external documentation, GitHub history, local repository implementation, platform versions, or specialized acronyms. Use the concept source mode in `.agents/workflows/wiki-research.md` to decide the source set and writing shape.
 
 ## Preferred Sources
 

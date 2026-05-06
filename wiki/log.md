@@ -107,3 +107,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-06] policy-update | Refactor agent workflow routing
 
 将 `.agents` 重新定位为 skill-first workflow system：新增 `.agents/README.md` 和 `.agents/policies/agent-workflow-policy.md`，明确 agents 不应预读所有 workflows，而应先选最小匹配 skill，再加载该 skill 引用的 workflows/policies。新增 GitHub unit skills：`github-pr-checkout`、`github-pr-reviewer`、`github-pr-publisher`、`github-branch-cleaner`，并把 `github-pr-operator` 收窄为复合 PR work、review comments 和 CI failure 的 operator。同步更新 `agent-command-reference.md` 和 `git-change-manager`，把 branch cleanup 从 commit workflow 中拆出。
+
+## [2026-05-06] policy-update | Simplify persistent wiki agent harness
+
+将 `.agents` harness 简化为四个 primary wiki/harness skills：`wiki-qa-maintainer`、`wiki-researcher`、`wiki-review-maintainer`、`agent-harness-maintainer`。新增 [Future](./future/) 作为 public ongoing-work section，用于保存目标、约束、roadmap/task division、blocker、planned feature 和 design-intended behavior；raw QA histories 放在 [QA Evidence](./evidence/qa/) 而不是 public learning sidebar。新增 mechanical validators for skill shape, local Markdown links, and VitePress builds。

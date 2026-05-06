@@ -2,13 +2,18 @@
 
 This repository is a reusable technical wiki template. Agents must keep reusable behavior separate from target-specific facts.
 
-## Required Reading
+## Required Routing
 
-Before answering lookup requests, updating the wiki, documenting repositories, or operating GitHub tasks:
+Before answering lookup requests, updating the wiki, researching sources, reviewing feedback, changing `.agents`, or operating GitHub tasks:
 
 1. Read `.agents/README.md` and `.agents/policies/agent-workflow-policy.md`.
-2. Select the smallest matching skill from `.agents/skills/`.
-3. Read only the workflows and policies named by that skill.
+2. Select one primary skill when the task is wiki or harness work:
+   - `wiki-qa-maintainer`: answer wiki questions, record QA history, or promote QA into curated wiki pages.
+   - `wiki-researcher`: research missing knowledge from code, materials, GitHub, dependencies, concepts, or official docs.
+   - `wiki-review-maintainer`: review wiki quality or integrate issue/PR/review feedback into wiki changes.
+   - `agent-harness-maintainer`: update reusable `.agents` behavior, policies, workflows, validators, CI, or routing.
+3. Use support skills only for support operations: `github-pr-operator`, `github-issue-operator`, and `git-change-manager`.
+4. Read only the workflows and policies named by that skill.
 
 Do not pre-read every workflow file. Workflows are reference procedures loaded through skills, not global required context.
 
@@ -18,6 +23,8 @@ Do not pre-read every workflow file. Workflows are reference procedures loaded t
 - Keep `wiki/` self-contained enough to learn from directly. Source links, PRs, issues, materials, and evidence ledgers are audit support, not substitutes for explanation.
 - Write public wiki narrative mostly in Chinese. Preserve English for code identifiers, repository names, APIs, classes, functions, file paths, PR titles, and source-native technical terms.
 - Keep `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` current enough for navigation, synthesis, and auditability.
+- Keep raw QA histories under `wiki/evidence/qa/`. Promote selected QA into curated public pages only when explicitly instructed.
+- Keep durable future, roadmap, ongoing, planned, blocker, missing-example, task-division, and design-intended knowledge under `wiki/future/` when it is not verified as implemented.
 - Do not narrow this wiki system to only distributed features. Non-distributed foundations, normal execution flows, basic terminology, and representative examples must be covered before or alongside distributed synthesis.
 - Keep `.agents/` target-set agnostic and reusable.
 - Put reusable agent process, command patterns, quality gates, and templates in `.agents/`; do not put agent operating instructions in rendered wiki content.

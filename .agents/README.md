@@ -7,10 +7,25 @@ This repository separates reusable agent behavior from target-specific wiki fact
 Agents should not pre-read every workflow and policy file. Use this order:
 
 1. Read `AGENTS.md`.
-2. Select the smallest matching skill from `.agents/skills/`.
+2. Select one primary wiki/harness skill for wiki or harness tasks.
 3. Read only the workflows and policies named by that skill.
 4. Update `wiki/` only for target-set knowledge.
 5. Update `.agents/` for reusable process, quality gates, command patterns, or templates.
+
+## Primary Skills
+
+Use four primary wiki/harness skills:
+
+- `wiki-qa-maintainer`: answer from wiki, record QA history, and promote selected QA when explicitly ordered.
+- `wiki-researcher`: research missing knowledge through concept, repository, material, GitHub, dependency/code, or official internet source modes.
+- `wiki-review-maintainer`: review standalone learning quality or integrate issue/PR/review feedback into wiki changes.
+- `agent-harness-maintainer`: change `.agents`, validators, CI gates, routing, workflows, policies, and recurring-failure rules.
+
+Use support skills for support operations:
+
+- `github-pr-operator`
+- `github-issue-operator`
+- `git-change-manager`
 
 ## Directory Roles
 
@@ -24,16 +39,10 @@ Agents should not pre-read every workflow and policy file. Use this order:
 
 Prefer unit skills over workflow-shaped mega-skills:
 
-- Good: `concept-evidence-lookup`, `wiki-health-linter`, `github-pr-reviewer`.
+- Good: `wiki-qa-maintainer`, `wiki-researcher`, `wiki-review-maintainer`, `agent-harness-maintainer`.
 - Too broad: one skill that claims to handle all wiki, GitHub, repository, material, and branch work.
 - Too narrow: one skill per file, command, or checklist row.
 
 When a user asks for a broad operation, use a router skill or `agent-command-reference.md` to choose the unit skill.
-
-## Current Core Skill Families
-
-- Wiki knowledge: `wiki-evidence-maintainer`, `topic-evidence-researcher`, `repository-evidence-documenter`, `document-material-ingester`, `concept-evidence-lookup`, `wiki-health-linter`.
-- GitHub operations: `github-pr-checkout`, `github-pr-reviewer`, `github-pr-publisher`, `github-pr-operator`, `github-issue-operator`, `github-branch-cleaner`.
-- Change management: `git-change-manager`.
 
 Keep this file target-set agnostic. Put PTO-specific facts in `wiki/` or `config/target-set.yml`.

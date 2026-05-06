@@ -27,7 +27,8 @@ Basic terms
 2. [PTO Examples](./examples/pto/)：用 hello/add、GEMM/FFN、attention、complete model、L3 allreduce/FFN TP 建立具体直觉。
 3. [Repositories](./repositories/)：理解 [pypto](./repositories/pypto.md)、[pto-isa](./repositories/pto-isa.md)、[simpler](./repositories/simpler.md) 分别拥有哪一层。
 4. [Topics](./topics/)：把普通执行、`simpler` runtime、distributed execution、Lingqu level 和 maintainer takeover 串起来。
-5. [Materials](./materials/) 和 [Evidence](./evidence/)：当你需要追溯设计材料、源码 ref、PR/issue 状态或 checksum 时再进入。
+5. [Future](./future/)：查看 durable ongoing work、roadmap、task division、planned feature、blocker 和 design-intended behavior。
+6. [Materials](./materials/) 和 [Evidence](./evidence/)：当你需要追溯设计材料、源码 ref、PR/issue 状态或 checksum 时再进入。
 
 ## Public Areas
 
@@ -35,4 +36,5 @@ Basic terms
 - [Examples](./examples/) teaches by concrete cases: every chapter names the concept, shows source-shaped code, explains run surface, proof boundary, and next example.
 - [Topics](./topics/) teaches cross-repository behavior: execution flow, runtime architecture, distributed blueprint/status, level mapping, and takeover risks.
 - [Concepts](./concepts/) teaches reusable vocabulary: the words that otherwise look similar across PyPTO, PTO-ISA, `simpler`, and CANN.
+- [Future](./future/) preserves public ongoing-work knowledge: objectives, constraints, roadmap or task division, blockers, missing examples, and design-intended behavior that is not yet implemented.
 - [Materials](./materials/) exposes user-provided source materials as readable public references. Synthesized wiki pages remain the canonical learning layer when source status matters.
