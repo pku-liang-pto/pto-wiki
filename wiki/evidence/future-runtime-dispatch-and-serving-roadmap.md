@@ -5,12 +5,15 @@ status: draft
 sources:
   - https://github.com/hw-native-sys/simpler/pull/711
   - https://github.com/hw-native-sys/pypto_top_level_documents/blob/main/UBL128_serving.md
-last_updated: 2026-05-06
+  - https://grpc.io/docs/what-is-grpc/introduction/
+  - https://grpc.io/docs/languages/python/basics/
+  - https://protobuf.dev/overview/
+last_updated: 2026-05-07
 ---
 
 # Future Runtime Dispatch and Serving Roadmap Evidence
 
-This ledger supports [Runtime Dispatch and Serving Roadmap](../future/runtime-dispatch-and-serving-roadmap.md). It records the exact PR/document/material sources used on 2026-05-06 and explains why claims are labelled `ongoing`, `emerging`, `design-intended`, `blocked`, or `open question`.
+This ledger supports [Runtime Dispatch and Serving Roadmap](../future/runtime-dispatch-and-serving-roadmap.md) and [PR 711 gRPC Dispatch Primer](../future/pr711-grpc-dispatch-primer.md). It records the exact PR/document/material sources used on 2026-05-06 and the PR #711 gRPC source pass on 2026-05-07, then explains why claims are labelled `ongoing`, `emerging`, `design-intended`, `blocked`, or `open question`.
 
 ## Source Inventory
 
@@ -63,6 +66,8 @@ The current branch worktree did not contain the ad hoc material files. They were
 ### External Concept Source
 
 - [NVIDIA RoCE documentation](https://docs.nvidia.com/networking/display/Onyxv3104006/RDMA%2BOver%2BConverged%2BEthernet%2B%28RoCE%29) was used only to stabilize the general definition of `RoCE` as RDMA capability over Ethernet. Project-specific `UB`, `Urma`, `uRPC`, `SU`, and `SO` meanings come from the UBL128 material, not from NVIDIA.
+- [gRPC Introduction](https://grpc.io/docs/what-is-grpc/introduction/) and [gRPC Python Basics tutorial](https://grpc.io/docs/languages/python/basics/) were used to stabilize the definitions of service, RPC method, client stub, server servicer, generated code, unary RPC, streaming RPC, and Python gRPC code generation.
+- [Protocol Buffers Overview](https://protobuf.dev/overview/) was used to stabilize the definitions of `.proto` schema, generated message classes, serialization, cross-language compatibility, and protobuf limits for large scientific/tensor-like payloads.
 
 ## Claim Map
 
@@ -70,6 +75,9 @@ The current branch worktree did not contain the ad hoc material files. They were
 | --- | --- | --- |
 | PR #711 adds an emerging Python-first L4 -> remote L3 dispatch path. | `ongoing` / `emerging` | PR #711 metadata, body, changed files, commit `d8dba325c08c2ef02fc3328809e0d87251f3ad9b`. |
 | PR #711 should not be treated as implemented production remote tensor dispatch. | `open question` / `TODO` | PR body explicitly says scalar `TaskArgs` and callable execution are covered while full remote tensor materialization/output write-back remains future work; PR is still open/review-required. |
+| PR #711's gRPC concept map is `.proto` -> generated message/stub code -> `RpcServer`/`RpcClient` -> `RemoteWorkerProxy`/`L3Daemon`. | `emerging` | PR #711 files `dispatch.proto`, `dispatch_pb2_grpc.py`, `rpc.py`, `remote_proxy.py`, `l3_daemon.py`; official gRPC Python docs for generated stub/servicer shape. |
+| `Catalog` exists because remote hosts cannot use fork-inherited Python callable pointers. | `emerging` | PR #711 `catalog.py`, `remote_proxy.py`, `l3_daemon.py`, `worker.py`; existing runtime evidence about local fork/mailbox assumptions. |
+| `L3Daemon` uses a backend process because `grpcio` server threads and `Worker(level=3)` fork behavior should not be mixed in one process. | `emerging` | PR #711 `docs/distributed-l4-implementation.zh.md` and `l3_daemon.py`. |
 | Raw local memory pointers are invalid across host boundary. | `blocked` | Gemini review on PR #711; `RUNTIME_OPEN_PROBLEMS.md` shared-VA assumptions; data-plane design replaces raw pointer with pool handle, remote address, rkey. |
 | L4/L3 tensor data should use a dual-plane design: control via RPC, tensor bytes via SHM/RDMA/Urma/NPU-direct. | `design-intended` | `materials/L4_L3_data_plane_design.md`; UBL128 §5 network model. |
 | `TensorPool` is the bridge between RPC handles and registered data-plane memory. | `design-intended` | `materials/L4_L3_data_plane_design.md` §III.2 and §VIII. |
@@ -82,6 +90,7 @@ The current branch worktree did not contain the ad hoc material files. They were
 | Source | Routed To | Notes |
 | --- | --- | --- |
 | PR #711 | Future control-plane workstream | Used for live ongoing state, source anchors, PR boundaries, CI/review risk. |
+| PR #711 gRPC/protobuf source files | [PR 711 gRPC Dispatch Primer](../future/pr711-grpc-dispatch-primer.md) | Used for the intuitive concept-to-code walkthrough requested in QA. |
 | `UBL128_serving.md` | Future serving target workstream | Used for serving objective, F/M/PC/PN/DC/DN/S roles, SU/SO/DCN separation, request lifecycle. |
 | `A5_send_recv_dispatch.pdf` | Future A5 zero-copy data-plane workstream | Used for `jetty`, free/receive queue, buffer-order invariant, stride tensor view, ping/pong pool constraints. |
 | `L4_L3_data_plane_design.md` | Future L4/L3 tensor data-plane workstream | Used for dual-plane model, `TensorPool`, transport choices, synchronization, roadmap estimates. |

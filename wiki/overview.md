@@ -6,7 +6,7 @@ sources:
   - config/target-set.yml
   - wiki/evidence/non-distributed-execution.md
   - wiki/evidence/distributed-execution.md
-last_updated: 2026-05-05
+last_updated: 2026-05-07
 ---
 
 # Overview
@@ -61,7 +61,7 @@ Remote L3、DistWorker、cross-host callable registration、RoCE/URMA-backed rem
 
 第四层是 distributed synthesis。[Distributed Execution](./topics/distributed-execution.md) 解释 hierarchy、rank/window communication、HCCL data-plane support，以及 implemented single-host L3 与 design-intended remote L3 的边界。
 
-第五层是 future / ongoing work。[Future](./future/) 保存已经有持久学习价值、但还不能写成 implemented behavior 的 roadmap、task division、planned feature、blocker、missing example 和 design-intended behavior。当前第一条 promoted Future workstream 是 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)：它把 `simpler` PR #711 remote L3 control-plane、L4/L3 tensor data-plane、A5 send/receive zero-copy dispatch、UBL128 serving target 和 runtime blockers 放在同一个状态边界里读。Future 页面必须说明目标、约束、状态和证据边界，并链接回当前已经实现的基础页面。
+第五层是 future / ongoing work。[Future](./future/) 保存已经有持久学习价值、但还不能写成 implemented behavior 的 roadmap、task division、planned feature、blocker、missing example 和 design-intended behavior。[PR 711 gRPC Dispatch Primer](./future/pr711-grpc-dispatch-primer.md) 用来补足 gRPC/protobuf、generated stubs、L4 proxy/mailbox shim 和 L3 daemon/backend process 的基础直觉；[Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md) 把 `simpler` PR #711 remote L3 control-plane、L4/L3 tensor data-plane、A5 send/receive zero-copy dispatch、UBL128 serving target 和 runtime blockers 放在同一个状态边界里读。Future 页面必须说明目标、约束、状态和证据边界，并链接回当前已经实现的基础页面。
 
 ## What To Remember
 

@@ -2,7 +2,7 @@
 title: QA Evidence
 type: evidence-index
 status: maintained
-last_updated: 2026-05-06
+last_updated: 2026-05-07
 ---
 
 # QA Evidence
@@ -13,4 +13,4 @@ QA history 可以记录 wiki-first answer、fresh source research、open questio
 
 ## Entries
 
-No QA history entries have been recorded yet.
+- [2026-05-07 PR 711 gRPC Dispatch Primer](./2026-05-07-pr711-grpc-primer.md): QA promoted into a Future primer explaining gRPC/protobuf and the PR #711 implementation shape.

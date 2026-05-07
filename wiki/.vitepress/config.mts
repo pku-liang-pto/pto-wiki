@@ -56,6 +56,7 @@ export default defineConfig({
         text: 'Future',
         items: [
           { text: 'Future index', link: '/future/' },
+          { text: 'PR 711 gRPC Dispatch Primer', link: '/future/pr711-grpc-dispatch-primer' },
           { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
@@ -128,6 +129,7 @@ export default defineConfig({
         text: 'Future',
         items: [
           { text: 'Future index', link: '/future/' },
+          { text: 'PR 711 gRPC Dispatch Primer', link: '/future/pr711-grpc-dispatch-primer' },
           { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },

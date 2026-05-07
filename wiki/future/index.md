@@ -2,7 +2,7 @@
 title: Future
 type: index
 status: maintained
-last_updated: 2026-05-06
+last_updated: 2026-05-07
 ---
 
 # Future
@@ -36,3 +36,4 @@ current implemented foundation
 ## Pages
 
 - [Runtime Dispatch and Serving Roadmap](./runtime-dispatch-and-serving-roadmap.md): ongoing L4 -> remote L3 dispatch, L4/L3 tensor data plane, A5 send/receive zero-copy dispatch, UBL128 serving target, and runtime blockers.
+- [PR 711 gRPC Dispatch Primer](./pr711-grpc-dispatch-primer.md): intuitive primer for gRPC/protobuf basics, generated stubs, L4 `RemoteWorkerProxy`, local mailbox shim, L3 `L3Daemon`, and current PR #711 proof boundaries.

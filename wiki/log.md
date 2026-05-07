@@ -115,3 +115,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-06] future-update | Add runtime dispatch and serving roadmap
 
 新增 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)，把 `simpler` PR #711、`pypto_top_level_documents/UBL128_serving.md`、`materials/A5_send_recv_dispatch.pdf`、`materials/L4_L3_data_plane_design.md` 和 `materials/RUNTIME_OPEN_PROBLEMS.md` 整理为 Future workstream。同步新增 [Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)，记录 PR state、external document commit/blob、local material checksums、claim map、negative findings 和 status-change criteria；更新 Future navigation、Evidence index、Home/Overview reading path。
+
+## [2026-05-07] qa-promotion | Add PR 711 gRPC dispatch primer
+
+根据 QA 反馈，新增 [PR 711 gRPC Dispatch Primer](./future/pr711-grpc-dispatch-primer.md)，用自包含、图示化方式解释 gRPC、Protocol Buffers、generated stubs、`RpcServer`/`RpcClient`、`RemoteWorkerProxy`、local mailbox shim、`L3Daemon` backend process、example path、error/heartbeat model 和 PR #711 当前边界。同步记录 [QA evidence](./evidence/qa/2026-05-07-pr711-grpc-primer.md)，并扩展 Future roadmap evidence 中的 gRPC/protobuf source trail。
