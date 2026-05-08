@@ -4,7 +4,9 @@ type: index
 status: draft
 sources:
   - wiki/materials/pto-runtime-distributed/
-last_updated: 2026-05-05
+  - wiki/materials/simpler_distributed_runtime_design.md
+  - wiki/materials/UBL128_serving.md
+last_updated: 2026-05-08
 ---
 
 # Materials
@@ -39,3 +41,10 @@ Materials 是公开资料库，也是可读学习材料。读者可以直接阅�
 - [07 Source and Evidence Notes](./pto-runtime-distributed/07_source_notes.md)
 - [08 HostWorker / DistWorker Alignment](./pto-runtime-distributed/08_top_level_design_alignment.md)
 - [PTO Runtime 分布式拓展文档系统设计](./pto-runtime-distributed/PTO-Runtime分布式拓展文档系统设计.md)
+
+## Top-Level Design Documents
+
+这些材料来自公开 GitHub 文档，按用户要求直接公开在 `wiki/materials/` 根目录，同时保留原始 source-material 语境。它们支持 [Runtime Dispatch and Serving Roadmap](../future/runtime-dispatch-and-serving-roadmap.md) 中的 Future synthesis；当材料和源码状态不同步时，以带状态标签的 Future / Evidence 页面为准。
+
+- [simpler Distributed Runtime Design](./simpler_distributed_runtime_design.md): HostWorker / DistWorker implementation design, including level definitions, `IWorker`, `DistWorker`, `HostSubWorker`, fork+shared-memory mailbox, zero-copy tensor ownership, callable registration, scheduler/drain behavior, and Linqu runtime relationship.
+- [UBL128 Serving Design](./UBL128_serving.md): prefill/decode decoupled serving design with prefix support, UBL128/PC16/SU/SO/DCN topology, KV cache physical layout, KV meta server, FFN/Attention parallel strategy, node interaction matrix, and end-to-end request lifecycle.

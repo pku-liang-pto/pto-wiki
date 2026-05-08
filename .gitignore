@@ -2,6 +2,8 @@ node_modules/
 docs/
 materials/*
 !materials/README.md
+!materials/simpler_distributed_runtime_design.md
+!materials/UBL128_serving.md
 materials/pto-runtime-distributed.zip
 wiki/.vitepress/cache/
 wiki/.vitepress/dist/

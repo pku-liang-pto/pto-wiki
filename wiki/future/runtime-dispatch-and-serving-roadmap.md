@@ -4,7 +4,10 @@ type: future
 status: draft
 sources:
   - https://github.com/hw-native-sys/simpler/pull/711
+  - https://github.com/hengliao1972/pypto_top_level_design_documents/blob/main/simpler_distributed_runtime_design.md
   - https://github.com/hw-native-sys/pypto_top_level_documents/blob/main/UBL128_serving.md
+  - ../materials/simpler_distributed_runtime_design.md
+  - ../materials/UBL128_serving.md
   - ../evidence/future-runtime-dispatch-and-serving-roadmap.md
 last_updated: 2026-05-08
 ---
@@ -18,8 +21,9 @@ last_updated: 2026-05-08
 先把当前实现和 future 目标分开：
 
 ```text
-current foundation
+current and design foundation
   simpler L2/L3 local Worker hierarchy
+  simpler HostWorker / DistWorker design material
   PyPTO / PTO-ISA examples and local distributed data-plane examples
   HCCL / CANN / UB / RoCE as communication substrate
 
@@ -39,13 +43,58 @@ blockers / open questions
   platform/transport ABI decomposition
 ```
 
-如果你只关心 `simpler` PR #711，先读前半部分的 remote L3 control plane 和 host-memory tensor data-plane prototype，再读 [PR 711 Remote Dispatch and Data Plane Primer](./pr711-grpc-dispatch-primer.md)。如果你关心 serving target，读后半部分的 UBL128 path。所有 claim 的 source set、checksum、PR state 和 status label 见 [Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md)。
+如果你只关心 `simpler` PR #711，先读 HostWorker / DistWorker baseline、remote L3 control plane 和 host-memory tensor data-plane prototype，再读 [PR 711 Remote Dispatch and Data Plane Primer](./pr711-grpc-dispatch-primer.md)。如果你关心 serving target，读 UBL128 path。公开原始材料见 [simpler Distributed Runtime Design](../materials/simpler_distributed_runtime_design.md) 和 [UBL128 Serving Design](../materials/UBL128_serving.md)。所有 claim 的 source set、checksum、PR state 和 status label 见 [Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md)。
 
 ## Current Foundation
 
 当前 wiki 已经把 implemented foundation 分在几个 public pages：`simpler` 的 L2/L3 worker hierarchy 和 mailbox path 见 [simpler Runtime Architecture](../topics/simpler-runtime-architecture.md)；普通 PyPTO/PTO-ISA/simpler execution 见 [Non-Distributed Execution](../topics/non-distributed-execution.md)；现有 single-host distributed examples 见 [Distributed Runtime](../examples/pto/distributed-runtime.md)；remote L3 状态边界见 [Distributed Execution](../topics/distributed-execution.md)。
 
 这些基础很重要，因为 future work 不是凭空新增一个 distributed runtime。它是在已有的 `Worker(level=3+)`、`submit_next_level`、mailbox、TensorMap/ring buffer、AICPU/AICore launch 和 communication data-plane 上继续扩展。任何 future page 都不能跳过这个地基，否则容易把 design document 里的 remote worker 当成已经 merged 的 runtime。
+
+`simpler_distributed_runtime_design.md` 给这个地基补了一层更明确的设计语言：L1 是单个 AICore/AIV kernel，L2 是单 chip 的 `ChipWorker`，L3 是单 host 的 `HostWorker` / `DistWorker`，L4+ 才是多 host 递归扩展。它把 `IWorker.run(payload)` 定义成每层 worker 的共同阻塞接口，并把 `ChipWorker`、`SubWorker`、`DistWorker` 放进同一棵树里。这个材料现在公开在 [Materials](../materials/simpler_distributed_runtime_design.md)，但它仍是设计材料；进入 implemented pages 仍要回到 `simpler` merged source 和 tests。
+
+## Workstream 0: HostWorker / DistWorker Baseline
+
+**Status: `design-intended` / `context for ongoing work`.** `simpler_distributed_runtime_design.md` 不是 PR #711 的替代品，而是解释 PR #711 为什么要保持 “level-isomorphic worker” 形状。它的核心约束是：每一层都应该像 L2 一样用 `scope`、ring buffer、TensorMap、fanin/fanout 和 blocking `run(payload)` 表达任务，而不是为 L3/L4 发明完全不同的编排模型。
+
+这个设计的最小心智模型如下：
+
+```text
+IWorker.run(payload)
+  |
+  +-- ChipWorker
+  |     L2 hardware worker
+  |     run() calls device-side C API and blocks until completion
+  |
+  +-- SubWorker / HostSubWorker
+  |     forked Python child process
+  |     parent worker thread writes shared-memory mailbox
+  |     child polls TASK_READY, executes callable, writes TASK_DONE
+  |
+  +-- DistWorker
+        recursive host-level worker
+        level=3 owns ChipWorker + HostSubWorker children
+        level=4 can own multiple level=3 DistWorker children
+```
+
+`HostSubWorker` 的关键实现原则是 “fork before threading”。设计材料要求在 `HostWorker.__init__()` 里完成 callable registration、shared-memory mailbox allocation 和 child process fork，然后才启动 C++ scheduler / worker threads。这样避免多线程环境里 fork 的不安全组合，也让 child process 通过 fork-COW 继承 callable registry，不需要 pickle lambda 或 closure。共享数据走 `/dev/shm` 和 `share_memory_()`，mailbox 只传 state、callable id、args offset、result address 和错误码。
+
+```text
+Parent process
+  Scheduler thread picks ready task
+  SubWorker thread writes mailbox:
+    IDLE -> TASK_READY(callable_id, args_shm_fd, args_offset)
+  SubWorker thread spin-polls TASK_DONE
+
+Child process
+  polls mailbox.state
+  on TASK_READY:
+    execute callable_registry entry for callable_id with task_args
+    write result / error
+    mailbox.state = TASK_DONE
+```
+
+这个 baseline 和 PR #711 的关系很重要。HostWorker / DistWorker 设计假设 fork 后共享本机地址空间、共享 `/dev/shm` 和 COW callable registry；PR #711 则把 L4 的 next-level child 变成 remote L3 daemon，remote host 不能继承这些本机假设。因此 PR #711 引入 `Catalog`、`TensorRef`、`TensorHandle`、`TensorPool` 和 transport backend，是对 HostWorker / DistWorker 递归模型的 cross-host 化，而不是另起一个不相干的 runtime。
 
 ## Target Mental Model
 
@@ -161,6 +210,8 @@ row stride    = message_buffer_size
 
 **Status: `design-intended`.** `UBL128_serving.md` 把 runtime dispatch 放到更大的 serving system 中：prefill/decode 解耦、prefix caching、KV cache 持久化、SU/SO/DCN 三类网络隔离，以及 F/M/PC/PN/DC/DN/S 七类逻辑节点。它提供的是 target architecture，不等于 `simpler` 或 PyPTO 当前已经实现 serving stack。
 
+UBL128 的硬件起点是 `HBD`，也就是 UB High Bandwidth Domain。一个 UBL128 HBD 由 8 台 PC16 服务器组成，每台 PC16 有 2 颗 CPU 和 16 颗 Ascend 950 NPU；整个 HBD 有 16 颗 CPU 和 128 颗 NPU。PC16 内部把 16 颗 NPU 分成两个 8-NPU NUMA 组，每组由一颗 CPU 通过 8 条 400 Gbps UB 链路一对一直连；跨 PC16 的 128 颗 NPU 通过 UBL128 域内 SU switch 形成 high-bandwidth any-to-any 网络。这个硬件边界解释了为什么 serving design 把 “域内 EP/DP 计算通信” 和 “跨域 KV / control traffic” 严格分开。
+
 最重要的 mental model 是三张网络的职责分离：
 
 ```text
@@ -190,7 +241,46 @@ user -> F
   F detokenizes and returns text
 ```
 
-Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这套 serving roles。PR #711 的 L4→L3 daemon 更像 control-plane seed；L4/L3 data-plane material 和 A5 send/receive material 补的是 tensor movement 和 zero-copy compute；UBL128 serving material 补的是 system-level objective、network isolation 和 validation scenarios。
+UBL128 serving 的 KV cache 不是一个普通文件系统对象。材料把 KV storage 设计成 SSU 上的 LBA-direct layout：Meta server 只维护 prefix radix tree、ChunkRecord、SSU/LBA allocation 和 refcount；真正的 KV bytes 由 NPU 通过 SO Urma read/write 直接访问 SSU。换句话说，CPU 可以决定 “哪些 chunk 在哪个 SSU/LBA”，但 CPU 不应该在 hot path 上搬 KV bytes。
+
+```text
+F receives request
+  tokenize
+  PrefixMatch(token_seq) -> M
+    M returns ChunkRecord[]:
+      chunk_id
+      model_id
+      per-layer SSU id
+      entry_lba_start / count
+      optional CSA indexer LBA
+
+PN / DN NPU
+  uses ChunkRecord[]
+  directly reads or writes KV bytes on SSU through SO Urma
+```
+
+Serving 节点也要和 runtime worker 名字分开。`F` 是 service access / scheduler，`M` 是 KV Meta Server，`PC` / `DC` 是 PC16 host CPU side prefill/decode controllers，`PN` / `DN` 是 prefill/decode NPU workers，`S` 是 SSU storage unit。PR #711 的 `L4 Worker` / `L3Daemon` 只能类比其中一部分 dispatch skeleton：它可以启发 `F -> PC/DC` 或 host-level dispatch，但它不是完整的 F/M/PC/PN/DC/DN/S serving system。
+
+```text
+serving roles
+  F  frontend + scheduler
+  M  KV metadata and prefix radix tree
+  PC prefill host CPU controller
+  PN prefill NPU workers
+  DC decode host CPU controller
+  DN decode NPU workers
+  S  SSU LBA-direct KV storage
+
+runtime foundation candidates
+  HostWorker / DistWorker:
+    local recursive worker hierarchy
+  PR #711:
+    remote host dispatch + tensor handle prototype
+  A5 send/receive:
+    zero-copy receive-buffer compute pattern
+```
+
+Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这套 serving roles。PR #711 的 L4->L3 daemon 更像 control-plane seed；L4/L3 data-plane material 和 A5 send/receive material 补的是 tensor movement 和 zero-copy compute；UBL128 serving material 补的是 system-level objective、network isolation、KV/prefix semantics 和 validation scenarios。
 
 ## Open Runtime Problems That Gate The Roadmap
 
@@ -211,6 +301,7 @@ Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这
 | Step | Status | Objective | Exit Evidence |
 | --- | --- | --- | --- |
 | R0 | `implemented foundation` | 继续维护 local L2/L3 hierarchy、examples、mailbox、TensorMap/ring 和 current distributed data-plane pages。 | merged source, examples/tests, repository/topic pages updated |
+| R0a | `design-intended` | 把 HostWorker / DistWorker design material 映射到当前 `simpler` source，明确哪些是 implemented local worker behavior，哪些仍是 design language。 | source-mapped page or evidence ledger with exact commit, tests, and negative findings |
 | R1 | `ongoing` | 合理收敛 PR #711 的 remote L3 callable/control path。 | merged PR, passing CI, docs/tests cite exact commit |
 | R2 | `ongoing` | 把 raw pointer boundary 改成 stable callable id、serialized callable version、tensor refs 和 error model。 | callable catalog tests, tensor-ref tests, no cross-host raw VA claim |
 | R3a | `emerging` | 保留 PR #711 host-memory `TensorPool`、gRPC chunk fallback、RXE input write、RXE output writeback、HCOMM adapter hooks。 | merged PR, source-shaped wiki update, tests for output/input tensor semantics |
@@ -227,6 +318,7 @@ Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这
 - PR #711 的 RXE/ibverbs MVP 等于 production tensor data-plane。当前 PR branch 已经有 host-memory tensor prototype 和 output writeback，但还不是 UBL128 SO/UB Urma/NPU HBM/SSU KV serving path。
 - `ContinuousTensor.data`、mailbox pointer 或 Python callable pointer 可以跨 host 使用。跨 host 必须用 handle、catalog id、registered memory 或 transport-level reference。
 - UBL128 serving document 是 `simpler` 当前实现。它是 higher-level target design，需要后续 source evidence 或 examples 才能迁移到 implemented pages。
+- `simpler_distributed_runtime_design.md` 中的 HostWorker / DistWorker 语言全部都已经 merged。它是重要 design context，但具体实现状态仍要按当前 `simpler` source 和 tests 重新核验。
 - A5 jetty receive order 等于 sender global order。它保证 message 完整和 receive completion order；跨 sender 业务顺序要由 payload protocol 恢复。
 
 ## Source Boundary

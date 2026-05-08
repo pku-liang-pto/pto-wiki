@@ -123,3 +123,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-08] future-update | Sync PR 711 RXE data-plane commits
 
 根据 PR #711 新 commits，将 [PR 711 gRPC Dispatch Primer](./future/pr711-grpc-dispatch-primer.md) 重新定位为 [PR 711 Remote Dispatch and Data Plane Primer](./future/pr711-grpc-dispatch-primer.md)，补足 `TensorRef` / `TensorHandle`、`TensorPool`、gRPC chunk fallback、RXE/ibverbs data-plane MVP、HCOMM adapter boundary、`OUTPUT / OUTPUT_EXISTING` output writeback、remote closure result-return correction、tests 和 serving non-goals。同步更新 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)、[Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)、Future/QA navigation、Home/Overview 和 VitePress Future sidebar labels。
+
+## [2026-05-08] material-update | Publish top-level runtime and serving designs
+
+按用户要求，将 upstream `simpler_distributed_runtime_design.md` 和 `UBL128_serving.md` 同时加入 `materials/` 与 [Materials](./materials/) 根目录，并在 Materials sidebar 中公开。同步增强 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)：补充 HostWorker / DistWorker baseline、fork+shared-memory mailbox、recursive `IWorker.run(payload)` 模型、UBL128 HBD/PC16/SU/SO/DCN topology、KV Meta/SSU/LBA model、F/M/PC/PN/DC/DN/S serving roles 和 Future status boundary；对应 checksum、upstream commit/blob 和 public-copy link rewrite 记录在 [Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)。

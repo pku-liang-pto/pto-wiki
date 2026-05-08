@@ -35,7 +35,7 @@ These labels describe the status of target-set claims across topic pages, reposi
 - [Lingqu Level Map Evidence](./lingqu-level-map.md): evidence for Lingqu/PyPTO/runtime level alignment and implementation status labels.
 - [Non-Distributed Execution Evidence](./non-distributed-execution.md): evidence for the normal PyPTO -> PTO-ISA -> simpler L2 execution path.
 - [Developer Takeover Guide Evidence](./developer-takeover-guide.md): evidence for maintainer onboarding, ownership boundaries, and high-risk follow-up areas.
-- [Future Runtime Dispatch and Serving Roadmap Evidence](./future-runtime-dispatch-and-serving-roadmap.md): evidence for ongoing PR #711 remote L3 dispatch, host-memory tensor data-plane prototype, production data-plane target, A5 zero-copy dispatch, UBL128 serving design, and runtime open problems.
+- [Future Runtime Dispatch and Serving Roadmap Evidence](./future-runtime-dispatch-and-serving-roadmap.md): evidence for HostWorker / DistWorker design material, ongoing PR #711 remote L3 dispatch, host-memory tensor data-plane prototype, production data-plane target, A5 zero-copy dispatch, UBL128 serving design, and runtime open problems.
 
 ## Audit Boundary
 
