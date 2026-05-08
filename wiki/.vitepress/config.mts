@@ -56,6 +56,7 @@ export default defineConfig({
         text: 'Future',
         items: [
           { text: 'Future index', link: '/future/' },
+          { text: 'PR 711 Dispatch/Data Plane', link: '/future/pr711-grpc-dispatch-primer' },
           { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
@@ -63,6 +64,8 @@ export default defineConfig({
         text: 'Materials',
         items: [
           { text: 'Materials Home', link: '/materials/' },
+          { text: 'simpler Distributed Runtime Design', link: '/materials/simpler_distributed_runtime_design' },
+          { text: 'UBL128 Serving Design', link: '/materials/UBL128_serving' },
           { text: 'PTO Runtime Bundle Guide', link: '/materials/pto-runtime-distributed/' },
           { text: '00 Overview and Reading Paths', link: '/materials/pto-runtime-distributed/00_README' },
           { text: '01 Hardware, CANN, HCCL, RoCE', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
@@ -128,6 +131,7 @@ export default defineConfig({
         text: 'Future',
         items: [
           { text: 'Future index', link: '/future/' },
+          { text: 'PR 711 Dispatch/Data Plane', link: '/future/pr711-grpc-dispatch-primer' },
           { text: 'Runtime Dispatch and Serving Roadmap', link: '/future/runtime-dispatch-and-serving-roadmap' }
         ]
       },
@@ -135,6 +139,8 @@ export default defineConfig({
         text: 'Materials',
         items: [
           { text: 'Materials Home', link: '/materials/' },
+          { text: 'simpler Distributed Runtime Design', link: '/materials/simpler_distributed_runtime_design' },
+          { text: 'UBL128 Serving Design', link: '/materials/UBL128_serving' },
           { text: 'PTO Runtime Bundle Guide', link: '/materials/pto-runtime-distributed/' },
           { text: '00 Overview and Reading Paths', link: '/materials/pto-runtime-distributed/00_README' },
           { text: '01 Hardware, CANN, HCCL, RoCE', link: '/materials/pto-runtime-distributed/01_hardware_and_software_stack' },
