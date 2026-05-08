@@ -2,7 +2,7 @@
 title: QA Evidence
 type: evidence-index
 status: maintained
-last_updated: 2026-05-07
+last_updated: 2026-05-08
 ---
 
 # QA Evidence
@@ -13,4 +13,5 @@ QA history 可以记录 wiki-first answer、fresh source research、open questio
 
 ## Entries
 
-- [2026-05-07 PR 711 gRPC Dispatch Primer](./2026-05-07-pr711-grpc-primer.md): QA promoted into a Future primer explaining gRPC/protobuf and the PR #711 implementation shape.
+- [2026-05-08 PR 711 Data Plane Sync](./2026-05-08-pr711-data-plane-sync.md): QA promoted into the PR #711 Future primer and roadmap after new PR commits added TensorPool, RXE data plane, HCOMM adapter boundaries, output writeback, and review docs.
+- [2026-05-07 PR 711 gRPC Dispatch Primer](./2026-05-07-pr711-grpc-primer.md): earlier QA snapshot promoted into a Future primer explaining gRPC/protobuf and the initial PR #711 implementation shape.

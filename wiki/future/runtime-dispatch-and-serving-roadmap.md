@@ -6,7 +6,7 @@ sources:
   - https://github.com/hw-native-sys/simpler/pull/711
   - https://github.com/hw-native-sys/pypto_top_level_documents/blob/main/UBL128_serving.md
   - ../evidence/future-runtime-dispatch-and-serving-roadmap.md
-last_updated: 2026-05-06
+last_updated: 2026-05-08
 ---
 
 # Runtime Dispatch and Serving Roadmap
@@ -23,11 +23,12 @@ current foundation
   PyPTO / PTO-ISA examples and local distributed data-plane examples
   HCCL / CANN / UB / RoCE as communication substrate
 
-ongoing control-plane work
+ongoing control/data-plane work
   simpler PR #711: Python L4 -> remote L3 dispatch over gRPC/protobuf
+  PR #711 host-memory TensorPool + RXE/ibverbs data-plane MVP
 
-design-intended data-plane work
-  TensorPool + RDMA/Urma transport
+design-intended production data-plane work
+  production TensorPool + RDMA/Urma transport
   A5 UB jetty send/receive zero-copy buffer layout
   UBL128 prefill/decode serving over SU/SO/DCN networks
 
@@ -38,7 +39,7 @@ blockers / open questions
   platform/transport ABI decomposition
 ```
 
-如果你只关心 `simpler` PR #711，读前半部分的 remote L3 control plane。如果你关心 serving target，读后半部分的 UBL128 path。所有 claim 的 source set、checksum、PR state 和 status label 见 [Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md)。
+如果你只关心 `simpler` PR #711，先读前半部分的 remote L3 control plane 和 host-memory tensor data-plane prototype，再读 [PR 711 Remote Dispatch and Data Plane Primer](./pr711-grpc-dispatch-primer.md)。如果你关心 serving target，读后半部分的 UBL128 path。所有 claim 的 source set、checksum、PR state 和 status label 见 [Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md)。
 
 ## Current Foundation
 
@@ -72,7 +73,7 @@ Control plane 只应该搬小对象：task id、callable id、shape、dtype、bu
 
 ## Workstream 1: L4 To Remote L3 Control Plane
 
-**Status: `ongoing` / `emerging`.** `hw-native-sys/simpler` PR [#711 Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711) 是第一条 concrete code path。它的 PR body 说明了三件事：新增 Python-first gRPC/protobuf distributed dispatch package；通过 local `PROCESS` mailbox shim 把 `Worker.add_remote_worker()` 接到已有 C++ scheduler；增加 callable catalog、L3 daemon backend process、heartbeat、tensor-pool surface、examples 和 docs。该 PR 在 2026-05-06 仍是 open/review-required，不应写成 implemented source state。
+**Status: `ongoing` / `emerging`.** `hw-native-sys/simpler` PR [#711 Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711) 是第一条 concrete code path。它的 PR body 和新 commits 说明了几件事：新增 Python-first gRPC/protobuf distributed dispatch package；通过 local `PROCESS` mailbox shim 把 `Worker.add_remote_worker()` 接到已有 C++ scheduler；增加 callable catalog、L3 daemon backend process、heartbeat、TensorPool control service、RXE/HCOMM transport backend hooks、examples 和 review docs。该 PR 在 2026-05-08 仍是 open/review-required，不应写成 `simpler/main` implemented source state。
 
 它的控制流可以这样读：
 
@@ -96,36 +97,37 @@ local L3 run(callable, args, config)
 
 这条路径的关键价值不是性能，而是 compatibility：上层用户仍然可以用 `orch.submit_next_level(...)` 表达 next-level work；local C++ scheduler 先把 remote worker 看成一个 ordinary PROCESS worker；Python shim 再把本地 mailbox request 转成 network request。这样可以先验证 remote control plane 和 callable catalog，不必一开始重写 C++ scheduler ABI。
 
-但 PR #711 自己也给出边界：当前 e2e remote dispatch covers scalar `TaskArgs` and callable execution；full remote tensor materialization/output write-back remains future work。Gemini review 还指出 raw memory pointers across hosts 是 critical risk：本地 VA、fork-COW pointer、shared-memory buffer 指针都不能跨机器直接使用。这个风险和 `RUNTIME_OPEN_PROBLEMS.md` 的第一、第二个 gap 对齐：remote next-level worker 必须从 raw pointer 升级到 stable callable identity 和 transport-level handles。
+PR #711 的后续 commits 已经不再只是 scalar path。当前 PR branch 上有 host-memory `TensorPool`、`TensorRef(handle)`、gRPC chunk fallback、RXE/ibverbs input write、RXE local output writeback、HCOMM optional adapter，以及覆盖 output tensor writeback 的 tests。Gemini review 早期指出 raw memory pointers across hosts 是 critical risk；新代码的方向正是把 remote next-level worker 从 raw pointer 升级到 stable callable identity 和 transport-level handles。仍要保留边界：这些能力还在 open PR branch 上，且是 host-memory prototype，不是 production serving data plane。
 
 ## Workstream 2: Tensor Data Plane For L4/L3
 
-**Status: `design-intended`.** `materials/L4_L3_data_plane_design.md` 把 PR #711 尚未完成的 tensor path 补成 design target。它的核心判断是：gRPC 可以传 `DispatchReq`，不能承载 MB 到 GB 级 tensor hot path。大 tensor 通过 protobuf 会引入分片、序列化、额外 buffer 和多次拷贝；cross-host CPU↔CPU 或 CPU↔NPU data movement 应该走 RDMA over RoCE / Urma 或 future NPU-direct path。
+**Status: `emerging prototype` + `design-intended production target`.** `materials/L4_L3_data_plane_design.md` 把 tensor path 的目标说清楚：gRPC 可以传 `DispatchReq`，不能承载 MB 到 GB 级 tensor hot path。大 tensor 通过 protobuf 会引入分片、序列化、额外 buffer 和多次拷贝；cross-host CPU<->CPU 或 CPU<->NPU data movement 应该走 RDMA over RoCE / Urma 或 future NPU-direct path。PR #711 新 commits 已经把其中一部分做成 host-memory prototype：小 tensor inline，大 tensor 用 L3 `TensorPool` handle，input 可以通过 gRPC chunks / RXE / HCOMM adapter 写入，output 可以通过 inline、L3 handle 或 L4-local RXE ACK 回到 L4。
 
-一个完整 L4→L3 dispatch 在设计上分成五步：
+当前 PR branch 和后续 production target 可以共用这条五步 mental model：
 
 ```text
 1. L4 chooses transport
-     tiny metadata -> INLINE
-     same host     -> SHM
-     cross host    -> RDMA / Urma
+     tiny tensor   -> INLINE
+     fallback      -> gRPC chunks
+     PR prototype  -> RXE / HCOMM adapter
+     target        -> SHM / RDMA / Urma / NPU-direct
 
 2. L4 asks L3 TensorPool for remote buffer
-     pool.alloc(size) -> handle, remote_addr, rkey
+     TensorPool.AllocTensor(size) -> handle, remote_addr, rkey
 
-3. data plane writes tensor bytes
-     rdma_write(local_va, remote_addr, rkey)
+3. data plane writes input tensor bytes
+     PushTensor chunks or RDMA write(local_va, remote_addr, rkey)
 
 4. control plane sends dispatch
      DispatchReq { callable_id, scalar_args, tensor_refs: [handle] }
 
-5. L3 resolves handle to local pointer
-     run Worker(level=3), then return output handle or push output back
+5. L3 resolves handle to local buffer
+     run Worker(level=3), then return inline/output handle or push output back
 ```
 
-`TensorPool` 是这条路线的关键 bridge。它把 control-plane handle 变成本机可访问的 registered memory；启动时一次性注册大块 GB 级 region，运行时只做 sub-allocation。这样避免每次 dispatch 都执行 `ibv_reg_mr` / `urma_register_seg` 之类昂贵注册动作。数据面材料建议每个 L3 host 预留 8-16 GB pool，并把 pool exhaustion、NUMA placement、large tensor fragmentation、output push/pull policy、lease/GC 作为后续明确问题。
+`TensorPool` 是这条路线的关键 bridge。PR #711 当前实现的是进程内 bytearray pool：`AllocTensor` 分配 buffer，`transport_backend.register_region()` 返回 `TensorHandle`，`RefreshTensor` 续租并在 RXE backend 下重建 one-shot server，`FreeTensor` 和 GC 释放 entry。生产 design 还要求更稳定的 registered-memory pool：启动时预注册 GB 级 region，运行时 sub-allocation，避免每次 dispatch 都执行 `ibv_reg_mr` / `urma_register_seg` 之类昂贵注册动作。数据面材料建议每个 L3 host 预留 8-16 GB pool，并把 pool exhaustion、NUMA placement、large tensor fragmentation、output push/pull policy、lease/GC 作为后续明确问题。
 
-这条 design 也改变了 PR #711 的验收标准。一个 remote L3 control-plane PR 可以先合入 scalar path，但不能声称完成 production remote tensor dispatch。生产形态至少需要 stable tensor refs、pool lifetime、transport abstraction、RDMA/Urma backend、failure recovery 和 tests that prove no raw local pointer crosses the host boundary。
+这条 design 也改变了 PR #711 的验收标准。现在不能再把 PR #711 描述成 “只覆盖 scalar `TaskArgs`”。它已经有 remote tensor prototype 和 output writeback；但也不能声称完成 production remote tensor dispatch。生产形态至少还需要 stable tensor refs、long-lived pool lifetime、transport schema stability、RDMA/Urma backend、failure observability、cross-node concurrency tests，以及 no raw local pointer crosses the host boundary 的持续证明。
 
 ## Workstream 3: A5 Send/Receive Zero-Copy Dispatch
 
@@ -209,9 +211,10 @@ Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这
 | Step | Status | Objective | Exit Evidence |
 | --- | --- | --- | --- |
 | R0 | `implemented foundation` | 继续维护 local L2/L3 hierarchy、examples、mailbox、TensorMap/ring 和 current distributed data-plane pages。 | merged source, examples/tests, repository/topic pages updated |
-| R1 | `ongoing` | 合理收敛 PR #711 的 remote L3 scalar/callable path。 | merged PR, passing CI, docs/tests cite exact commit |
-| R2 | `design-intended` | 把 raw pointer boundary 改成 stable callable id、serialized callable version、tensor refs 和 error model。 | callable catalog tests, no cross-host raw VA claim |
-| R3 | `design-intended` | 实现 `Transport` + `TensorPool` + RDMA/Urma data plane。 | cross-host tensor input/output tests, pool lease/GC, failure tests |
+| R1 | `ongoing` | 合理收敛 PR #711 的 remote L3 callable/control path。 | merged PR, passing CI, docs/tests cite exact commit |
+| R2 | `ongoing` | 把 raw pointer boundary 改成 stable callable id、serialized callable version、tensor refs 和 error model。 | callable catalog tests, tensor-ref tests, no cross-host raw VA claim |
+| R3a | `emerging` | 保留 PR #711 host-memory `TensorPool`、gRPC chunk fallback、RXE input write、RXE output writeback、HCOMM adapter hooks。 | merged PR, source-shaped wiki update, tests for output/input tensor semantics |
+| R3b | `design-intended` | 将 prototype data plane 推进到 production RDMA/Urma/NPU/SSU path。 | cross-host tensor input/output tests, pool lease/GC, failure tests, performance baseline |
 | R4 | `design-intended` | 将 A5 UB jetty receive buffers 接到 MoE/BGEMM zero-copy layout。 | kernel examples prove stride-aware compute on receive buffers |
 | R5 | `design-intended` | 把 UBL128 serving roles、prefix/KV flows、SU/SO/DCN isolation 映射到 runtime APIs。 | serving example or design-to-source mapping with runnable slices |
 | R6 | `open question` | Decouple platform/transport ABI enough to avoid per-runtime stub explosion. | ABI proposal, build matrix, platform tests |
@@ -220,8 +223,8 @@ Future runtime work 需要决定 `simpler` remote L3 dispatch 如何映射到这
 
 不要从这些材料推断：
 
-- PR #711 已经 merged 或 production-ready。它在 2026-05-06 仍是 open/review-required，且 CI 中 `pre-commit` failed。
-- gRPC remote dispatch 等于 tensor data-plane 完成。PR body 明确说 full remote tensor materialization/output write-back remains future work。
+- PR #711 已经 merged 或 production-ready。它在 2026-05-08 仍是 open/review-required。
+- PR #711 的 RXE/ibverbs MVP 等于 production tensor data-plane。当前 PR branch 已经有 host-memory tensor prototype 和 output writeback，但还不是 UBL128 SO/UB Urma/NPU HBM/SSU KV serving path。
 - `ContinuousTensor.data`、mailbox pointer 或 Python callable pointer 可以跨 host 使用。跨 host 必须用 handle、catalog id、registered memory 或 transport-level reference。
 - UBL128 serving document 是 `simpler` 当前实现。它是 higher-level target design，需要后续 source evidence 或 examples 才能迁移到 implemented pages。
 - A5 jetty receive order 等于 sender global order。它保证 message 完整和 receive completion order；跨 sender 业务顺序要由 payload protocol 恢复。

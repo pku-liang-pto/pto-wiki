@@ -8,89 +8,115 @@ sources:
   - https://grpc.io/docs/what-is-grpc/introduction/
   - https://grpc.io/docs/languages/python/basics/
   - https://protobuf.dev/overview/
-last_updated: 2026-05-07
+  - https://docs.nvidia.com/networking/display/RDMAAwareProgrammingv17/Key+Concepts
+  - https://docs.redhat.com/documentation/pt/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_soft-_roce
+last_updated: 2026-05-08
 ---
 
 # Future Runtime Dispatch and Serving Roadmap Evidence
 
-This ledger supports [Runtime Dispatch and Serving Roadmap](../future/runtime-dispatch-and-serving-roadmap.md) and [PR 711 gRPC Dispatch Primer](../future/pr711-grpc-dispatch-primer.md). It records the exact PR/document/material sources used on 2026-05-06 and the PR #711 gRPC source pass on 2026-05-07, then explains why claims are labelled `ongoing`, `emerging`, `design-intended`, `blocked`, or `open question`.
+This ledger supports [Runtime Dispatch and Serving Roadmap](../future/runtime-dispatch-and-serving-roadmap.md) and [PR 711 Remote Dispatch and Data Plane Primer](../future/pr711-grpc-dispatch-primer.md). It records the exact PR/document/material sources used on 2026-05-06, the first PR #711 gRPC source pass on 2026-05-07, and the PR #711 RXE/data-plane sync on 2026-05-08.
 
 ## Source Inventory
 
 ### GitHub PR
 
-- Source: [hw-native-sys/simpler PR #711: Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711)
-- State inspected: `OPEN`, `REVIEW_REQUIRED`, `MERGEABLE` on 2026-05-06.
+- Source: [hw-native-sys/simpler PR #711: Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711).
+- State inspected: `OPEN`, `REVIEW_REQUIRED` on 2026-05-08.
 - Head branch: `feat/l4-l3-distributed-dispatch`.
 - Base branch: `main`.
-- Commit inspected: `d8dba325c08c2ef02fc3328809e0d87251f3ad9b`.
-- PR body summary: Python-first gRPC/protobuf distributed dispatch package for L4 -> remote L3; `Worker.add_remote_worker()` through local PROCESS mailbox shim; callable catalog, L3 daemon backend process, heartbeat, tensor-pool surface, examples, docs.
-- PR body boundary: current e2e remote dispatch covers scalar `TaskArgs` and callable execution; full remote tensor materialization/output write-back remains future work.
-- Review evidence: `gemini-code-assist` review on 2026-05-06 identifies raw memory pointers across host boundaries as critical risk and recommends catalog/cloudpickle/backend-termination improvements.
-- CI evidence: most checks passed, but `pre-commit` check concluded `FAILURE` in the inspected status rollup.
-- Changed-file anchors include:
-  - `docs/distributed-l4-implementation.zh.md`
-  - `docs/distributed-l4.md`
-  - `examples/distributed/l4_l3_remote/*`
-  - `python/simpler/distributed/catalog.py`
-  - `python/simpler/distributed/l3_daemon.py`
-  - `python/simpler/distributed/remote_proxy.py`
-  - `python/simpler/distributed/rpc.py`
-  - `python/simpler/distributed/tensor_pool.py`
-  - `python/simpler/worker.py`
-  - `tests/ut/py/test_distributed/*`
+- Head commit inspected: `2dd89eeaff9164166a6b4f36edce3c4621777b53`.
+- Local inspection path: `/tmp/simpler-pr711`, branch `pr711`, synced to the PR head above.
+- PR comment evidence: `jvjhfhg` review comment on 2026-05-07 noted that the original example misleadingly implied remote execution could mutate L4-local closure state. The PR later added `docs(distributed): fix remote result example`, changing the example to return through an `OUTPUT_EXISTING` tensor.
+
+Commits inspected:
+
+| Commit | Role In This Evidence Pass |
+| --- | --- |
+| `d8dba325c08c2ef02fc3328809e0d87251f3ad9b` | Initial Python distributed L4 -> L3 dispatch, gRPC/protobuf, catalog, daemon, remote worker shim. |
+| `2adeb0ae2b01eda3369da903ec5f404a8215d46c` | Adds L4/L3 RXE data plane, transport backend, RXE helper, HCOMM adapter hooks, tensor output writeback path. |
+| `92abca766e0093e77e1cb1420f0529ad86103417` | Fixes remote result example so result returns through `OUTPUT_EXISTING` tensor rather than closure mutation. |
+| `b6cc6ddcb186a6d7c6f36b1656c09d2bb309486e` | Adds L4/L3 distributed review guide. |
+| `a3ea12e8109cab5a464b93bcce601e94d1a35400` | Aligns review guide with serving design. |
+| `2dd89eeaff9164166a6b4f36edce3c4621777b53` | Adds L4 review glossary; current inspected head. |
+
+Changed-file anchors used for implementation claims:
+
+- `docs/distributed-l4-control-data-plane-rxe.zh.md`
+- `docs/l4-l3-distributed-review-guide.zh.md`
+- `docs/distributed-l4-implementation.zh.md`
+- `examples/distributed/l4_l3_remote/l4_master.py`
+- `examples/distributed/l4_l3_remote/README.md`
+- `python/simpler/distributed/proto/dispatch.proto`
+- `python/simpler/distributed/remote_proxy.py`
+- `python/simpler/distributed/l3_daemon.py`
+- `python/simpler/distributed/serialization.py`
+- `python/simpler/distributed/tensor_pool.py`
+- `python/simpler/distributed/transport_backend.py`
+- `python/simpler/distributed/rxe_verbs_helper.c`
+- `python/simpler/distributed/hcomm_abi_shim.cc`
+- `python/simpler/worker.py`
+- `src/common/hierarchical/worker_manager.cpp`
+- `tests/ut/py/test_distributed/test_l4_l3_remote.py`
+- `tests/ut/py/test_distributed/test_tensor_pool.py`
+- `tests/ut/py/test_distributed/test_transport_backend.py`
+- `tests/ut/py/test_distributed/test_real_e2e_smoke.py`
+- `tests/ut/py/test_distributed/test_rxe_real.py`
+- `tools/test_rxe_data_plane.sh`
+- `tools/benchmark_rxe_data_plane.py`
 
 ### External Top-Level Document
 
 - Source: [hw-native-sys/pypto_top_level_documents `UBL128_serving.md`](https://github.com/hw-native-sys/pypto_top_level_documents/blob/main/UBL128_serving.md).
 - Repository main commit inspected: `4f9e0b874156f212417408016288131a392f2dca`, committer date `2026-04-28T08:57:50Z`.
 - Blob SHA inspected: `dd1443f7547b3ebb5d0374a352077f1c3bd0323f`.
-- Retrieval method: `gh api repos/hw-native-sys/pypto_top_level_documents/contents/UBL128_serving.md`.
-- Important anchors:
-  - §1: UBL128 hardware, PC16, SU/SO/DCN network roles.
-  - §2: one source/build artifact, configuration-driven scale across three hardware scenarios.
-  - §3: KV cache, prefix cache, SSU/LBA storage model.
-  - §5: F/M/PC/PN/DC/DN/S node matrix, SU/SO/DCN network selection, uRPC over UB Urma, end-to-end request lifecycle.
+- Important anchors: UBL128 hardware/PC16/SU/SO/DCN network roles; one source/build artifact; KV cache and prefix cache; F/M/PC/PN/DC/DN/S node matrix; uRPC over UB Urma; end-to-end request lifecycle.
 - Boundary: target-level serving design, not inspected as merged `simpler` or PyPTO implementation.
 
 ### Local User Materials
 
-The current branch worktree did not contain the ad hoc material files. They were read from the user's main workspace material directory and were not copied into the wiki repository.
+The material files were read from `/home/uvxiao/pto-wiki/materials/` and were not copied into this evidence pass.
 
 | Material | SHA-256 | Ingestion / conversion |
 | --- | --- | --- |
-| `/home/uvxiao/pto-wiki/materials/A5_send_recv_dispatch.pdf` | `4e8a62685184dc4d7c354c68567454838bc36bd659b44f85d5e01e5616007637` | PDF v1.4, 8 pages, converted with `pdftotext` on 2026-05-06. |
-| `/home/uvxiao/pto-wiki/materials/L4_L3_data_plane_design.md` | `fd2894381e60c3d23f8d5c46dea7577a7a0f4d49b3ba40df7c36fc67557d6244` | Markdown read directly on 2026-05-06. |
-| `/home/uvxiao/pto-wiki/materials/RUNTIME_OPEN_PROBLEMS.md` | `5c201d2c1b5aa2071d8b80f61577b9b49f1519c738308d44ad8054e26941546e` | Markdown read directly on 2026-05-06; document states it is based on `simpler` git HEAD `08f6f769` / PR #692 era. |
+| `materials/A5_send_recv_dispatch.pdf` | `4e8a62685184dc4d7c354c68567454838bc36bd659b44f85d5e01e5616007637` | PDF v1.4, 8 pages, converted with `pdftotext` on 2026-05-06. |
+| `materials/L4_L3_data_plane_design.md` | `fd2894381e60c3d23f8d5c46dea7577a7a0f4d49b3ba40df7c36fc67557d6244` | Markdown read directly on 2026-05-06. |
+| `materials/RUNTIME_OPEN_PROBLEMS.md` | `5c201d2c1b5aa2071d8b80f61577b9b49f1519c738308d44ad8054e26941546e` | Markdown read directly on 2026-05-06; document states it is based on `simpler` git HEAD `08f6f769` / PR #692 era. |
 
-### External Concept Source
+### External Concept Sources
 
-- [NVIDIA RoCE documentation](https://docs.nvidia.com/networking/display/Onyxv3104006/RDMA%2BOver%2BConverged%2BEthernet%2B%28RoCE%29) was used only to stabilize the general definition of `RoCE` as RDMA capability over Ethernet. Project-specific `UB`, `Urma`, `uRPC`, `SU`, and `SO` meanings come from the UBL128 material, not from NVIDIA.
-- [gRPC Introduction](https://grpc.io/docs/what-is-grpc/introduction/) and [gRPC Python Basics tutorial](https://grpc.io/docs/languages/python/basics/) were used to stabilize the definitions of service, RPC method, client stub, server servicer, generated code, unary RPC, streaming RPC, and Python gRPC code generation.
-- [Protocol Buffers Overview](https://protobuf.dev/overview/) was used to stabilize the definitions of `.proto` schema, generated message classes, serialization, cross-language compatibility, and protobuf limits for large scientific/tensor-like payloads.
+- [gRPC Introduction](https://grpc.io/docs/what-is-grpc/introduction/) and [gRPC Python Basics tutorial](https://grpc.io/docs/languages/python/basics/) stabilize definitions of service, RPC method, client stub, server servicer, generated code, unary RPC, streaming RPC, and Python gRPC code generation.
+- [Protocol Buffers Overview](https://protobuf.dev/overview/) stabilizes `.proto` schema, generated message classes, serialization, cross-language compatibility, and protobuf limits for large payloads.
+- [NVIDIA RDMA Key Concepts](https://docs.nvidia.com/networking/display/RDMAAwareProgrammingv17/Key+Concepts) stabilizes MR, rkey, QP, CQ, and work-completion language for the RXE explanation.
+- [Red Hat Soft-RoCE documentation](https://docs.redhat.com/documentation/pt/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_soft-_roce) stabilizes the general meaning of Soft-RoCE/RXE as a software RDMA transport. Project-specific RXE behavior comes from PR #711 source files.
+- [NVIDIA RoCE documentation](https://docs.nvidia.com/networking/display/Onyxv3104006/RDMA%2BOver%2BConverged%2BEthernet%2B%28RoCE%29) was used in the earlier roadmap pass to stabilize the general definition of RoCE as RDMA capability over Ethernet. Project-specific `UB`, `Urma`, `uRPC`, `SU`, and `SO` meanings come from UBL128 material.
 
 ## Claim Map
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
-| PR #711 adds an emerging Python-first L4 -> remote L3 dispatch path. | `ongoing` / `emerging` | PR #711 metadata, body, changed files, commit `d8dba325c08c2ef02fc3328809e0d87251f3ad9b`. |
-| PR #711 should not be treated as implemented production remote tensor dispatch. | `open question` / `TODO` | PR body explicitly says scalar `TaskArgs` and callable execution are covered while full remote tensor materialization/output write-back remains future work; PR is still open/review-required. |
-| PR #711's gRPC concept map is `.proto` -> generated message/stub code -> `RpcServer`/`RpcClient` -> `RemoteWorkerProxy`/`L3Daemon`. | `emerging` | PR #711 files `dispatch.proto`, `dispatch_pb2_grpc.py`, `rpc.py`, `remote_proxy.py`, `l3_daemon.py`; official gRPC Python docs for generated stub/servicer shape. |
-| `Catalog` exists because remote hosts cannot use fork-inherited Python callable pointers. | `emerging` | PR #711 `catalog.py`, `remote_proxy.py`, `l3_daemon.py`, `worker.py`; existing runtime evidence about local fork/mailbox assumptions. |
-| `L3Daemon` uses a backend process because `grpcio` server threads and `Worker(level=3)` fork behavior should not be mixed in one process. | `emerging` | PR #711 `docs/distributed-l4-implementation.zh.md` and `l3_daemon.py`. |
-| Raw local memory pointers are invalid across host boundary. | `blocked` | Gemini review on PR #711; `RUNTIME_OPEN_PROBLEMS.md` shared-VA assumptions; data-plane design replaces raw pointer with pool handle, remote address, rkey. |
-| L4/L3 tensor data should use a dual-plane design: control via RPC, tensor bytes via SHM/RDMA/Urma/NPU-direct. | `design-intended` | `materials/L4_L3_data_plane_design.md`; UBL128 §5 network model. |
-| `TensorPool` is the bridge between RPC handles and registered data-plane memory. | `design-intended` | `materials/L4_L3_data_plane_design.md` §III.2 and §VIII. |
+| PR #711 adds an emerging Python-first L4 -> remote L3 dispatch path. | `ongoing` / `emerging` | PR #711 metadata and source at head `2dd89ee`; `dispatch.proto`, `remote_proxy.py`, `l3_daemon.py`, `worker.py`. |
+| PR #711 now includes host-memory remote tensor prototype, not just scalar dispatch. | `ongoing` / `emerging` | `TensorRef`, `TensorHandle`, `TensorPool` RPCs in `dispatch.proto`; staging/writeback logic in `remote_proxy.py`, `serialization.py`, `tensor_pool.py`; tests in `test_l4_l3_remote.py` and `test_tensor_pool.py`. |
+| PR #711 should not be treated as merged or production remote tensor dispatch. | `open question` / `TODO` | PR state is open/review-required; docs list RXE helper, INOUT, descriptor, failure, and cross-node validation limitations. |
+| PR #711's control-plane concept map is `.proto` -> generated message/stub code -> `RpcServer`/`RpcClient` -> `RemoteWorkerProxy`/`L3Daemon`. | `emerging` | PR #711 files `dispatch.proto`, generated `dispatch_pb2_grpc.py`, `rpc.py`, `remote_proxy.py`, `l3_daemon.py`; official gRPC Python docs. |
+| `Catalog` exists because remote hosts cannot use fork-inherited Python callable pointers. | `emerging` | `catalog.py`, `remote_proxy.py`, `l3_daemon.py`, `worker.py`; PR comment about closure mutation; runtime open problems about fork/local address assumptions. |
+| `L3Daemon` uses a backend process because gRPC server threads and `Worker(level=3)` fork behavior should not be mixed in one process. | `emerging` | `l3_daemon.py`; `docs/l4-l3-distributed-review-guide.zh.md`; `docs/distributed-l4-control-data-plane-rxe.zh.md`. |
+| `TensorPool` is the bridge between RPC handles and backend storage/registered memory. | `emerging` + `design-intended` | Implemented bytearray pool in `tensor_pool.py`; design target in `materials/L4_L3_data_plane_design.md`; PR docs explain future production pool constraints. |
+| PR #711 implements RXE/ibverbs host-memory data-plane MVP. | `emerging` | `RxeTensorTransport`, `RxeDataPlaneClient`, `RxeRuntime`, `_encode_rxe_desc`, `rxe_verbs_helper.c`, `test_rxe_real.py`, `test_real_e2e_smoke.py`, `tools/test_rxe_data_plane.sh`. |
+| PR #711 implements large `OUTPUT` / `OUTPUT_EXISTING` RXE local output writeback with fallback. | `emerging` | `_stage_local_output_tensor` and `_is_local_output_ack` in `remote_proxy.py`; `RemoteTensorWriteback` and `encode_output_tensor_refs` in `serialization.py`; PR docs and tests. |
+| `INOUT` does not yet have a complete two-way RXE fast path. | `TODO` | PR docs state `INOUT` still uses input staging because it needs initial L4->L3 value plus L3->L4 result; code only classifies `OUTPUT` and `OUTPUT_EXISTING` as remote-output writeback tags. |
+| HCOMM support is optional adapter work, not the main proved data-plane path. | `emerging` / `partial` | `HcommRuntime`, `HcommTensorTransport`, `HcommDataPlaneClient`, `hcomm_abi_shim.cc`, HCOMM smoke tests; PR docs name RXE as main real smoke/E2E path. |
+| Raw local memory pointers are invalid across host boundary. | `blocked` / constraint | Gemini review on PR #711; user review comment about closure/local state; `RUNTIME_OPEN_PROBLEMS.md`; tensor refs and transport handles replace raw pointer assumptions. |
 | A5 UB `jetty` send/receive can support zero-copy MoE/BGEMM receive-buffer compute if buffer ordering and stride invariants are preserved. | `design-intended` | `materials/A5_send_recv_dispatch.pdf` converted text, especially sections 1.1-1.8. |
-| UBL128 serving design separates SU, SO, and DCN responsibilities and uses `uRPC over UB Urma` for hot-path internal RPC. | `design-intended` | `UBL128_serving.md` §1.3, §5.2, §5.5. |
-| Runtime gaps include no remote next-level worker network management, incomplete callable registration, no async child-worker communication, and coupled platform ABI. | `open question` / `blocked` | `materials/RUNTIME_OPEN_PROBLEMS.md`, based on `simpler` HEAD `08f6f769`. |
+| UBL128 serving design separates SU, SO, and DCN responsibilities and uses `uRPC over UB Urma` for hot-path internal RPC. | `design-intended` | `UBL128_serving.md` sections on hardware/network roles and request lifecycle. |
+| Runtime gaps include no production remote next-level worker management, incomplete callable registration, no async child-worker communication, and coupled platform ABI. | `open question` / `blocked` | `materials/RUNTIME_OPEN_PROBLEMS.md`, based on `simpler` HEAD `08f6f769`. |
 
 ## Material Routing
 
 | Source | Routed To | Notes |
 | --- | --- | --- |
-| PR #711 | Future control-plane workstream | Used for live ongoing state, source anchors, PR boundaries, CI/review risk. |
-| PR #711 gRPC/protobuf source files | [PR 711 gRPC Dispatch Primer](../future/pr711-grpc-dispatch-primer.md) | Used for the intuitive concept-to-code walkthrough requested in QA. |
+| PR #711 | Future control/data-plane workstreams | Used for live ongoing state, source anchors, PR boundaries, review risk, and current code shape. |
+| PR #711 gRPC/protobuf/RXE source files | [PR 711 Remote Dispatch and Data Plane Primer](../future/pr711-grpc-dispatch-primer.md) | Used for self-contained concept-to-code walkthrough requested in QA and updated after new commits. |
 | `UBL128_serving.md` | Future serving target workstream | Used for serving objective, F/M/PC/PN/DC/DN/S roles, SU/SO/DCN separation, request lifecycle. |
 | `A5_send_recv_dispatch.pdf` | Future A5 zero-copy data-plane workstream | Used for `jetty`, free/receive queue, buffer-order invariant, stride tensor view, ping/pong pool constraints. |
 | `L4_L3_data_plane_design.md` | Future L4/L3 tensor data-plane workstream | Used for dual-plane model, `TensorPool`, transport choices, synchronization, roadmap estimates. |
@@ -99,23 +125,27 @@ The current branch worktree did not contain the ad hoc material files. They were
 ## Negative Findings
 
 - No inspected evidence proves PR #711 has merged into `simpler/main`.
-- No inspected evidence proves PR #711 implements full tensor materialization and output write-back across hosts.
-- No inspected evidence proves UBL128 serving design is implemented in `simpler`, PyPTO, or PTO-ISA.
+- No inspected evidence proves PR #711 is production-ready remote tensor dispatch. It is a host-memory prototype on an open PR branch.
+- No inspected evidence proves PR #711 implements UBL128 serving frontend, prefill/decode split, continuous batching, KV Meta Server, SSU LBA allocation, NPU->SSU SO/UB Urma KV data plane, or production SO uRPC hot path.
+- No inspected evidence proves RXE performance is production-representative; PR docs describe current helper as one-write RC QP + TCP control MVP.
+- No inspected evidence proves `INOUT` has a complete two-way RXE fast path.
 - No inspected evidence proves A5 send/receive zero-copy dispatch has a runnable BGEMM/MoE example in this wiki pass.
 - No inspected evidence resolves the platform ABI split described in `RUNTIME_OPEN_PROBLEMS.md`.
 
 ## Open Questions
 
-- What exact `TensorRef` ABI should survive across PR #711 and the later data-plane implementation?
-- Should output transfer default to L4 pull, L3 push, or policy-based selection?
-- What should happen when a remote `TensorPool` is exhausted: block, fail, spill to TCP, or backpressure the scheduler?
+- What exact `TensorRef` ABI should survive across PR #711 and later production data-plane implementation?
+- Should output transfer default to L4 pull, L3 push, RXE ACK, or policy-based selection?
+- Should explicit `rxe` input failure always fail fast, or should users be able to request fallback?
+- What should happen when remote `TensorPool` is exhausted: block, fail, spill to TCP, or backpressure the scheduler?
 - How should callable identity become stable across L2 chip callable, L3+ orch/sub callable, AICPU cache, and remote catalog?
 - Where should A5 `jetty` receive-buffer stride support be tested: a unit kernel, a MoE example, or a full serving path?
 - Which UBL128 serving roles map directly to `simpler` Worker levels, and which belong outside `simpler` as service-level orchestration?
 
 ## Status Change Criteria
 
-- Move PR #711 claims from `ongoing` to `implemented` only after the PR is merged, the merged commit is cited, and wiki pages show source-shaped code walkthroughs for the new API and dispatch path.
-- Move tensor data-plane claims from `design-intended` to `implemented` only after source/tests/examples prove cross-host tensor input/output with handles instead of raw VA.
+- Move PR #711 claims from `ongoing` to `implemented` only after the PR is merged, the merged commit is cited, and wiki pages show source-shaped code walkthroughs for the new API, dispatch path, tensor path, and limitations.
+- Move RXE host-memory prototype claims from `emerging` to `implemented` only after the merged source commit and tests are re-read from `simpler/main`.
+- Move production tensor data-plane claims from `design-intended` to `implemented` only after source/tests/examples prove cross-host tensor input/output with handles instead of raw VA, with pool lifetime, failure, and concurrency behavior.
 - Move A5 zero-copy dispatch claims from `design-intended` to `implemented` only after code or examples prove stride-aware compute directly on receive buffers.
 - Move UBL128 serving claims out of Future only after repository source, tests, examples, or merged design-to-implementation PRs provide implemented evidence.

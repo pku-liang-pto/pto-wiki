@@ -119,3 +119,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-07] qa-promotion | Add PR 711 gRPC dispatch primer
 
 根据 QA 反馈，新增 [PR 711 gRPC Dispatch Primer](./future/pr711-grpc-dispatch-primer.md)，用自包含、图示化方式解释 gRPC、Protocol Buffers、generated stubs、`RpcServer`/`RpcClient`、`RemoteWorkerProxy`、local mailbox shim、`L3Daemon` backend process、example path、error/heartbeat model 和 PR #711 当前边界。同步记录 [QA evidence](./evidence/qa/2026-05-07-pr711-grpc-primer.md)，并扩展 Future roadmap evidence 中的 gRPC/protobuf source trail。
+
+## [2026-05-08] future-update | Sync PR 711 RXE data-plane commits
+
+根据 PR #711 新 commits，将 [PR 711 gRPC Dispatch Primer](./future/pr711-grpc-dispatch-primer.md) 重新定位为 [PR 711 Remote Dispatch and Data Plane Primer](./future/pr711-grpc-dispatch-primer.md)，补足 `TensorRef` / `TensorHandle`、`TensorPool`、gRPC chunk fallback、RXE/ibverbs data-plane MVP、HCOMM adapter boundary、`OUTPUT / OUTPUT_EXISTING` output writeback、remote closure result-return correction、tests 和 serving non-goals。同步更新 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)、[Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)、Future/QA navigation、Home/Overview 和 VitePress Future sidebar labels。

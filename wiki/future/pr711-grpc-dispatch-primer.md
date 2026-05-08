@@ -1,5 +1,5 @@
 ---
-title: "PR 711 gRPC Dispatch Primer"
+title: "PR 711 Remote Dispatch and Data Plane Primer"
 type: future
 status: draft
 sources:
@@ -7,97 +7,78 @@ sources:
   - https://grpc.io/docs/what-is-grpc/introduction/
   - https://grpc.io/docs/languages/python/basics/
   - https://protobuf.dev/overview/
+  - https://docs.nvidia.com/networking/display/RDMAAwareProgrammingv17/Key+Concepts
+  - https://docs.redhat.com/documentation/pt/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_soft-_roce
   - ../evidence/future-runtime-dispatch-and-serving-roadmap.md
-last_updated: 2026-05-07
+last_updated: 2026-05-08
 ---
 
-# PR 711 gRPC Dispatch Primer
+# PR 711 Remote Dispatch and Data Plane Primer
 
-本页是为了读懂 `simpler` PR [#711 Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711) 准备的入门材料。它先用直觉解释 gRPC、Protocol Buffers、stub、servicer、channel、RPC server，再把这些概念逐个映射到 PR #711 的 `dispatch.proto`、`rpc.py`、`RemoteWorkerProxy`、`L3Daemon` 和 `Worker.add_remote_worker()`。
+本页帮助读者读懂 `simpler` PR [#711 Add Python distributed L4 to L3 dispatch](https://github.com/hw-native-sys/simpler/pull/711) 在 2026-05-08 新增后的形态。它不再只是 “gRPC dispatch primer”：PR #711 现在同时包含 L4 -> remote L3 control plane、callable catalog、TensorPool handle、gRPC chunk fallback、RXE/ibverbs data-plane MVP、HCOMM optional adapter、大 `OUTPUT / OUTPUT_EXISTING` writeback，以及与 UBL128 serving design 的边界说明。状态和证据见 [Future Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md)。
 
 ## How To Read This Page
 
-如果你完全不熟 gRPC，按顺序读。如果你已经知道 gRPC，可以直接跳到 `PR #711 的代码地图`。
+如果你第一次读 PR #711，按下面顺序读。先建立双平面直觉，再进入代码形状。
 
 ```text
-gRPC mental model
-  -> Protocol Buffers schema
-  -> generated Python code
-  -> PR #711 services
-  -> L4 proxy and mailbox shim
-  -> L3 daemon and backend process
-  -> current proof boundary
+current status boundary
+  -> gRPC/protobuf control-plane basics
+  -> L4 mailbox shim and RemoteWorkerProxy
+  -> L3Daemon backend process
+  -> TensorRef / TensorHandle schema
+  -> TensorPool and transport backends
+  -> RXE output writeback
+  -> tests, limitations, serving boundary
 ```
 
-状态边界先说清楚：PR #711 在 2026-05-07 仍是 `OPEN` / `REVIEW_REQUIRED`，所以本页讲的是 `emerging` implementation shape，不是 `simpler/main` 已实现能力。PR body 也明确说当前 e2e 覆盖 scalar `TaskArgs` 和 callable execution，完整 remote tensor materialization / output write-back 仍是 future work；证据见 [Future Runtime Dispatch and Serving Roadmap Evidence](../evidence/future-runtime-dispatch-and-serving-roadmap.md#github-pr)。
+状态边界先说清楚：PR #711 在 2026-05-08 仍是 `OPEN` / `REVIEW_REQUIRED`，当前 head 是 `2dd89eeaff9164166a6b4f36edce3c4621777b53`。本页因此使用 `emerging` 描述 PR branch 上已经出现并有测试覆盖的实现形状，而不是说它已经进入 `simpler/main`。其中 RXE 是 host-memory Soft-RoCE / ibverbs MVP，不等于 UBL128 设计里的 production SO / UB Urma / NPU HBM / SSU KV data plane。
 
-## One Picture
+## One Picture: Two Planes
 
-PR #711 想把原来 “L4 fork 本地 L3 child process” 的路径，改成 “L4 把任务通过 gRPC 发给远端 L3 daemon”。它不直接重写 C++ scheduler，而是在 L4 本机放一个 mailbox shim，让 C++ scheduler 仍然以为自己在调一个普通 PROCESS worker。
+PR #711 把 “发什么任务” 和 “大 tensor 字节怎么走” 分开。
 
 ```text
-L4 process                                      Remote L3 process
-==========                                      =================
+Control plane: small, typed, stateful
 
-Worker(level=4)
-  orch.submit_next_level(...)
-        |
-        v
-local C++ scheduler
-        |
-        | writes TASK_READY into local mailbox
-        v
-Python _remote_worker_loop
-        |
-        | reads callable id / TaskArgs / CallConfig
-        v
-RemoteWorkerProxy
-        |
-        | gRPC L3Worker.Dispatch(DispatchReq)
-        v
-                                             L3Daemon gRPC server
-                                                |
-                                                | pipe to backend
-                                                v
-                                             backend process
-                                                |
-                                                | lazy Worker(level=3).run(...)
-                                                v
-                                             local L3 runtime
+L4 Worker
+  local PROCESS mailbox shim
+    -> RemoteWorkerProxy
+       -> gRPC L3Worker.Dispatch(DispatchReq)
+       -> gRPC Catalog.PushCallable(...)
+       -> gRPC TensorPool.Alloc/Refresh/Free(...)
+       -> gRPC Heartbeat()
+          |
+          v
+       L3Daemon gRPC server
+          |
+          v
+       backend process with Worker(level=3)
+
+Data plane: byte movement for tensors
+
+small tensor
+  DispatchReq.tensor_refs.inline_data
+
+large input tensor
+  L4 asks L3 TensorPool for handle
+  L4 writes bytes by gRPC chunks, RXE RDMA write, or HCOMM adapter
+  DispatchReq carries TensorRef(handle)
+
+large output tensor
+  L4 may register its local output buffer as RXE region
+  L3 runs task into temporary local buffer
+  L3 writes output bytes back to L4 RXE handle
+  DispatchResp carries ACK-style TensorRef(handle)
 ```
 
-读这张图时抓住两个分界：
+这张图的关键是：gRPC 仍然是 control-plane 主路径。它负责 `DispatchReq`、catalog、heartbeat、TensorPool control RPC 和 fallback chunk transfer。RXE/HCOMM 是 data-plane backend，用来搬运大块 tensor bytes；它们不替代 dispatch protocol，也不让 local pointer 直接跨 host 使用。
 
-- L4 本机的 C++ scheduler 和 mailbox 仍是 current `simpler` local runtime 语义。
-- 跨进程/跨 Host 的新边界只从 `RemoteWorkerProxy` 到 `L3Daemon`，这段用 gRPC/protobuf 做 control plane。
+## gRPC And Protobuf Basics
 
-## gRPC 是什么
+gRPC 是 RPC framework：client 像调用本地方法一样调用远端 service；网络连接、序列化、timeout、错误码和 server dispatch 由框架处理。gRPC 官方文档把 service/method 定义放在 `.proto` schema 里，Python 代码再由 `grpc_tools.protoc` 生成 client stub 和 server servicer skeleton。Protocol Buffers 提供 typed binary message schema，但它不是大 tensor 的理想容器；大数组通常需要单独的 data plane。[gRPC Introduction](https://grpc.io/docs/what-is-grpc/introduction/)、[gRPC Python Basics](https://grpc.io/docs/languages/python/basics/) 和 [Protocol Buffers Overview](https://protobuf.dev/overview/) 是这里的外部概念来源。
 
-gRPC 是一种 RPC framework。RPC 的直觉是：client 像调用本地函数一样调用远端 server 的方法；真正的网络连接、序列化、超时、错误码、server dispatch 由框架处理。gRPC 官方介绍把服务定义放在 `.proto` 文件里：先定义 service，说明可以远程调用哪些 method；再定义 request/response message，说明每个 method 收什么、回什么。[gRPC Introduction](https://grpc.io/docs/what-is-grpc/introduction/) 和 [Python Basics tutorial](https://grpc.io/docs/languages/python/basics/) 都按这个顺序解释。
-
-一个普通 unary RPC 可以这样想：
-
-```text
-client code
-  req = DispatchReq(...)
-  resp = stub.Dispatch(req, timeout=...)
-
-network
-  req bytes go to server
-  resp bytes come back
-
-server code
-  def Dispatch(self, request, context):
-      return DispatchResp(...)
-```
-
-`unary` 的意思是 “一次 request，返回一次 response”。PR #711 的 `L3Worker.Dispatch` 和 `L3Worker.Heartbeat` 都是 unary RPC。`TensorPool.PullTensor` / `PushTensor` 是 streaming RPC：一个方向可以连续传多段 `TensorChunk`，但 PR #711 当前端到端 remote dispatch 还没有完成真实 tensor data-plane。
-
-## Protocol Buffers 是什么
-
-Protocol Buffers 解决 “网络两端怎样同意消息结构” 这个问题。它不是 Python dict，也不是 JSON；它是一个 schema-first 的 typed binary serialization mechanism。你在 `.proto` 文件里写 message 和 service，`protoc` 再生成语言绑定。Protobuf 官方文档强调它是 language-neutral、platform-neutral，并且适合 typed structured data；但它也提醒大数据、科学数组、大型 tensor 不适合直接塞进 protobuf message，因为会带来额外拷贝和内存压力。[Protocol Buffers Overview](https://protobuf.dev/overview/)。
-
-PR #711 的关键 schema 在 `python/simpler/distributed/proto/dispatch.proto`：
+PR #711 的 schema 在 `python/simpler/distributed/proto/dispatch.proto`。最重要的是三个 service：
 
 ```protobuf
 service L3Worker {
@@ -105,255 +86,396 @@ service L3Worker {
   rpc Heartbeat(Empty) returns (Health);
 }
 
-message DispatchReq {
-  uint64 task_id = 1;
-  uint64 callable_id = 2;
-  uint64 callable_version = 3;
-  bytes config_blob = 4;
-  repeated uint64 scalar_args = 5;
-  repeated ContinuousTensorRef tensor_args = 6;
-  repeated TensorRef tensor_refs = 7;
+service Catalog {
+  rpc PullCallable(CallableRef) returns (CallablePayload);
+  rpc PushCallable(CallablePayload) returns (Empty);
+}
+
+service TensorPool {
+  rpc AllocTensor(TensorAllocReq) returns (TensorHandle);
+  rpc FreeTensor(TensorFreeReq) returns (Empty);
+  rpc RefreshTensor(TensorRefreshReq) returns (TensorHandle);
+  rpc PullTensor(TensorHandle) returns (stream TensorChunk);
+  rpc PushTensor(stream TensorChunk) returns (TensorHandle);
 }
 ```
 
-这段定义的意思是：`L3Worker` server 暴露 `Dispatch` 和 `Heartbeat` 两个远端方法；`Dispatch` 的输入是 `DispatchReq`，输出是 `DispatchResp`。`DispatchReq` 不是直接放 Python function，也不是直接放 tensor bytes，而是放 task id、callable id/version、配置 blob、scalar args、tensor metadata 和 future tensor refs。
+`L3Worker` 是 task dispatch 和 heartbeat。`Catalog` 是 callable 分发：remote host 不能继承 L4 进程里的 Python function object，所以 L4 必须把 callable payload 推给 L3。`TensorPool` 是大 tensor 的 handle 管理和 fallback streaming interface。
 
-字段后面的 `= 1`、`= 2` 不是默认值，而是 wire format 的 field number。它们让 protobuf 在 bytes 中稳定识别字段。后续加字段时，只要不复用旧 field number，就能让旧代码忽略新字段，这就是 protobuf 常用于 RPC schema evolution 的原因之一。
+## Wire Schema: TensorRef And TensorHandle
 
-## Generated Code: pb2 和 pb2_grpc
+PR #711 的新核心不是把 tensor bytes 塞进 `DispatchReq`，而是把 tensor 表达成 `TensorRef`。小 tensor 可以 inline，大 tensor 使用 handle。
 
-读 PR #711 时会看到两个 generated files：
+```protobuf
+message TensorHandle {
+  string node_id = 1;
+  uint64 handle_id = 2;
+  uint64 remote_addr = 3;
+  uint32 rkey = 4;
+  uint64 nbytes = 5;
+  uint64 lease_deadline_unix_ms = 6;
+  string transport = 7;
+  bytes transport_desc = 8;
+}
 
-- `dispatch_pb2.py`: protobuf message 类，例如 `DispatchReq`、`DispatchResp`、`Health`。
-- `dispatch_pb2_grpc.py`: gRPC service 类，例如 `L3WorkerStub`、`L3WorkerServicer`、`add_L3WorkerServicer_to_server`。
-
-gRPC Python tutorial 说明，`grpc_tools.protoc` 会从 `.proto` 生成 request/response message classes、client stub、server servicer interface 和把 servicer 注册到 server 的函数。[Python Basics tutorial](https://grpc.io/docs/languages/python/basics/)。
-
-把名字翻译成 PR #711 的角色：
-
-```text
-L3WorkerStub
-  client-side object
-  RemoteWorkerProxy uses it through RpcClient
-
-L3WorkerServicer
-  server-side interface
-  L3Daemon subclasses/implements it
-
-add_L3WorkerServicer_to_server
-  registration glue
-  RpcServer.add_l3_worker calls it
+message TensorRef {
+  oneof source {
+    bytes inline_data = 1;
+    TensorHandle handle = 2;
+  }
+  repeated int64 shape = 10;
+  int32 dtype = 11;
+  int32 tag = 12;
+}
 ```
 
-所以看到 `dispatch_pb2_grpc.L3WorkerStub(channel)` 时，不要把它理解成 server。它是 client 端的 typed handle，负责把 `stub.Dispatch(req)` 变成网络请求。看到 `class L3Daemon(dispatch_pb2_grpc.L3WorkerServicer)` 时，才是在实现 server 收到 request 后要做什么。
+这个 schema 同时表达三类事实。
 
-## PR #711 的代码地图
+第一，`shape`、`dtype` 和 `tag` 是 runtime 语义。L3 要重建 `ContinuousTensor`，必须知道 tensor 的维度、元素类型和方向 tag，例如 `INPUT`、`OUTPUT`、`INOUT`、`OUTPUT_EXISTING`。
 
-PR #711 的 gRPC/control-plane implementation 可以按这条链读：
+第二，`handle_id` 和 `node_id` 是 ownership。L3 TensorPool handle 属于 L3 backend pool；L4 local output RXE handle 属于 `node_id="l4-rxe-..."`。这个区别让 L4 能判断 `DispatchResp.output_tensors` 是 “需要 PullTensor 的 L3 handle”，还是 “已经写回我本地 output buffer 的 ACK”。
+
+第三，`remote_addr`、`rkey`、`transport` 和 `transport_desc` 是 data-plane metadata。`grpc` backend 主要靠 `PushTensor/PullTensor` 分片；`rxe` backend 需要 RDMA write 的地址、remote key 和 RXE helper descriptor；`hcomm` backend 需要可导入的 HCOMM memory descriptor。
+
+## L4 Side: Mailbox Shim And RemoteWorkerProxy
+
+L4 侧 public API 是 `Worker.add_remote_worker(endpoint, ...)`。它把一个远端 L3 endpoint 注册成当前 L4 worker 的 next-level worker。为了复用已有 C++ scheduler，PR #711 没有让 scheduler 直接懂 gRPC；它给 remote worker 配一个 local `PROCESS` mailbox，再启动 Python shim thread 读写这个 mailbox。
 
 ```text
-dispatch.proto
-  declares services/messages
+Worker(level=4)
+  add_remote_worker("127.0.0.1:5050", tensor_transport="rxe")
+  init()
+    -> create local mailbox for a remote child
+    -> RemoteWorkerProxy.handshake()
+    -> start _remote_worker_loop thread
 
-dispatch_pb2.py / dispatch_pb2_grpc.py
-  generated Python message classes and stubs
+existing C++ scheduler
+  writes TASK_READY into local mailbox
 
-rpc.py
-  wraps grpc.server and grpc.insecure_channel
-
-remote_proxy.py
-  L4-side client: heartbeat, PushCallable, Dispatch
-
-l3_daemon.py
-  L3-side server: receives Dispatch and runs backend Worker(level=3)
-
-worker.py
-  add_remote_worker + local mailbox shim thread
-
-tests/ut/py/test_distributed/
-  prove scalar dispatch, catalog, heartbeat, error propagation
+Python shim thread
+  reads callable id, TaskArgs, CallConfig
+  calls RemoteWorkerProxy.dispatch(...)
+  writes TASK_DONE or error back into mailbox
 ```
 
-`rpc.py` 是薄封装，不是新的 distributed runtime。它把常见 gRPC setup 收进两个类：
+`RemoteWorkerProxy.dispatch()` 的 implementation shape 可以压缩成：
 
 ```python
-server = RpcServer()
-server.add_l3_worker(L3Daemon(...))
-port = server.start(0)
+tensor_args, scalar_args = encode_task_args(args)
+tensor_refs, remote_handles, local_output_regions = self._stage_tensor_args(args)
 
-client = RpcClient("127.0.0.1:5050")
-resp = client.dispatch(DispatchReq(...), timeout=...)
+req = DispatchReq(
+    task_id=next(self._task_ids),
+    callable_id=callable_id,
+    callable_version=version,
+    config_blob=encode_config(config),
+    scalar_args=scalar_args,
+    tensor_args=[] if tensor_refs else tensor_args,
+    tensor_refs=tensor_refs,
+)
+
+resp = self._client.dispatch(req, self._timeout)
+self._write_output_tensors(args, resp.output_tensors)
 ```
 
-PR #711 当前用 `grpc.insecure_channel` 和 `add_insecure_port`，表示没有 TLS/auth。这符合 MVP 目标，但不能当成 production security boundary。PR docs 也说明 callable payload 只能用于 trusted cluster internal，因为反序列化 callable 等价于执行 Python code。
+注意这里保留了 `tensor_args` 旧路径：如果没有 `tensor_refs`，旧的 `ContinuousTensorRef(data=local_pointer, ...)` 仍可用于同进程/兼容路径。但跨 host 的可靠路径应该看 `tensor_refs`，因为 raw local virtual address 不能跨机器使用。
 
-## The Three Services
+## Input Tensor Staging
 
-`dispatch.proto` 里有三个 service。它们不是同一个层次的东西：
-
-### `L3Worker`
-
-`L3Worker.Dispatch` 是主路径。L4 把一个 task 发给 L3，L3 尝试执行，然后回 `DispatchResp`。`L3Worker.Heartbeat` 是健康检查。`RemoteWorkerProxy` handshake 先调用 heartbeat，之后后台 heartbeat thread 周期检测远端是否还可用。
+`RemoteWorkerProxy._stage_tensor_args()` 决定每个 tensor 如何进入 remote dispatch。
 
 ```text
-RemoteWorkerProxy
-  -> Heartbeat()
-  -> Dispatch(DispatchReq)
+for each TaskArgs tensor:
+  if large OUTPUT / OUTPUT_EXISTING and transport is rxe/auto:
+      register L4 local output buffer as RXE region
+      send TensorRef(handle=node_id l4-rxe-...)
+      remember local output region for cleanup
+  else:
+      copy bytes from local tensor pointer
+      if nbytes <= 4KB:
+          send TensorRef(inline_data=bytes)
+      else:
+          AllocTensor on L3 TensorPool
+          push bytes by rxe / hcomm / grpc
+          send TensorRef(handle=L3 handle)
 ```
 
-### `Catalog`
+这段代码解释了一个容易误读的点：`OUTPUT_EXISTING` 在 RXE output fast path 中不会把旧值先发到 L3。它的语义是 “给 L3 一个写回位置”。如果任务需要远端先读旧值再更新，应该使用 `INOUT`；`INOUT` 当前走 input staging + response writeback 路径，还没有做单 handle 双向 RXE fast path。
 
-`Catalog` 负责 callable 分发。Local fork 模型里，child process 能靠 fork-COW 继承父进程的 Python registry；remote host 不能继承。PR #711 于是把 callable 序列化成 payload，用 `PushCallable` 推到远端。每个 callable 有 `callable_id` 和 `callable_version`；version 是 payload 的 `blake2b` hash。
+## L3 Side: Daemon And Backend Process
 
-```text
-L4 Catalog
-  register(fn) -> cid/version/pickled payload
-  PushCallable(payload) -> L3Daemon Catalog -> backend Catalog
-```
-
-这里的重点不是 hash 算法，而是 “远端不能 dereference 本地 function pointer”。远端必须先拥有可执行 callable payload，才能解释 `DispatchReq.callable_id`。
-
-### `TensorPool`
-
-`TensorPool` 是 future tensor data-plane 的表面。当前代码能 inline 小 bytes、为大 bytes 生成 handle，并提供 `PullTensor` / `PushTensor` streaming；但 PR body 和 docs 都说完整 tensor materialization / output write-back 未完成。因此读到 `TensorPool` 时，应该标为 `design-intended surface`，不能把它当作 production tensor transport。
-
-## L4 Side: RemoteWorkerProxy 和 Mailbox Shim
-
-L4 侧入口是 `Worker.add_remote_worker(endpoint, **options)`。它只能在 `level >= 4` 的 `Worker` 上、`Worker.init()` 前调用。初始化时，PR #711 为每个 remote worker 分配一块 local `SharedMemory` mailbox，创建 `RemoteWorkerProxy`，做 handshake，然后启动 `_remote_worker_loop` thread。
-
-`_remote_worker_loop` 的作用是把 local mailbox protocol 转成 remote RPC：
-
-```text
-while running:
-  if mailbox.state == TASK_READY:
-      cid = mailbox.callable
-      args = read TaskArgs from mailbox
-      cfg = read CallConfig from mailbox
-      proxy.dispatch(cid, args, cfg)
-      mailbox.state = TASK_DONE
-```
-
-这就是 PR #711 的 compatibility trick。C++ scheduler 不知道远端 gRPC 的存在，它只看到一个 PROCESS-mode mailbox。Python shim thread 站在 mailbox 另一侧，把任务转发给 `RemoteWorkerProxy.dispatch()`。
-
-`RemoteWorkerProxy.dispatch()` 做四件事：
-
-1. 把 `TaskArgs` 拆成 `tensor_args` 和 `scalar_args`。
-2. 把 `CallConfig` 编成 `config_blob`。
-3. 从 catalog 查 `callable_id` 对应的 `callable_version`。
-4. 构造 `DispatchReq`，调用 `RpcClient.dispatch()`。
-
-如果 RPC 失败，proxy 会把 remote 标为 unavailable。若远端返回 `error_code != 0`，proxy 抛出带 `remote_traceback` 的 `RuntimeError`，shim 再把错误写回 mailbox，最后由现有 `Worker.run` drain/error path 抛回 L4 caller。
-
-## L3 Side: L3Daemon 和 Backend Process
-
-`L3Daemon` 是远端 server。它继承 `L3WorkerServicer`，所以它要实现 `Dispatch()` 和 `Heartbeat()`。启动时它还注册 `Catalog` service 和 `TensorPool` service。
-
-最容易困惑的一点是：`L3Daemon` 不直接在 gRPC server thread 里运行 `Worker(level=3)`。它先 fork 一个 backend process，再通过 `multiprocessing.Pipe` 把 dispatch bytes 发给 backend。
+`L3Daemon` 是 gRPC server，但真正执行任务的 `Worker(level=3)` 不在 gRPC server thread 里直接运行。PR #711 启动 daemon 时先 fork 一个 backend process，然后 daemon 通过 `multiprocessing.Pipe` 把 `dispatch`、`tensor_alloc`、`tensor_push`、`catalog push` 等操作转给 backend。
 
 ```text
 L3Daemon process
-  gRPC server threads
+  RpcServer
   L3Worker.Dispatch handler
-  CatalogService / TensorPoolService
+  Catalog service facade
+  TensorPool service facade
   Pipe parent end
-
-Backend process
-  Pipe child end
-  Catalog mirror
-  lazy inner Worker(level=3)
-  inner Worker forks its own sub/chip children
+      |
+      v
+backend process
+  Catalog
+  TensorPool
+  transport backend: grpc / rxe / hcomm / auto
+  Worker(level=3)
 ```
 
-这样做的原因是 fork safety。`grpcio` server 会启动 worker threads；而 `simpler.Worker(level=3)` 仍然需要 fork sub worker / chip worker。PR docs 明确说，如果在已经启动 gRPC worker threads 的进程中 fork，可能触发 grpcio fork-safety 问题。因此 backend process 在 gRPC server start 前创建，真正的 inner `Worker(level=3)` 逻辑都在 backend process 内完成。
+这样做有两个原因。第一，`grpcio` server 自己有线程；直接在 gRPC server 进程里继续 fork `Worker(level=3)` 的 sub/chip workers 风险更高。第二，TensorPool 里的 bytearray buffer、mmap buffer 和 L3 task execution 必须处在同一个 backend address space，L3 才能把 handle materialize 成本进程可读写的 `ContinuousTensor`。
 
-`Dispatch` 到达后的实际 sequence 是：
+`_backend_dispatch()` 有两条运行模式：
 
 ```text
-gRPC handler receives DispatchReq
-  -> serialize req bytes through Pipe
-  -> backend parses DispatchReq
-  -> lazy create Worker(level=3)
-  -> install catalog callables into inner._callable_registry
-  -> lookup callable_id / callable_version
-  -> decode CallConfig and TaskArgs
-  -> inner.run(orch_fn, args, cfg)
-  -> return DispatchResp bytes
+DispatchReq without tensor_refs
+  decode old ContinuousTensorRef
+  reuse persistent inner Worker(level=3)
+
+DispatchReq with tensor_refs
+  materialize each TensorRef into mmap-backed local buffer
+  create ephemeral Worker(level=3)
+  install callable catalog
+  run task
+  encode output TensorRefs
+  close ephemeral Worker
 ```
 
-这个设计保留了当前 L3 runtime 的 local mechanics：remote L3 daemon 只负责接收 task；真正执行 task 的仍是 `Worker(level=3)`，它内部再管理 L2 chip workers 或 Python sub workers。
+临时 `Worker(level=3)` 的原因是：tensor payload 先在 backend process 里 materialize 成 mmap buffer，再让 L3 sub/chip child worker fork 后继承这段 mapping。这个路径是 MVP 取舍，也意味着当前 dispatch 不是高并发 production scheduler。
 
-## Minimal Example: Why `remote counter=7`
+## TensorPool: Handle To Bytes Bridge
 
-PR #711 的 example 分两个进程跑。终端 1 启动 L3 daemon：
-
-```bash
-python examples/distributed/l4_l3_remote/l3_worker.py --port 5050
-```
-
-终端 2 启动 L4 master：
-
-```bash
-python examples/distributed/l4_l3_remote/l4_master.py --remotes 127.0.0.1:5050
-```
-
-`l4_master.py` 里的逻辑可以压缩成：
+`TensorPool` 是 PR #711 中 control plane 和 data plane 的桥。它当前是 Python byte pool，不是 UBL128 里的 SSU KV store。默认 capacity 是 64 MiB，inline threshold 是 4 KiB，默认 lease TTL 是 60 秒。
 
 ```python
-w4 = Worker(level=4, num_sub_workers=0)
+data = bytearray(nbytes)
+region = self.transport_backend.register_region(data, tag=f"{node}:{handle}:{tag}")
 
-sub_cid = w4.register(l3_sub)
-l3_cid = w4.register(l3_orch)
-w4.add_remote_worker("127.0.0.1:5050")
-w4.init()
+entry = _Entry(
+    data=data,
+    nbytes=nbytes,
+    expires_at_ms=now + ttl,
+    shape=shape,
+    dtype=dtype,
+    tag=tag,
+    region=region,
+)
 
-def l4_orch(orch, task_args, config):
-    for value in (2, 5):
-        sub_args = TaskArgs()
-        sub_args.add_scalar(value)
-        orch.submit_next_level(l3_cid, sub_args, CallConfig())
-
-w4.run(l4_orch)
+return TensorHandle(
+    node_id=self.node_id,
+    handle_id=handle_id,
+    remote_addr=region.remote_addr,
+    rkey=region.rkey,
+    nbytes=nbytes,
+    transport=region.transport,
+    transport_desc=region.transport_desc,
+)
 ```
 
-这里的 `l4_orch` 在 L4 上运行，但它提交的 `l3_cid` 指向一个 L3 orchestration callable。因为 `w4.add_remote_worker()` 已经注册了 remote mailbox，`submit_next_level` 最终会被 shim 转成 `L3Worker.Dispatch`。远端 backend 找到 `l3_cid`，执行 `l3_orch`，`l3_orch` 再 `submit_sub(sub_cid, task_args)`，于是 `2` 和 `5` 都累加到 counter，输出 `remote counter=7`。
+`AllocTensor` 分配 bytearray 并注册 region。`PushTensor` / `PullTensor` 是 gRPC chunk fallback。`RefreshTensor` 不是只续租：对 RXE backend，它会调用 `refresh_region()`，关闭旧的一次性 RXE server，再在同一个 buffer 上重建 server，让同一个 handle 后续还能被再次写入。`FreeTensor` 和 GC 负责释放 handle 并 unregister region。
 
-这个 example 证明的是 remote scalar dispatch path 可以穿过：L4 orchestration -> local mailbox -> gRPC -> L3 daemon -> backend `Worker(level=3)` -> L3 sub callable。它不证明 tensor bytes 已经被跨 host materialize，也不证明 output tensor 已经回写。
+## Transport Backends
 
-## Error And Health Model
-
-PR #711 里有两层错误：
+`transport_backend.py` 定义 `TensorTransportBackend` 边界。这个边界的职责很窄：让 TensorPool 注册一段本地 byte buffer，并返回 peer 能理解的 `RegisteredRegion`。
 
 ```text
-transport-level error
-  grpc.RpcError
-  -> RpcClient wraps as RpcError
-  -> RemoteWorkerProxy marks remote unavailable
+GrpcTensorTransport
+  register_region -> local addr only
+  actual bytes go through PushTensor/PullTensor chunks
 
-remote execution error
-  backend catches exception
-  -> DispatchResp(error_code=1, error_msg, remote_traceback)
-  -> RemoteWorkerProxy raises RuntimeError
-  -> mailbox error region
-  -> existing Worker.run error path
+RxeTensorTransport
+  register_region -> RXE server_start(bytearray addr, size)
+  TensorHandle.transport = "rxe"
+  TensorHandle.transport_desc = binary RXE descriptor
+
+HcommTensorTransport
+  register_region -> HcommMemReg + HcommMemExport
+  TensorHandle.transport = "hcomm"
+  TensorHandle.transport_desc = HCOMM exported memory descriptor
+
+auto
+  RXE only if SIMPLER_RXE_AUTO=1 and available
+  then HCOMM if available
+  otherwise gRPC fallback
 ```
 
-Heartbeat 是 availability check，不是 correctness proof。远端 `Heartbeat` 返回 `Health(ok=True, message="ok")` 只能说明 daemon service 可达；不能说明 callable catalog、inner worker、tensor data-plane 或 device runtime 一定可用。
+显式 `tensor_transport="rxe"` 或 `"hcomm"` 是 fail-fast：backend 不可用就报错。`auto` 更保守，默认不会自动启用 RXE，除非设置 `SIMPLER_RXE_AUTO=1`；这避免机器上偶然存在 RXE device 时改变数据路径。
+
+## RXE Mental Model
+
+`RXE` 是 Linux Soft-RoCE。`RoCE` 的意思是 RDMA over Converged Ethernet；`Soft-RoCE` 是软件实现的 RDMA transport，Red Hat 文档把它描述成软件 RDMA transport，内核里对应 `rdma_rxe`/RXE 设备配置路径。PR #711 用 RXE 做单机/实验性真实 ibverbs data-plane smoke，不等于生产硬件 RoCE 性能路径。
+
+RDMA verbs 的基本对象可以这样记：
+
+```text
+MR: Memory Region
+  local process registers a memory range
+  peer needs remote address + rkey to access it
+
+QP: Queue Pair
+  send queue + receive queue
+  application posts work requests to QP
+
+CQ: Completion Queue
+  completed work requests show up here
+
+RDMA write
+  writer NIC/verbs writes local bytes into peer registered memory
+  peer CPU does not receive a normal TCP byte stream
+```
+
+NVIDIA RDMA key concepts 文档也用 MR、rkey、QP、CQ 来解释 verbs programming model。PR #711 的 `rxe_verbs_helper.c` 走的是 RC QP + TCP control connection + one RDMA write server：
+
+```text
+L3 TensorPool alloc large buffer
+  bytearray -> address
+  RxeRuntime.server_start(addr, size)
+    -> C helper opens RXE device
+    -> creates PD / CQ / QP
+    -> registers MR
+    -> starts TCP control server
+    -> returns addr, rkey, port, ip, size
+
+L4 pushes input or L3 writes output
+  RxeDataPlaneClient.write_handle(handle, local_addr, nbytes)
+    -> decode transport_desc
+    -> simpler_rxe_write(...)
+    -> TCP control exchange
+    -> RC QP RDMA write
+    -> wait CQ completion
+```
+
+这是功能 MVP，不是性能最终形态。每个 region/write 仍有 TCP control、QP 创建、MR 注册或 helper setup 成本；小 tensor 可能比 gRPC chunk 慢。后续如果要接 production path，需要连接池、QP reuse、稳定 descriptor schema、并发压测、跨节点 RoCE 验证和错误观测。
+
+## Output Writeback
+
+PR #711 新 commits 解决了旧 example 暗示 “remote closure mutates L4-local Python object” 的问题。远端 callable 是通过 catalog 序列化到 L3 daemon 的，closure 里的 Python object 会变成 L3 backend/sub-worker 的副本；直接修改 closure 不会改到 L4 进程里的原对象。
+
+新的 example 使用 `OUTPUT_EXISTING` tensor 返回结果：
+
+```python
+result = ctypes.c_int64(0)
+
+def l3_sub(task_args):
+    output = task_args.tensor(1)
+    current = ctypes.c_int64.from_address(int(output.data))
+    current.value += int(task_args.scalar(0))
+
+sub_args.add_tensor(
+    ContinuousTensor.make(ctypes.addressof(result), (1,), DataType.INT64),
+    TensorArgType.OUTPUT_EXISTING,
+)
+```
+
+完整 writeback 路径如下：
+
+```text
+L4 sees large OUTPUT / OUTPUT_EXISTING with RXE transport
+  register L4 local output buffer as RXE region
+  DispatchReq carries TensorRef(handle=node_id l4-rxe-...)
+
+L3 decodes TensorRef
+  detects remote output handle
+  creates temporary mmap buffer for local computation
+  records RemoteTensorWriteback(tensor_index, L4 handle)
+
+L3 task writes into temporary buffer
+
+encode_output_tensor_refs(...)
+  tries RxeDataPlaneClient.write_handle(L4 handle, temp bytes)
+  if success: return ACK TensorRef(handle=L4 handle)
+  if fail: fallback to L3 TensorPool/inline response
+
+L4 receives DispatchResp.output_tensors
+  if ACK belongs to local output handle: skip PullTensor
+  otherwise: read inline or PullTensor and memmove into local output buffer
+```
+
+当前 RXE local output fast path 覆盖 `OUTPUT` 和 `OUTPUT_EXISTING`。`INOUT` 仍走 input staging，因为它需要先把初始值送到 L3，再把修改后的值带回 L4；双向 RXE fast path 还没有完成。
+
+## HCOMM Boundary
+
+PR #711 也加入了 HCOMM adapter，但它是 optional / partial。`hcomm_abi_shim.cc`、`HcommRuntime`、`HcommTensorTransport` 和 `HcommDataPlaneClient` 都在 `simpler` 侧，不修改 `3rd/hcomm`。它尝试加载 `libhcomm.so`、预加载 CANN/HCOMM sidecar libraries、注册/导出 memory、创建 endpoint/channel，并通过 `write_with_notify` 写远端 memory。
+
+本页对 HCOMM 的状态判断是：有 adapter 入口和 smoke tests，但主实机 data-plane 验证仍以 RXE/ibverbs MVP 为主。不要把这段代码读成完整 HCOMM CPU RoCE production channel，也不要把它和 UBL128 SO / UB Urma target 混为一谈。
+
+## Tests And Proof Boundary
+
+PR #711 的测试覆盖比 2026-05-07 的 gRPC-only snapshot 更宽。按证明对象分成几组：
+
+```text
+unit/control
+  test_catalog.py
+  test_heartbeat.py
+  test_rpc_roundtrip.py
+
+remote dispatch semantics
+  test_l4_l3_remote.py
+    scalar remote dispatch
+    inline tensor input
+    large handle tensor input
+    inline and handle output writeback
+    INOUT response writeback
+    L3 sub-worker output writeback
+
+TensorPool and serialization
+  test_tensor_pool.py
+    alloc/free/refresh
+    inline vs handle refs
+    service PullTensor/PushTensor
+    output ref encoding
+
+transport metadata
+  test_transport_backend.py
+    RXE binary descriptor v2 roundtrip
+    legacy JSON descriptor compatibility
+    HCOMM runtime/import smoke where available
+
+real-machine smoke
+  test_real_e2e_smoke.py
+    real L4/L3 TensorPool handle E2E
+    RXE ibverbs smoke
+    L4/L3 RXE tensor transport E2E
+
+tools
+  tools/test_rxe_data_plane.sh
+  tools/benchmark_rxe_data_plane.py
+```
+
+这些测试能证明 PR branch 上已经有 host-memory remote tensor prototype、RXE write path 和 output writeback shape。它们还不能证明 production serving：没有外部 serving frontend、prefill/decode scheduler、KV Meta Server、SSU LBA allocation、NPU HBM KV lifecycle、SO uRPC hot path、multi-node RoCE soak 或 high-concurrency scheduler validation。
+
+## Serving Boundary
+
+PR #711 的 L4/L3 名字容易和 UBL128 serving design 混淆。这里要严格区分：
+
+```text
+PR #711 L4
+  simpler runtime level-4 worker
+  owns orchestration and remote next-level dispatch
+  not an HTTP/gRPC serving frontend
+
+PR #711 L3
+  L3Daemon + backend Worker(level=3)
+  runs serialized callable and TaskArgs
+  not prefill/decode service role by itself
+
+UBL128 serving F/M/PC/PN/DC/DN/S
+  target serving architecture
+  includes frontend, KV meta, prefill/decode hosts and NPUs, SSU storage
+  not implemented by PR #711
+```
+
+因此可以把 PR #711 看成 serving target 的 runtime foundation：它提供 “runtime 能否把 callable 和 tensor refs 发到远端执行” 的原型。它不提供完整 serving stack，也不实现 UBL128 的 prefix cache、KV store、SU/SO/DCN traffic isolation 或 uRPC over UB Urma production path。更大的路线见 [Runtime Dispatch and Serving Roadmap](./runtime-dispatch-and-serving-roadmap.md)。
 
 ## What To Remember
 
-读 PR #711 时记住这六个判断：
+读完本页要记住五点。
 
-1. `.proto` 是合同：它定义远端 service 和 request/response shape。
-2. `dispatch_pb2.py` 是 message classes；`dispatch_pb2_grpc.py` 是 client/server glue。
-3. `RemoteWorkerProxy` 是 L4 client；`L3Daemon` 是 remote L3 server。
-4. `_remote_worker_loop` 是 compatibility shim：它让 C++ scheduler 继续看到 PROCESS mailbox。
-5. `Catalog` 是为了替代 fork-COW callable registry；remote host 不能用本地 Python function pointer。
-6. `TensorPool` 只是当前 data-plane 表面；完整 tensor movement 仍是 future work。
+第一，PR #711 当前核心是 L4 -> remote L3 control plane 加 host-memory tensor data-plane prototype。gRPC 负责 control plane；TensorPool handle 负责把大 tensor 从 protobuf message 里拿出来。
 
-## Current Boundaries
+第二，跨 host 不能传 raw local pointer。旧 `ContinuousTensorRef.data` 只适合同进程/兼容语义；跨 host 应该用 `TensorRef(handle)`、catalog callable id 和 transport metadata。
 
-- `emerging`: gRPC/protobuf control plane、remote scalar `TaskArgs` dispatch、callable catalog push/install、heartbeat、remote traceback propagation。
-- `design-intended`: tensor refs、tensor pool streaming、future tensor materialization/output write-back、RDMA/Urma data-plane integration。
-- `blocked/open question`: raw local VA crossing host boundary, production security/TLS/auth, node discovery, load balancing, C++ hot-path remote worker, backend crash recovery.
+第三，RXE 是真实 ibverbs data-plane MVP，但还是 Soft-RoCE / one-write helper / smoke-test path。它证明架构可通，不证明 production 性能。
 
-读完本页后，可以回到 [Runtime Dispatch and Serving Roadmap](./runtime-dispatch-and-serving-roadmap.md) 看 PR #711 如何接到 L4/L3 data-plane、A5 zero-copy dispatch 和 UBL128 serving target。
+第四，output result 应该通过 output tensor writeback 或 response tensor 返回，不应该依赖 remote closure 修改 L4-local Python object。
+
+第五，PR #711 仍是 open PR。Wiki 可以用它作为 Future learning material，但进入 implemented pages 需要等 PR merge、固定 merge commit，并重新核对 tests/examples/source shape。
