@@ -35,5 +35,6 @@ current implemented foundation
 
 ## Pages
 
+- [UBL128 V4 Pro Serving Techniques](./ubl128-v4-pro-serving-techniques.md): survey-driven Future page for techniques required by DeepSeek V4 Pro serving on UBL128 HBD, using NVIDIA Dynamo / TensorRT-LLM / Megatron-LM / NIXL / Triton backend as reference systems and mapping lessons back to `simpler` distributed runtime design.
 - [Runtime Dispatch and Serving Roadmap](./runtime-dispatch-and-serving-roadmap.md): HostWorker / DistWorker baseline, ongoing L4 -> remote L3 dispatch, PR #711 host-memory tensor data-plane prototype, production data-plane target, A5 send/receive zero-copy dispatch, UBL128 serving target, and runtime blockers.
 - [PR 711 Remote Dispatch and Data Plane Primer](./pr711-grpc-dispatch-primer.md): intuitive primer for gRPC/protobuf basics, generated stubs, L4 `RemoteWorkerProxy`, local mailbox shim, L3 `L3Daemon`, `TensorPool`, RXE/ibverbs data-plane MVP, HCOMM boundary, output writeback, and PR #711 proof boundaries.
