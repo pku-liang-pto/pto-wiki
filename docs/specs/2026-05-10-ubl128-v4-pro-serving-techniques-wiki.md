@@ -11,8 +11,8 @@ Upgrade PR #8 from a single survey page into a small Future learning package abo
 The package should help a developer understand:
 
 - what the UBL128 V4 Pro serving target requires;
-- what to learn from NVIDIA-targeted large LLM serving stacks;
-- how kernels, collectives, KV transfer, and serving orchestration compose from one device to hundreds of devices;
+- what to learn from hot open LLM serving engines and NVIDIA-targeted large LLM serving stacks;
+- how model-specific kernels, collectives, KV transfer, serving engines, and fleet orchestration compose from one device to hundreds of devices;
 - which ideas should be extracted as reusable lessons for `simpler` distributed runtime design;
 - which parts are verified source survey, UBL128 design intent, or recommendation rather than implemented behavior.
 
@@ -42,7 +42,16 @@ These are the goal and design foundation. `UBL128_serving.md` defines the servin
 
 ### Reference Systems
 
-The PR should survey cloned source and documentation for:
+The PR should survey cloned source and documentation for two classes of reference systems.
+
+Deep-study serving engines:
+
+- `vllm-project/vllm`
+- `sgl-project/sglang`
+
+These are mandatory first-class sources, not optional examples. They must be studied deeply because both expose open DeepSeek V4 / DeepSeek-V4-Pro-facing code paths, runtime flags, model-specific kernels, tokenizer/parser integration, KV-cache handling, and distributed serving/disaggregation mechanisms. The wiki should explain their internal abstractions and execution flows, not only extract a small transferable checklist.
+
+NVIDIA / NVIDIA-targeted serving stack and data-plane sources:
 
 - `ai-dynamo/dynamo`
 - `NVIDIA/TensorRT-LLM`
@@ -50,9 +59,46 @@ The PR should survey cloned source and documentation for:
 - `ai-dynamo/nixl`
 - `triton-inference-server/tensorrtllm_backend`
 
+Additional focused dependencies may be inspected when they are needed to explain the above systems, especially DeepEP, FlashInfer, DeepGEMM, Mooncake, UCX, NCCL, CUDA Graph, or Ascend/HCCL analogues. These should be cited as supporting evidence unless the final page relies on them for a central explanation.
+
 The survey should prefer source files, official repository docs, examples, deployment recipes, and implementation-facing design docs over external articles. Internet lookup may be used for current or missing concepts, but the wiki must cite exact source snapshots in the evidence ledger when the claim is about a repository.
 
 ### What To Learn From Each Source
+
+#### vLLM
+
+Learn:
+
+- DeepSeek V4 / DeepSeek-V4-Pro model registration and architecture-specific execution paths;
+- DeepSeek V4 MLA / attention / compressor kernels and how they connect to the engine iteration;
+- MegaMoE / expert-parallel-related execution, quantization, FP4/FP8, and backend selection;
+- tokenizer, reasoning parser, tool-call parser, and model-serving surface integration;
+- continuous batching, paged KV cache, prefix cache, chunked prefill, speculative decoding, and scheduler interaction;
+- disaggregated prefill/decode and `NixlConnector` / `KVTransferConfig` behavior;
+- Ascend-facing DeepSeek-V4-Pro deployment documentation when it explains HCCL, TP/DP/EP, and PD separation.
+
+Extract:
+
+- source-shaped explanation of how a serving engine maps a request into model-specific kernels and KV-cache state;
+- a comparison point for UBL128's `F/M/PC/PN/DC/DN/S` roles;
+- lessons for what `simpler` should expose as runtime primitives versus what a higher serving engine owns.
+
+#### SGLang
+
+Learn:
+
+- DeepSeek V4 config, runtime hooks, JIT kernels, memory pool, tokenizer/parser, and `dsv4` state handling;
+- RadixAttention, HiRadixTree, HiCache, prefix cache, paged attention, chunked prefill, and cache-aware scheduling;
+- prefill/decode disaggregation over Mooncake, NIXL, and Ascend transfer backends;
+- expert parallelism, DeepEP, Mooncake/NIXL-EP, data-parallel attention, SMG, and all-to-all token routing;
+- speculative decoding / MTP support and serving-facing runtime flags;
+- source-level boundaries between scheduler, router, model runner, memory pool, transfer connector, and kernel layer.
+
+Extract:
+
+- a concrete serving-engine mental model for request scheduling, KV ownership, and transfer;
+- examples of how DeepSeek-family model features force engine-specific runtime hooks;
+- lessons for UBL128 cache hierarchy, routing, and transfer-domain design.
 
 #### Dynamo
 
@@ -63,6 +109,7 @@ Learn:
 - KV-aware routing and KVBM;
 - planner / placement / scaling concepts;
 - DeepSeek-V4-Pro and gpt-oss recipe shapes;
+- how Dynamo composes with vLLM and SGLang rather than replacing their engine internals;
 - how deployment recipes encode topology, model size, parallelism, and data-plane assumptions.
 
 Extract:
@@ -176,16 +223,17 @@ Acceptance:
 - The page keeps Chinese narrative and English identifiers.
 - The page clearly labels target claims as `design-intended`.
 
-### `wiki/future/nvidia-llm-serving-stack-map.md`
+### `wiki/future/llm-serving-stack-map.md`
 
 Role: explain the reference systems and what each contributes to the survey.
 
 Required content:
 
-- Dynamo, TensorRT-LLM, Megatron-LM, NIXL, Triton TensorRT-LLM backend;
+- vLLM, SGLang, Dynamo, TensorRT-LLM, Megatron-LM, NIXL, Triton TensorRT-LLM backend;
 - a layered stack diagram;
 - what to learn and what not to copy from each;
 - DeepSeek-V4-Pro and gpt-oss recipe relevance;
+- why vLLM and SGLang are studied as engine internals, while Dynamo/Triton are studied as orchestration/deployment layers;
 - evidence links to the source inventory.
 
 Acceptance:
@@ -193,6 +241,29 @@ Acceptance:
 - The page is not a list of links.
 - It teaches why these systems are relevant to UBL128.
 - It avoids implying CUDA/NCCL/NVLink compatibility with UBL128.
+- It avoids implying that NVIDIA-owned frameworks are the only useful references.
+
+### `wiki/future/serving-engine-internals.md`
+
+Role: explain what a modern LLM serving engine owns below the HTTP/OpenAI API surface and above individual kernels.
+
+Required content:
+
+- request lifecycle from API request to scheduler, batch, model runner, KV allocation, kernel sequence, streaming output, cancellation, and cleanup;
+- vLLM and SGLang as primary source-shaped examples;
+- model-specific integration points for DeepSeek V4 Pro:
+  - architecture registration/config;
+  - tokenizer and chat template / reasoning / tool-call parser;
+  - custom attention, KV compressor/indexer, MoE, quantization, and speculative decoding hooks;
+  - engine flags that select backend behavior;
+- boundaries between engine, transfer backend, collective backend, and fleet orchestrator;
+- why `simpler` should learn the abstractions without copying either engine whole.
+
+Acceptance:
+
+- A reader can explain why "serving framework" is not just a web server around `model.forward`.
+- The page includes at least one source-shaped request/engine iteration pseudocode block.
+- The page cites exact vLLM and SGLang commits and source paths in the evidence ledger.
 
 ### `wiki/future/kernel-and-parallel-orchestration.md`
 
@@ -202,9 +273,11 @@ Required content:
 
 - single-rank kernel sequence for decode/prefill;
 - stream/event/graph capture intuition where relevant;
-- TP, PP, DP, EP, CP and Wide-EP as runtime group patterns;
+- TP, PP, DP, EP, CP, data-parallel attention, and Wide-EP as runtime group patterns;
 - MoE router -> token dispatch -> local expert compute -> combine flow;
 - all-reduce, all-gather, reduce-scatter, P2P, all-to-all as synchronization patterns;
+- how vLLM/SGLang expose or hide model-specific kernel orchestration behind engine abstractions;
+- where TensorRT-LLM/Megatron-LM make process groups and collectives explicit;
 - UBL128 mapping: which traffic wants SU and which traffic must not pollute SU;
 - source-shaped pseudocode for an engine iteration and MoE dispatch metadata.
 
@@ -224,6 +297,8 @@ Required content:
 - KV block/page/chunk mental model;
 - prefix reuse and metadata;
 - TensorRT-LLM KV cache and disaggregated serving lessons;
+- vLLM `KVTransferConfig` / NIXL connector lessons;
+- SGLang PD disaggregation, HiCache, HiRadixTree, Mooncake, NIXL, and Ascend backend lessons;
 - Dynamo/KVBM/NIXL lessons;
 - UBL128 KV Meta / `ChunkRecord` / SSU LBA / SO Urma mapping;
 - handoff metadata fields and lifecycle:
@@ -310,12 +385,13 @@ The sidebar should show the Future package in a readable order:
 1. Future index
 2. UBL128 V4 Pro Serving Techniques
 3. UBL128 Serving Target
-4. NVIDIA LLM Serving Stack Map
-5. Kernel and Parallel Orchestration
-6. KV Prefill/Decode Handoff
-7. Simpler Runtime Lessons for UBL128 Serving
-8. PR 711 Dispatch/Data Plane
-9. Runtime Dispatch and Serving Roadmap
+4. LLM Serving Stack Map
+5. Serving Engine Internals
+6. Kernel and Parallel Orchestration
+7. KV Prefill/Decode Handoff
+8. Simpler Runtime Lessons for UBL128 Serving
+9. PR 711 Dispatch/Data Plane
+10. Runtime Dispatch and Serving Roadmap
 
 ## Writing Requirements
 
@@ -337,7 +413,7 @@ All new Future pages must follow the wiki standalone learning standard:
 ## Non-Goals
 
 - Do not move these pages to `wiki/topics/` or `wiki/concepts/` in this PR.
-- Do not document all of TensorRT-LLM, Dynamo, Megatron-LM, NIXL, or Triton backend exhaustively.
+- Do not document all of vLLM, SGLang, TensorRT-LLM, Dynamo, Megatron-LM, NIXL, or Triton backend exhaustively.
 - Do not claim UBL128 runs CUDA/NCCL/NVLink or NVIDIA frameworks.
 - Do not implement runtime code.
 - Do not turn evidence pages into tutorials.
@@ -364,4 +440,4 @@ Manual review:
 
 - Whether `wiki/future/ubl128-serving-target.md` should cite `UBL128_serving.md` as the single source of truth or duplicate enough topology detail to fully stand alone.
 - Whether `simpler-runtime-lessons-for-ubl128-serving.md` should remain a learning page or become a later implementation design spec.
-- Whether more source repositories should be surveyed before implementation, such as vLLM, SGLang, DeepEP, FlashInfer, or DeepGEMM. They are intentionally out of the first package unless review says they are necessary.
+- Whether DeepEP, FlashInfer, DeepGEMM, Mooncake, UCX, NCCL, CUDA Graph, or Ascend/HCCL documents should become separate deep-study pages or remain supporting subsections under the vLLM/SGLang/NIXL mechanism pages.
