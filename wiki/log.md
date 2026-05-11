@@ -127,3 +127,7 @@ Added reusable workflow and skill coverage for updating the wiki from document f
 ## [2026-05-08] material-update | Publish top-level runtime and serving designs
 
 按用户要求，将 upstream `simpler_distributed_runtime_design.md` 和 `UBL128_serving.md` 同时加入 `materials/` 与 [Materials](./materials/) 根目录，并在 Materials sidebar 中公开。同步增强 [Runtime Dispatch and Serving Roadmap](./future/runtime-dispatch-and-serving-roadmap.md)：补充 HostWorker / DistWorker baseline、fork+shared-memory mailbox、recursive `IWorker.run(payload)` 模型、UBL128 HBD/PC16/SU/SO/DCN topology、KV Meta/SSU/LBA model、F/M/PC/PN/DC/DN/S serving roles 和 Future status boundary；对应 checksum、upstream commit/blob 和 public-copy link rewrite 记录在 [Future Runtime Dispatch and Serving Roadmap Evidence](./evidence/future-runtime-dispatch-and-serving-roadmap.md)。
+
+## [2026-05-10] future-update | Survey NVIDIA LLM serving techniques for UBL128 V4 Pro
+
+新增 [UBL128 V4 Pro Serving Techniques](./future/ubl128-v4-pro-serving-techniques.md)，以 [UBL128 Serving Design](./materials/UBL128_serving.md) 为目标，survey Dynamo、TensorRT-LLM、Megatron-LM、NIXL 和 Triton TensorRT-LLM backend 的 source/documentation snapshots，解释 single-rank kernels、TP/PP/EP/DP/CP groups、disaggregated prefill/decode、KV transfer、serving orchestration 和 endpoint/runtime boundary 对 `simpler` distributed runtime 的设计启发。同步新增 [UBL128 V4 Pro Serving Techniques Evidence](./evidence/future-ubl128-v4-pro-serving-techniques.md)，记录 repository commits、local material checksums、claim map、negative findings 和 status-change criteria。
