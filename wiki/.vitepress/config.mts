@@ -40,6 +40,7 @@ export default defineConfig({
           { text: 'Examples Feature Map', link: '/topics/examples-feature-map' },
           { text: 'simpler Runtime Architecture', link: '/topics/simpler-runtime-architecture' },
           { text: 'Distributed Execution', link: '/topics/distributed-execution' },
+          { text: 'NVIDIA Distributed Communication', link: '/topics/nvidia-distributed-communication' },
           { text: 'Lingqu Level Map', link: '/topics/lingqu-level-map' },
           { text: 'Developer Takeover Guide', link: '/topics/developer-takeover-guide' }
         ]
@@ -115,6 +116,7 @@ export default defineConfig({
           { text: 'Examples Feature Map', link: '/topics/examples-feature-map' },
           { text: 'simpler Runtime Architecture', link: '/topics/simpler-runtime-architecture' },
           { text: 'Distributed Execution', link: '/topics/distributed-execution' },
+          { text: 'NVIDIA Distributed Communication', link: '/topics/nvidia-distributed-communication' },
           { text: 'Lingqu Level Map', link: '/topics/lingqu-level-map' },
           { text: 'Developer Takeover Guide', link: '/topics/developer-takeover-guide' }
         ]

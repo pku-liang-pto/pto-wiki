@@ -3,7 +3,7 @@ title: "Evidence"
 type: index
 status: draft
 sources: []
-last_updated: 2026-05-08
+last_updated: 2026-05-19
 ---
 
 # Evidence
@@ -31,6 +31,7 @@ These labels describe the status of target-set claims across topic pages, reposi
 
 - [QA Evidence](./qa/): raw QA histories for wiki-first answers, fresh research trails, open questions, and promotion status. It is audit material, not a primary public learning section.
 - [Distributed Execution Evidence](./distributed-execution.md): evidence for the distributed execution synthesis, material routing, GitHub status labels, and negative findings.
+- [NVIDIA Distributed Communication Evidence](./nvidia-distributed-communication.md): official NVIDIA documentation trail for multi-node, multi-GPU communication concepts used by the platform overview.
 - [Examples Feature Map Evidence](./examples-feature-map.md): evidence for the public Examples area, representative example ordering, and feature/status matrix.
 - [Lingqu Level Map Evidence](./lingqu-level-map.md): evidence for Lingqu/PyPTO/runtime level alignment and implementation status labels.
 - [Non-Distributed Execution Evidence](./non-distributed-execution.md): evidence for the normal PyPTO -> PTO-ISA -> simpler L2 execution path.

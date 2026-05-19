@@ -12,6 +12,10 @@ Operations include `lookup-update`, `repo-profile`, `topic-synthesis`, `dependen
 
 ---
 
+## [2026-05-19] topic-synthesis | NVIDIA distributed communication overview
+
+新增 [NVIDIA Distributed Communication](./topics/nvidia-distributed-communication.md) 和 [NVIDIA Distributed Communication Evidence](./evidence/nvidia-distributed-communication.md)，基于 NVIDIA 官方 CUDA、NCCL、GPUDirect RDMA、NVSHMEM、Multi-Node NVLink/IMEX、UCX 和 NVLink Domain 文档，整理 NVIDIA 多机多卡通信方式，并把它定位为 PTO-CANN distributed runtime 的外部平台对照背景。
+
 ## [2026-05-03] policy-update | Add wiki organization and health rules
 
 Added reusable organization rules based on the plain-Markdown wiki maintenance pattern from [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent), while intentionally excluding graph-data requirements.
